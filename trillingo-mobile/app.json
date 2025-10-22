@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Trillingo",
+    "slug": "trillingo-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#E8F5E8"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E8F5E8"
+      }
+    },
+    "plugins": []
+  }
+}

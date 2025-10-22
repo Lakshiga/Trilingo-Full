@@ -1,0 +1,138 @@
+<div class="admin-layout">
+  <!-- Top Navigation Bar -->
+  <header class="top-navbar">
+    <div class="navbar-content">
+      <div class="navbar-left">
+        <h1 class="admin-title">Tamil App Admin</h1>
+      </div>
+      <div class="navbar-right">
+        <div class="profile-dropdown" (click)="toggleProfileDropdown()">
+          <div class="profile-icon">
+            <span class="user-avatar">👤</span>
+            <span class="user-name">Admin</span>
+            <span class="dropdown-arrow">▼</span>
+          </div>
+          <div class="dropdown-menu" [class.show]="showProfileDropdown">
+            <a href="#" class="dropdown-item" (click)="updateProfile()">
+              <span class="dropdown-icon">⚙️</span>
+              Update Profile
+            </a>
+            <a href="#" class="dropdown-item" (click)="logout()">
+              <span class="dropdown-icon">🚪</span>
+              Logout
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="content-wrapper">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>Navigation</h2>
+      </div>
+      <ul class="nav-menu">
+        <li><a routerLink="/dashboard" routerLinkActive="active">📊 Dashboard</a></li>
+        <li><a routerLink="/main-activities" routerLinkActive="active">🎯 Main Activities</a></li>
+        <li><a routerLink="/activity-types" routerLinkActive="active">🏷️ Activity Types</a></li>
+        <li><a routerLink="/games" routerLinkActive="active">🎮 Games</a></li>
+        <li><a routerLink="/levels" routerLinkActive="active">📚 Levels</a></li>
+      </ul>
+      
+      <!-- Language Management Section -->
+      <!-- Only show on Activities-related routes (when adding/editing/previewing activities) -->
+      <ng-container *ngIf="router.url.startsWith('/activities') || router.url.startsWith('/activity-edit')">
+        <div class="language-section-separator"></div>
+        <app-sidebar-language-manager></app-sidebar-language-manager>
+      </ng-container>
+    </nav>
+    
+    <main class="main-content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+
+<style>
+  .admin-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+  }
+
+  .sidebar {
+    width: 250px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  }
+
+  .sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .sidebar-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .nav-menu li {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .nav-menu a {
+    display: block;
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+
+  .nav-menu a:hover {
+    background-color: rgba(255,255,255,0.1);
+    padding-left: 25px;
+  }
+
+  .nav-menu a.active {
+    background-color: rgba(255,255,255,0.2);
+    border-right: 3px solid #fff;
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #f5f5f5;
+  }
+
+  @media (max-width: 768px) {
+    .admin-layout {
+      flex-direction: column;
+    }
+    
+    .sidebar {
+      width: 100%;
+      height: auto;
+    }
+    
+    .nav-menu {
+      display: flex;
+      overflow-x: auto;
+    }
+    
+    .nav-menu li {
+      border-bottom: none;
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+  }
+</style>

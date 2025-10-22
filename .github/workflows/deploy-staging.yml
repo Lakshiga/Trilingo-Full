@@ -1,0 +1,45 @@
+name: Deploy Admin App to S3 and CloudFront
+
+on:
+  push:
+    branches:
+      - staging # Trigger on push to the 'staging' branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Use a current LTS version
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build React App
+        # This creates the optimized production build in the 'build' folder
+        run: npm run build
+        env:
+          # Set the production API URL for the build
+          REACT_APP_API_BASE_URL: https://api-icedt.test123unicomtic.work/api
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1 # Your AWS region
+
+      - name: Deploy to S3
+        # The sync command is powerful: it uploads new/changed files and deletes old ones.
+        run: aws s3 sync ./build s3://icedt-tamilapp-admin-staging --delete
+        # Replace with your bucket name
+
+      - name: Invalidate CloudFront Cache
+        # This step is CRUCIAL. It tells CloudFront to fetch the new files from S3 immediately.
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
