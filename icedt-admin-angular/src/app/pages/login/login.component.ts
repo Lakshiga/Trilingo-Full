@@ -33,10 +33,10 @@ import { LoginRequest } from '../../types/auth.types';
           
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Username</mat-label>
+              <mat-label>Username or Email</mat-label>
               <input 
                 matInput 
-                formControlName="username"
+                formControlName="identifier"
                 type="text"
                 autocomplete="username"
                 required>
@@ -128,8 +128,8 @@ export class LoginPageComponent {
     private snackBar: MatSnackBar
   ) {
     this.loginForm = this.fb.group({
-      username: ['admin', [Validators.required]],
-      password: ['admin123', [Validators.required]]
+      identifier: ['admin', [Validators.required]],
+      password: ['Admin123!', [Validators.required]]
     });
   }
 
@@ -142,7 +142,7 @@ export class LoginPageComponent {
     this.error = null;
 
     const loginRequest: LoginRequest = {
-      username: this.loginForm.value.username,
+      identifier: this.loginForm.value.identifier,
       password: this.loginForm.value.password
     };
 

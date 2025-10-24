@@ -31,13 +31,13 @@ export type ActivityUpdateDto = ActivityCreateDto;
   providedIn: 'root'
 })
 export class ActivityApiService {
-  private readonly endpoint = '/multilingual/activities';
+  private readonly endpoint = '/Activities';
 
   constructor(private httpClient: HttpClientService) {}
 
   // GET all activities for a specific lesson
   getActivitiesByLessonId(lessonId: number | string): Observable<MultilingualActivity[]> {
-    return this.httpClient.get<MultilingualActivity[]>(`/multilingual/lessons/${lessonId}/activities`);
+    return this.httpClient.get<MultilingualActivity[]>(`/lessons/${lessonId}/activities`);
   }
 
   // GET a single activity by its own ID

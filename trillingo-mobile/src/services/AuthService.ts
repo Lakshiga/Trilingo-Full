@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { User, LanguageCode } from '../types/navigation';
 
-const API_BASE_URL = 'http://localhost:5069/api'; // Update with your backend URL
+const API_BASE_URL = 'http://localhost:5166/api'; // Updated to use correct backend port
 
 interface LoginRequest {
   username: string;
@@ -59,10 +59,9 @@ class AuthServiceClass {
         password,
       });
 
-      if (response.data.result) {
-        this.token = response.data.result.token;
-        // await AsyncStorage.setItem('authToken', this.token);
-        return response.data.result;
+      if (response.data) {
+        this.token = response.data.token;
+        return response.data;
       }
       throw new Error('Login failed');
     } catch (error) {
@@ -75,10 +74,9 @@ class AuthServiceClass {
     try {
       const response = await axios.post(`${API_BASE_URL}/auth/register`, userData);
 
-      if (response.data.result) {
-        this.token = response.data.result.token;
-        // await AsyncStorage.setItem('authToken', this.token);
-        return response.data.result;
+      if (response.data) {
+        this.token = response.data.token;
+        return response.data;
       }
       throw new Error('Registration failed');
     } catch (error) {

@@ -27,7 +27,7 @@ export interface LevelCreateDto {
   providedIn: 'root'
 })
 export class LevelApiService {
-  private readonly endpoint = '/multilingual/levels';
+  private readonly endpoint = '/Levels';
 
   constructor(private httpClient: HttpClientService) {}
 

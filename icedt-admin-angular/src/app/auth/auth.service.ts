@@ -16,11 +16,11 @@ export class AuthService {
 
   constructor(private authApi: AuthApiService) {}
 
-  async login(username: string, password: string): Promise<AuthResponse> {
+  async login(identifier: string, password: string): Promise<AuthResponse> {
     this.isLoadingSubject.next(true);
     
     try {
-      const credentials: LoginRequest = { username, password };
+      const credentials: LoginRequest = { identifier, password };
       const response = await firstValueFrom(this.authApi.login(credentials));
       
       if (response.isSuccess && response.token) {

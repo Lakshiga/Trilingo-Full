@@ -4,7 +4,7 @@ import { HttpClientService } from './http-client.service';
 import { Router } from '@angular/router';
 
 export interface LoginRequest {
-  username: string;
+  identifier: string;
   password: string;
 }
 
@@ -40,8 +40,6 @@ export class AuthService {
     private router: Router
   ) {
     this.loadUserFromStorage();
-    // Auto-login as admin for development
-    this.autoLoginAsAdmin();
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
@@ -113,20 +111,4 @@ export class AuthService {
     throw new Error('No authenticated user found');
   }
 
-  private autoLoginAsAdmin(): void {
-    // Auto-login as admin for development purposes
-    if (!this.isAuthenticated()) {
-      const mockAdminUser = {
-        userId: 1,
-        username: 'admin',
-        email: 'admin@trillingo.com',
-        role: 'admin',
-        nativeLanguage: 'en',
-        targetLanguage: 'ta',
-        currentLearningLanguage: 'ta'
-      };
-      
-      this.setAuthData('mock-admin-token', mockAdminUser);
-    }
-  }
 }

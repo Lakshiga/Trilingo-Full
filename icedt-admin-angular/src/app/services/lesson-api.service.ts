@@ -26,13 +26,13 @@ export interface LessonCreateDto {
   providedIn: 'root'
 })
 export class LessonApiService {
-  private readonly endpoint = '/multilingual/lessons';
+  private readonly endpoint = '/lessons';
 
   constructor(private httpClient: HttpClientService) {}
 
   // GET lessons for a specific level
   getLessonsByLevelId(levelId: number | string): Observable<MultilingualLesson[]> {
-    return this.httpClient.get<MultilingualLesson[]>(`/multilingual/levels/${levelId}/lessons`);
+    return this.httpClient.get<MultilingualLesson[]>(`/levels/${levelId}/lessons`);
   }
 
   // POST a new lesson

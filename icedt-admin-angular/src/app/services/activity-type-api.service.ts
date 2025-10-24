@@ -21,7 +21,7 @@ export interface MultilingualActivityType {
   providedIn: 'root'
 })
 export class ActivityTypeApiService {
-  private readonly endpoint = '/multilingual/activitytypes';
+  private readonly endpoint = '/ActivityTypes';
 
   constructor(private httpClient: HttpClientService) {}
 
