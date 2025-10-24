@@ -7,7 +7,7 @@ using TES_Learning_App.Application_Layer.Interfaces.IServices;
 
 namespace TES_Learning_App.API.Controllers
 {
-    [Authorize(Roles = "Admin")] // This entire controller is secure and for Admins only
+    [Authorize(Roles = "Admin,Parent")] // This entire controller is secure and for Admins only
     public class LevelsController : BaseApiController
     {
         private readonly ILevelService _levelService;

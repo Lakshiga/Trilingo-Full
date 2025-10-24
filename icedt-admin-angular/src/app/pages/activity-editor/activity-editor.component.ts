@@ -11,11 +11,10 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { ActivityFormComponent } from '../../components/activities/activity-form.component';
 import { DevicePreviewComponent } from '../../components/activities/device-preview.component';
 import { ExerciseEditorComponent } from '../../components/activities/exercise-editor.component';
-import { LanguageSelectorComponent } from '../../components/common/language-selector.component';
 import { MultilingualActivityTemplates } from '../../services/multilingual-activity-templates.service';
 import { ActivityApiService, MultilingualActivity } from '../../services/activity-api.service';
-import { MainActivityApiService } from '../../services/main-activity-api.service';
-import { ActivityTypeApiService } from '../../services/activity-type-api.service';
+import { MainActivityApiService, MainActivityResponse } from '../../services/main-activity-api.service';
+import { ActivityTypeApiService, ActivityTypeResponse } from '../../services/activity-type-api.service';
 import { Activity } from '../../types/activity.types';
 import { MainActivity } from '../../types/main-activity.types';
 import { ActivityType } from '../../types/activity-type.types';
@@ -45,7 +44,6 @@ interface ActivityCreateDto {
     ActivityFormComponent,
     DevicePreviewComponent,
     ExerciseEditorComponent,
-    LanguageSelectorComponent
   ],
   template: `
     <div class="activity-editor-page">
@@ -371,8 +369,18 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
         activityPromise
       ]);
 
-      this.mainActivities = mainActs || [];
-      this.activityTypes = actTypes || [];
+      this.mainActivities = (mainActs || []).map(ma => ({
+        id: ma.id,
+        name: ma.name_en || ma.name_ta || ma.name_si || '',
+        title: { ta: ma.name_ta, en: ma.name_en, si: ma.name_si },
+        description: undefined
+      }));
+      this.activityTypes = (actTypes || []).map(at => ({
+        activityTypeId: at.id,
+        activityName: at.name_en || at.name_ta || at.name_si || '',
+        title: { ta: at.name_ta, en: at.name_en, si: at.name_si },
+        description: undefined
+      }));
 
       let exercises: any[] = [];
       try {

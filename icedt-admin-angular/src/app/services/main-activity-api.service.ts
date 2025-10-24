@@ -2,19 +2,19 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClientService } from './http-client.service';
 import { MainActivity } from '../types/main-activity.types';
-import { MultilingualText } from '../types/multilingual.types';
 
-export interface MultilingualMainActivity {
+// Backend-compatible interfaces
+export interface MainActivityResponse {
   id: number;
-  name: string;
-  title?: MultilingualText;
-  description?: MultilingualText;
+  name_en: string;
+  name_ta: string;
+  name_si: string;
 }
 
 export interface MainActivityCreateDto {
-  name: string;
-  title?: MultilingualText;
-  description?: MultilingualText;
+  name_en: string;
+  name_ta: string;
+  name_si: string;
 }
 
 @Injectable({
@@ -26,18 +26,18 @@ export class MainActivityApiService {
   constructor(private httpClient: HttpClientService) {}
 
   // GET all main activities
-  getAll(): Observable<MultilingualMainActivity[]> {
-    return this.httpClient.get<MultilingualMainActivity[]>(this.endpoint);
+  getAll(): Observable<MainActivityResponse[]> {
+    return this.httpClient.get<MainActivityResponse[]>(this.endpoint);
   }
 
   // POST a new main activity
-  create(newItem: MainActivityCreateDto): Observable<MultilingualMainActivity> {
-    return this.httpClient.post<MultilingualMainActivity, MainActivityCreateDto>(this.endpoint, newItem);
+  create(newItem: MainActivityCreateDto): Observable<MainActivityResponse> {
+    return this.httpClient.post<MainActivityResponse, MainActivityCreateDto>(this.endpoint, newItem);
   }
 
   // PUT (update) an existing main activity
-  update(id: number | string, itemToUpdate: Partial<MainActivityCreateDto>): Observable<MultilingualMainActivity> {
-    return this.httpClient.put<MultilingualMainActivity, Partial<MainActivityCreateDto>>(`${this.endpoint}/${id}`, itemToUpdate);
+  update(id: number | string, itemToUpdate: Partial<MainActivityCreateDto>): Observable<MainActivityResponse> {
+    return this.httpClient.put<MainActivityResponse, Partial<MainActivityCreateDto>>(`${this.endpoint}/${id}`, itemToUpdate);
   }
 
   // DELETE a main activity

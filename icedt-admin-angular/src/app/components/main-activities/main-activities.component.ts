@@ -10,11 +10,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MainActivityApiService, MainActivityCreateDto, MultilingualMainActivity } from '../../services/main-activity-api.service';
-import { MainActivity } from '../../types/main-activity.types';
-import { MultilingualText } from '../../types/multilingual.types';
+import { MainActivityApiService, MainActivityCreateDto, MainActivityResponse } from '../../services/main-activity-api.service';
 import { LanguageService } from '../../services/language.service';
-import { MultilingualInputComponent } from '../common/multilingual-input.component';
+import { MultilingualFormComponent, MultilingualFormData } from '../common/multilingual-form.component';
 
 @Component({
   selector: 'app-main-activities',
@@ -31,7 +29,7 @@ import { MultilingualInputComponent } from '../common/multilingual-input.compone
     MatTableModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    MultilingualInputComponent
+    MultilingualFormComponent
   ],
   template: `
     <div class="main-activities-container">
@@ -60,9 +58,19 @@ import { MultilingualInputComponent } from '../common/multilingual-input.compone
               <td mat-cell *matCellDef="let activity">{{ activity.id }}</td>
             </ng-container>
 
-            <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef>Activity Name</th>
-              <td mat-cell *matCellDef="let activity">{{ getDisplayText(activity.title) || activity.name }}</td>
+            <ng-container matColumnDef="name_en">
+              <th mat-header-cell *matHeaderCellDef>English Name</th>
+              <td mat-cell *matCellDef="let activity">{{ activity.name_en }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="name_ta">
+              <th mat-header-cell *matHeaderCellDef>தமிழ் Name</th>
+              <td mat-cell *matCellDef="let activity">{{ activity.name_ta }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="name_si">
+              <th mat-header-cell *matHeaderCellDef>සිංහල Name</th>
+              <td mat-cell *matCellDef="let activity">{{ activity.name_si }}</td>
             </ng-container>
 
             <ng-container matColumnDef="actions">
@@ -98,29 +106,16 @@ import { MultilingualInputComponent } from '../common/multilingual-input.compone
           </button>
         </div>
         
-        <form class="main-activity-form" (ngSubmit)="saveMainActivity()">
-          <app-multilingual-input
-            [value]="currentMainActivity.title || { ta: '', en: '', si: '' }"
-            [label]="'Activity Name'"
-            [required]="true"
-            (valueChange)="onTitleChange($event)">
-          </app-multilingual-input>
-
-          <app-multilingual-input
-            [value]="currentMainActivity.description || { ta: '', en: '', si: '' }"
-            [label]="'Description'"
-            [required]="false"
-            (valueChange)="onDescriptionChange($event)">
-          </app-multilingual-input>
-
-          <div class="form-actions">
-            <button mat-button type="button" (click)="closeDialog()" [disabled]="isSaving">Cancel</button>
-            <button mat-raised-button color="primary" type="submit" [disabled]="isSaving">
-              <mat-spinner *ngIf="isSaving" diameter="20"></mat-spinner>
-              {{ isEditing ? 'Update' : 'Add' }} Main Activity
-            </button>
-          </div>
-        </form>
+        <app-multilingual-form
+          [title]="isEditing ? 'Edit Main Activity' : 'Add New Main Activity'"
+          [fieldLabel]="'Activity Name'"
+          [showDescription]="false"
+          [showActions]="true"
+          [saveButtonText]="isEditing ? 'Update Main Activity' : 'Add Main Activity'"
+          [initialData]="currentMainActivity"
+          (save)="onSave($event)"
+          (cancel)="closeDialog()">
+        </app-multilingual-form>
       </div>
     </div>
   `,
@@ -295,18 +290,18 @@ import { MultilingualInputComponent } from '../common/multilingual-input.compone
   `]
 })
 export class MainActivitiesComponent implements OnInit {
-  mainActivities: MultilingualMainActivity[] = [];
-  displayedColumns: string[] = ['id', 'name', 'actions'];
+  mainActivities: MainActivityResponse[] = [];
+  displayedColumns: string[] = ['id', 'name_en', 'name_ta', 'name_si', 'actions'];
   showDialog = false;
   isEditing = false;
   isLoading = false;
   isSaving = false;
   error: string | null = null;
   
-  currentMainActivity: MainActivityCreateDto = {
-    name: '',
-    title: { ta: '', en: '', si: '' },
-    description: { ta: '', en: '', si: '' }
+  currentMainActivity: MultilingualFormData = {
+    name_en: '',
+    name_ta: '',
+    name_si: ''
   };
 
   constructor(
@@ -334,41 +329,32 @@ export class MainActivitiesComponent implements OnInit {
     }
   }
 
-  getDisplayText(content: MultilingualText | undefined): string {
-    if (!content) return '';
-    return this.languageService.getText(content);
-  }
-
-  onTitleChange(value: MultilingualText) {
-    this.currentMainActivity.title = value;
-  }
-
-  onDescriptionChange(value: MultilingualText) {
-    this.currentMainActivity.description = value;
+  getDisplayText(activity: MainActivityResponse): string {
+    return activity.name_en || activity.name_ta || activity.name_si || '';
   }
 
   openAddMainActivityDialog() {
     this.isEditing = false;
     this.currentMainActivity = {
-      name: '',
-      title: { ta: '', en: '', si: '' },
-      description: { ta: '', en: '', si: '' }
+      name_en: '',
+      name_ta: '',
+      name_si: ''
     };
     this.showDialog = true;
   }
 
-  editMainActivity(activity: MultilingualMainActivity) {
+  editMainActivity(activity: MainActivityResponse) {
     this.isEditing = true;
     this.currentMainActivity = {
-      name: activity.name,
-      title: activity.title || { ta: '', en: '', si: '' },
-      description: activity.description || { ta: '', en: '', si: '' }
+      name_en: activity.name_en,
+      name_ta: activity.name_ta,
+      name_si: activity.name_si
     };
     this.showDialog = true;
   }
 
-  async deleteMainActivity(activity: MultilingualMainActivity) {
-    const activityName = this.getDisplayText(activity.title) || activity.name;
+  async deleteMainActivity(activity: MainActivityResponse) {
+    const activityName = this.getDisplayText(activity);
     if (confirm(`Are you sure you want to delete "${activityName}"?`)) {
       try {
         await this.mainActivityApiService.deleteItem(activity.id).toPromise();
@@ -385,29 +371,39 @@ export class MainActivitiesComponent implements OnInit {
     }
   }
 
-  async saveMainActivity() {
-    if (!this.currentMainActivity.title || !this.getDisplayText(this.currentMainActivity.title)) {
-      this.snackBar.open('Activity name is required', 'Close', { duration: 3000 });
+  async onSave(formData: MultilingualFormData) {
+    if (!formData.name_en && !formData.name_ta && !formData.name_si) {
+      this.snackBar.open('Activity name is required in at least one language', 'Close', { duration: 3000 });
       return;
     }
 
     this.isSaving = true;
     
     try {
+      const createDto: MainActivityCreateDto = {
+        name_en: formData.name_en,
+        name_ta: formData.name_ta,
+        name_si: formData.name_si
+      };
+
       if (this.isEditing) {
         // Find the main activity to update
-        const activityToUpdate = this.mainActivities.find(a => a.name === this.currentMainActivity.name);
+        const activityToUpdate = this.mainActivities.find(a => 
+          a.name_en === this.currentMainActivity.name_en && 
+          a.name_ta === this.currentMainActivity.name_ta && 
+          a.name_si === this.currentMainActivity.name_si
+        );
         if (activityToUpdate) {
-          await this.mainActivityApiService.update(activityToUpdate.id, this.currentMainActivity).toPromise();
+          await this.mainActivityApiService.update(activityToUpdate.id, createDto).toPromise();
           // Update local array
           const index = this.mainActivities.findIndex(a => a.id === activityToUpdate.id);
           if (index !== -1) {
-            this.mainActivities[index] = { ...this.mainActivities[index], ...this.currentMainActivity };
+            this.mainActivities[index] = { ...this.mainActivities[index], ...createDto };
           }
         }
         this.snackBar.open('Main activity updated successfully', 'Close', { duration: 3000 });
       } else {
-        const newMainActivity = await this.mainActivityApiService.create(this.currentMainActivity).toPromise();
+        const newMainActivity = await this.mainActivityApiService.create(createDto).toPromise();
         if (newMainActivity) {
           this.mainActivities.push(newMainActivity);
           this.snackBar.open('Main activity created successfully', 'Close', { duration: 3000 });
@@ -430,9 +426,9 @@ export class MainActivitiesComponent implements OnInit {
     this.showDialog = false;
     this.isEditing = false;
     this.currentMainActivity = {
-      name: '',
-      title: { ta: '', en: '', si: '' },
-      description: { ta: '', en: '', si: '' }
+      name_en: '',
+      name_ta: '',
+      name_si: ''
     };
   }
 }

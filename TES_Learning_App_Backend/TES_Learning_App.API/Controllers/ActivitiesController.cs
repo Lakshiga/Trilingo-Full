@@ -6,7 +6,7 @@ using TES_Learning_App.Application_Layer.Interfaces.IServices;
 
 namespace TES_Learning_App.API.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Parent")]
     public class ActivitiesController : BaseApiController
     {
         private readonly IActivityService _activityService;

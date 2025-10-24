@@ -1,26 +1,21 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClientService } from './http-client.service';
-import { Level } from '../types/level.types';
-import { MultilingualText } from '../types/multilingual.types';
 
-export interface MultilingualLevel {
-  levelId: number;
-  levelName: MultilingualText;
-  description?: MultilingualText;
-  sequenceOrder: number;
-  slug: string;
-  imageUrl?: string;
-  barcode: string;
+// Backend-compatible interfaces
+export interface LevelResponse {
+  id: number;
+  name_en: string;
+  name_ta: string;
+  name_si: string;
+  languageId: number;
 }
 
 export interface LevelCreateDto {
-  levelName: MultilingualText;
-  description?: MultilingualText;
-  sequenceOrder: number;
-  slug: string;
-  coverImageUrl?: string;
-  barcode: string;
+  name_en: string;
+  name_ta: string;
+  name_si: string;
+  languageId: number;
 }
 
 @Injectable({
@@ -31,27 +26,27 @@ export class LevelApiService {
 
   constructor(private httpClient: HttpClientService) {}
 
-  getAll(): Observable<MultilingualLevel[]> {
-    return this.httpClient.get<MultilingualLevel[]>(this.endpoint);
+  getAll(): Observable<LevelResponse[]> {
+    return this.httpClient.get<LevelResponse[]>(this.endpoint);
   }
 
-  create(newItem: LevelCreateDto): Observable<MultilingualLevel> {
-    return this.httpClient.post<MultilingualLevel, LevelCreateDto>(this.endpoint, newItem);
+  create(newItem: LevelCreateDto): Observable<LevelResponse> {
+    return this.httpClient.post<LevelResponse, LevelCreateDto>(this.endpoint, newItem);
   }
 
-  update(id: number, itemToUpdate: Partial<LevelCreateDto>): Observable<void> {
-    return this.httpClient.put(`${this.endpoint}/${id}`, itemToUpdate);
+  update(id: number, itemToUpdate: Partial<LevelCreateDto>): Observable<LevelResponse> {
+    return this.httpClient.put<LevelResponse, Partial<LevelCreateDto>>(`${this.endpoint}/${id}`, itemToUpdate);
   }
 
   deleteItem(id: number): Observable<void> {
     return this.httpClient.delete(`${this.endpoint}/${id}`);
   }
 
-  uploadCoverImage(levelId: number, file: File): Observable<MultilingualLevel> {
+  uploadCoverImage(levelId: number, file: File): Observable<LevelResponse> {
     const formData = new FormData();
     formData.append('file', file);
     
-    return this.httpClient.post<MultilingualLevel, FormData>(
+    return this.httpClient.post<LevelResponse, FormData>(
       `${this.endpoint}/${levelId}/cover-image`, 
       formData
     );
