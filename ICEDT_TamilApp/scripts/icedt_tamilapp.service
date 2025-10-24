@@ -1,0 +1,17 @@
+[Unit]
+Description=ICEDT TamilApp API Service
+After=network.target
+
+[Service]
+WorkingDirectory=/var/www/tamilapp/
+ExecStart=/usr/bin/dotnet /var/www/tamilapp/ICEDT_TamilApp.Web.dll
+Restart=always
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=icedt-tamilapp-api
+User=www-data
+Environment=ASPNETCORE_ENVIRONMENT=Staging
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+
+[Install]
+WantedBy=multi-user.target

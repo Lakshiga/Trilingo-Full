@@ -1,0 +1,71 @@
+@page "/Admin/ActivityEditor"
+@model ICEDT_TamilApp.Web.Pages.Admin.ActivityEditorModel
+@{
+    ViewData["Title"] = "Edit Activity";
+}
+<link rel="stylesheet" href="~/css/admin.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/material-darker.min.css" />
+<style>
+    .CodeMirror {
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+        height: 400px;
+        /* Adjust height as needed */
+    }
+</style>
+
+<div class="admin-container">
+    <h1 class="admin-header mb-3" id="editorHeader">Loading Activity...</h1>
+
+    <div class="row">
+        <!-- Left Side: Details Form -->
+        <div class="col-md-5">
+            <h4 class="mb-3">Activity Details</h4>
+            <form id="activityForm">
+                <input type="hidden" id="activityId" />
+
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" id="title" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="sequenceOrder" class="form-label">Sequence Order</label>
+                    <input type="number" id="sequenceOrder" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="activityType" class="form-label">Activity Type</label>
+                    <select id="activityType" class="form-select" required>
+                        <option value="">Loading types...</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="mainActivity" class="form-label">Main Activity</label>
+                    <select id="mainActivity" class="form-select" required>
+                        <option value="">Loading types...</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right Side: JSON Editor -->
+        <div class="col-md-7">
+            <h4 class="mb-3">Content (JSON)</h4>
+            <textarea id="contentJson"></textarea>
+            <div id="jsonError" class="text-danger mt-2"></div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button id="saveBtn" class="btn btn-success"><i class="fas fa-save"></i> Save Changes</button>
+        <a id="backToListBtn" href="#" class="btn btn-secondary">Cancel</a>
+        <button id="deleteBtn" class="btn btn-danger float-end" style="display: none;"><i class="fas fa-trash"></i>
+            Delete Activity</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
+    <script src="~/js/admin/activityEditor.js"></script>
+}

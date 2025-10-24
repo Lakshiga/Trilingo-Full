@@ -1,0 +1,40 @@
+@page "/Admin/ActivityList"
+@model ICEDT_TamilApp.Web.Pages.Admin.ActivityListModel
+@{
+    ViewData["Title"] = "Activities";
+}
+<link rel="stylesheet" href="~/css/admin.css" />
+
+<div class="admin-container">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="admin-header mb-0" id="dynamicHeader">Activities</h1>
+        <a id="addNewActivityBtn" href="#" class="btn btn-success"><i class="fas fa-plus"></i> Add New Activity</a>
+    </div>
+    <p class="admin-description" id="dynamicDescription">List of activities for the selected lesson.</p>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="activitiesTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Order</th>
+                    <th>Activity Type</th>
+                    <th>Main Activity</th>
+                    <th class="actions-column">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Data will be injected here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <div id="backButtonContainer" class="mt-3">
+        <!-- Back button will be injected here -->
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin/activityList.js"></script>
+}

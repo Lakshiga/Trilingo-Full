@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8133720E-8BAC-4F9F-A0BB-F926A88F4348}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICEDT_TamilApp.Domain", "src\ICEDT_TamilApp.Domain\ICEDT_TamilApp.Domain.csproj", "{204B6FE1-6111-4101-A1CF-0D2541694536}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICEDT_TamilApp.Application", "src\ICEDT_TamilApp.Application\ICEDT_TamilApp.Application.csproj", "{0153F1D3-4631-4FFD-AA2A-3468CF6B2586}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICEDT_TamilApp.Infrastructure", "src\ICEDT_TamilApp.Infrastructure\ICEDT_TamilApp.Infrastructure.csproj", "{3EA83497-193D-4F5C-BC08-5DB8CD49F3B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICEDT_TamilApp.Web", "src\ICEDT_TamilApp.Web\ICEDT_TamilApp.Web.csproj", "{27F97CE3-3B34-4404-A310-ADE0B0AC1476}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{204B6FE1-6111-4101-A1CF-0D2541694536}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{204B6FE1-6111-4101-A1CF-0D2541694536}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{204B6FE1-6111-4101-A1CF-0D2541694536}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{204B6FE1-6111-4101-A1CF-0D2541694536}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0153F1D3-4631-4FFD-AA2A-3468CF6B2586}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0153F1D3-4631-4FFD-AA2A-3468CF6B2586}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0153F1D3-4631-4FFD-AA2A-3468CF6B2586}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0153F1D3-4631-4FFD-AA2A-3468CF6B2586}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EA83497-193D-4F5C-BC08-5DB8CD49F3B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EA83497-193D-4F5C-BC08-5DB8CD49F3B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EA83497-193D-4F5C-BC08-5DB8CD49F3B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EA83497-193D-4F5C-BC08-5DB8CD49F3B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27F97CE3-3B34-4404-A310-ADE0B0AC1476}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27F97CE3-3B34-4404-A310-ADE0B0AC1476}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27F97CE3-3B34-4404-A310-ADE0B0AC1476}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27F97CE3-3B34-4404-A310-ADE0B0AC1476}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{204B6FE1-6111-4101-A1CF-0D2541694536} = {8133720E-8BAC-4F9F-A0BB-F926A88F4348}
+		{0153F1D3-4631-4FFD-AA2A-3468CF6B2586} = {8133720E-8BAC-4F9F-A0BB-F926A88F4348}
+		{3EA83497-193D-4F5C-BC08-5DB8CD49F3B7} = {8133720E-8BAC-4F9F-A0BB-F926A88F4348}
+		{27F97CE3-3B34-4404-A310-ADE0B0AC1476} = {8133720E-8BAC-4F9F-A0BB-F926A88F4348}
+	EndGlobalSection
+EndGlobal

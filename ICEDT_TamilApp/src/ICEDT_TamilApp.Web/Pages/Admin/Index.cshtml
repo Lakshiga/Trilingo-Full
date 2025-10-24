@@ -1,0 +1,25 @@
+@page
+@{
+    ViewData["Title"] = "Admin Panel";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="container">
+    <h2>Levels</h2>
+    <button class="btn btn-primary" id="add-level-btn">Add New Level</button>
+    <table id="levels-table" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Level ID</th>
+                <th>Level Name</th>
+                <th>Sequence Order</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="levels-tbody">
+        </tbody>
+    </table>
+</div>
+
+<script src="~/Scripts/admin.js"></script>
