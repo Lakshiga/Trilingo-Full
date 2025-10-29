@@ -2,6 +2,20 @@
   margin: 16px 0;
 }
 
+.exercises-info {
+  background-color: #e3f2fd;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  border-left: 4px solid #1976d2;
+}
+
+.exercises-info p {
+  margin: 0;
+  color: #555;
+  font-size: 0.9rem;
+}
+
 .panel-header {
   display: flex;
   justify-content: space-between;
@@ -11,6 +25,7 @@
 
 .exercise-title {
   font-weight: bold;
+  color: #333;
 }
 
 .panel-actions {
@@ -19,8 +34,13 @@
   align-items: center;
 }
 
-.preview-button {
-  margin-right: 8px;
+.preview-button, .copy-button {
+  min-width: 36px;
+  padding: 0 8px;
+}
+
+.delete-button {
+  margin-left: 8px;
 }
 
 .full-width {
@@ -30,6 +50,7 @@
 .add-exercise-button {
   width: 100%;
   margin-top: 16px;
+  background-color: #f5f5f5;
 }
 
 textarea.error {
@@ -37,5 +58,17 @@ textarea.error {
 }
 
 mat-expansion-panel {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.exercise-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.preview-full-button {
+  background-color: #e3f2fd;
 }

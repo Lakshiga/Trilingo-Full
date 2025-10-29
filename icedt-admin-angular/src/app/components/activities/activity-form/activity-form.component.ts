@@ -40,7 +40,7 @@ export class ActivityFormComponent {
   }
 
   onMainActivityChange(event: any): void {
-    const mainActivityId = Number(event.value);
+    const mainActivityId = Number(event?.value || event?.target?.value);
     // Ensure we have a valid main activity ID
     if (mainActivityId && mainActivityId > 0) {
       this.activityData.mainActivityId = mainActivityId;
@@ -54,7 +54,7 @@ export class ActivityFormComponent {
   }
 
   onActivityTypeChange(event: any): void {
-    const activityTypeId = Number(event.value);
+    const activityTypeId = Number(event?.value || event?.target?.value);
     // Ensure we have a valid activity type ID
     if (activityTypeId && activityTypeId > 0) {
       this.activityData.activityTypeId = activityTypeId;

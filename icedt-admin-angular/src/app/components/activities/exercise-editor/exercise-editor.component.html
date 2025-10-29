@@ -4,6 +4,11 @@
   </mat-card-header>
   
   <mat-card-content>
+    <div class="exercises-info">
+      <p>Each exercise represents one instance of the selected activity type. 
+         Use the template as a guide to fill in your content.</p>
+    </div>
+    
     <mat-accordion multi="false">
       <mat-expansion-panel 
         *ngFor="let exercise of exercises; let i = index"
@@ -53,10 +58,21 @@
             (ngModelChange)="handleExerciseChange(i, $event)"
             rows="15"
             [class.error]="!!jsonErrors[i]"
-            placeholder="Enter exercise JSON content...">
+            placeholder="Enter exercise JSON content based on the template...">
           </textarea>
           <mat-error *ngIf="jsonErrors[i]">{{ jsonErrors[i] }}</mat-error>
         </mat-form-field>
+        
+        <div class="exercise-actions">
+          <button 
+            mat-button 
+            (click)="onPreviewExercise(exercise)"
+            [disabled]="!!jsonErrors[i]"
+            class="preview-full-button">
+            <mat-icon>preview</mat-icon>
+            Preview This Exercise
+          </button>
+        </div>
       </mat-expansion-panel>
     </mat-accordion>
     

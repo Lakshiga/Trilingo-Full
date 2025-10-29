@@ -120,10 +120,19 @@ export class ExerciseEditorComponent implements OnInit, OnChanges {
     this.triggerParentUpdate(this.exercises);
   }
 
-  onPreviewExercise(exerciseJson: string, event: Event): void {
-    event.stopPropagation();
+  onPreviewExercise(exerciseJson: string, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
     // console.log('Preview exercise requested:', exerciseJson);
-    this.previewExercise.emit(exerciseJson);
+    try {
+      // Validate the JSON before emitting
+      JSON.parse(exerciseJson);
+      this.previewExercise.emit(exerciseJson);
+    } catch (error) {
+      console.error('Invalid JSON for preview:', error);
+      // Don't emit if JSON is invalid
+    }
   }
 
   async onCopyExercise(exerciseJson: string, event: Event): Promise<void> {

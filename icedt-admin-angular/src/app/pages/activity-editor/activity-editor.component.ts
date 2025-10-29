@@ -271,8 +271,15 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
   handlePreviewExercise(exerciseJsonString: string): void {
     // console.log('Preview exercise updated:', exerciseJsonString);
     if (!this.activity) return;
-    this.previewContent = { ...this.activity, contentJson: exerciseJsonString };
-    this.snackBar.open('Preview updated', 'Close', { duration: 1500 });
+    
+    try {
+      // Parse the exercise JSON to validate it
+      JSON.parse(exerciseJsonString);
+      this.previewContent = { ...this.activity, contentJson: exerciseJsonString };
+      this.snackBar.open('Preview updated', 'Close', { duration: 1500 });
+    } catch (error) {
+      this.snackBar.open('Invalid JSON - preview not updated', 'Close', { duration: 3000 });
+    }
   }
 
   async handleSave(): Promise<void> {
@@ -394,7 +401,7 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
   async handleCopyTemplate(): Promise<void> {
     try {
       const typeId = this.activity?.activityTypeId || 0;
-      if (!typeId) {
+      if (!typeId || typeId <= 0) {
         this.snackBar.open('Select an Activity Type to copy its template.', 'Close', { duration: 3000 });
         return;
       }
@@ -415,6 +422,9 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
   }
 
   getActivityTemplate(activityTypeId: number): string {
+    if (!activityTypeId || activityTypeId <= 0) {
+      return '{}';
+    }
     return MultilingualActivityTemplates.getTemplate(activityTypeId);
   }
 

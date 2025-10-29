@@ -58,6 +58,10 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
+      <div class="activity-type-info" *ngIf="activityData.activityTypeId && activityData.activityTypeId > 0">
+        <p>Selected activity type will determine the required JSON structure.</p>
+        <p>Template will auto-populate when you select an activity type.</p>
+      </div>
     </div>
   </mat-card-content>
 </mat-card>

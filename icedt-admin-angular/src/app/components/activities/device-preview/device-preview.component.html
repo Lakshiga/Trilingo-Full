@@ -1,4 +1,9 @@
 <div class="device-preview">
+  <div class="preview-header">
+    <h3>Activity Preview</h3>
+    <p>See how your activity will look on student devices</p>
+  </div>
+  
   <div class="controls">
     <mat-button-toggle-group 
       [value]="device" 
@@ -6,9 +11,11 @@
       class="control-group">
       <mat-button-toggle value="phone">
         <mat-icon>phone_iphone</mat-icon>
+        Phone
       </mat-button-toggle>
       <mat-button-toggle value="tablet">
         <mat-icon>tablet_mac</mat-icon>
+        Tablet
       </mat-button-toggle>
     </mat-button-toggle-group>
     
@@ -18,9 +25,11 @@
       class="control-group">
       <mat-button-toggle value="portrait">
         <mat-icon>stay_current_portrait</mat-icon>
+        Portrait
       </mat-button-toggle>
       <mat-button-toggle value="landscape">
         <mat-icon>stay_current_landscape</mat-icon>
+        Landscape
       </mat-button-toggle>
     </mat-button-toggle-group>
   </div>
@@ -37,15 +46,23 @@
           [content]="parsedContent">
         </app-activity-renderer>
         <div *ngIf="!hasValidData" class="placeholder-container">
-          <p class="placeholder">
+          <div class="placeholder-icon">
+            <mat-icon>visibility</mat-icon>
+          </div>
+          <p class="placeholder-title">No Preview Available</p>
+          <p class="placeholder-text">
             Select an activity type and provide valid JSON content to see the preview.
           </p>
           <div class="preview-instructions" *ngIf="activityData.activityTypeId && !parsedContent">
             <p>Tip: After selecting an activity type, a template will be auto-populated.</p>
-            <p>Fill in the required fields in the JSON editor and the preview will update automatically.</p>
+            <p>Fill in the required fields in the JSON editor and click "Preview" to see the result.</p>
           </div>
         </div>
       </div>
     </mat-card>
+  </div>
+  
+  <div class="preview-footer" *ngIf="hasValidData">
+    <p>Click "Preview" on any exercise to see it here</p>
   </div>
 </div>

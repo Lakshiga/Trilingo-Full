@@ -43,18 +43,26 @@
           <div class="template-header">
             <h3>JSON Template</h3>
             <button 
-              mat-button 
+              mat-raised-button 
+              color="accent"
               (click)="handleCopyTemplate()"
-              [disabled]="!activity.activityTypeId">
+              [disabled]="!(activity?.activityTypeId || 0) || (activity?.activityTypeId || 0) <= 0">
+              <mat-icon>content_copy</mat-icon>
               COPY TEMPLATE
             </button>
           </div>
           <p class="template-description">
-            This is the required structure for the selected Activity Type.
+            Select an Activity Type from the form to see its required JSON structure.
+            Click "COPY TEMPLATE" to copy this structure to your clipboard.
           </p>
-          <div class="template-content">
-            <pre><code>{{ getActivityTemplate(activity.activityTypeId || 0) }}</code></pre>
+          <div class="template-content" *ngIf="(activity?.activityTypeId || 0) > 0; else noTemplate">
+            <pre><code>{{ getActivityTemplate(activity?.activityTypeId || 0) }}</code></pre>
           </div>
+          <ng-template #noTemplate>
+            <div class="no-template">
+              <p>Please select an Activity Type to view its template.</p>
+            </div>
+          </ng-template>
         </div>
         
         <div class="exercises-section">

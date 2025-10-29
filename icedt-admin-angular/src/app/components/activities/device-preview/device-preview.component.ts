@@ -37,8 +37,12 @@ export class DevicePreviewComponent implements OnChanges {
     try {
       const parsed = JSON.parse(this.activityData.contentJson);
       // If it's an array, use the first element, otherwise use the object directly
-      return Array.isArray(parsed) ? (parsed[0] || null) : parsed;
+      if (Array.isArray(parsed)) {
+        return parsed.length > 0 ? parsed[0] : null;
+      }
+      return parsed;
     } catch (e) {
+      console.error('Error parsing JSON content:', e);
       return { error: 'Invalid JSON' };
     }
   }
@@ -68,6 +72,6 @@ export class DevicePreviewComponent implements OnChanges {
   
   // Check if we have valid data to display
   get hasValidData(): boolean {
-    return !!(this.activityData.activityTypeId && this.parsedContent);
+    return !!(this.activityData.activityTypeId && this.parsedContent && !this.parsedContent.error);
   }
 }
