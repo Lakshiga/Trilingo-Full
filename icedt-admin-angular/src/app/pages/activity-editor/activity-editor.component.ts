@@ -169,6 +169,24 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
         if (!this.isEditMode && this.activity.activityTypeId && this.activity.activityTypeId > 0) {
           this.autoPopulateTemplate(this.activity.activityTypeId);
         }
+
+        // Apply sensible defaults when creating new activity
+        if (!this.isEditMode) {
+          if (!this.activity.activityTypeId || this.activity.activityTypeId <= 0) {
+            const firstTypeId = this.activityTypes[0]?.activityTypeId;
+            if (firstTypeId) {
+              this.activity.activityTypeId = firstTypeId;
+              this.autoPopulateTemplate(firstTypeId);
+            }
+          }
+
+          if (!this.activity.mainActivityId || this.activity.mainActivityId <= 0) {
+            const firstMainId = this.mainActivities[0]?.id;
+            if (firstMainId) {
+              this.activity.mainActivityId = firstMainId;
+            }
+          }
+        }
       }
       
       // console.log('Loaded data:', { mainActivities: this.mainActivities, activityTypes: this.activityTypes, activity: this.activity });
@@ -307,7 +325,10 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
       }
       
       this.snackBar.open('Activity saved successfully!', 'Close', { duration: 3000 });
-      this.goBack();
+      // Add a small delay to ensure the activity is properly stored before navigating back
+      setTimeout(() => {
+        this.goBack();
+      }, 500);
     } catch (error) {
       console.error("Failed to save activity", error);
       this.snackBar.open('An error occurred while saving.', 'Close', { duration: 5000 });
@@ -398,8 +419,14 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    const backUrl = `/activities?lessonId=${this.activity?.lessonId || this.lessonId}`;
-    this.router.navigate([backUrl]);
+    const lessonId = this.activity?.lessonId || this.lessonId;
+    if (lessonId) {
+      const backUrl = `/activities?lessonId=${lessonId}`;
+      this.router.navigate([backUrl]);
+    } else {
+      // Fallback to lessons page if no lesson ID
+      this.router.navigate(['/lessons']);
+    }
   }
 
   // Wrapper methods to handle type conversion

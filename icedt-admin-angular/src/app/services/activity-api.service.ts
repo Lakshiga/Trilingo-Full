@@ -41,8 +41,12 @@ export class ActivityApiService {
     return {
       activityId: dto?.id ?? dto?.activityId,
       lessonId: dto?.stageId ?? dto?.lessonId ?? 0,
-      title: { ta: '', en: '', si: '' },
-      sequenceOrder: 1,
+      title: { 
+        ta: dto?.title?.ta ?? dto?.title_ta ?? '', 
+        en: dto?.title?.en ?? dto?.title_en ?? '', 
+        si: dto?.title?.si ?? dto?.title_si ?? '' 
+      },
+      sequenceOrder: dto?.sequenceOrder ?? 1,
       activityTypeId: dto?.activityTypeId ?? 0,
       mainActivityId: dto?.mainActivityId ?? 0,
       contentJson: dto?.details_JSON ?? dto?.contentJson ?? '[]'
@@ -66,12 +70,16 @@ export class ActivityApiService {
   getActivitiesByLessonId(lessonId: number | string): Observable<MultilingualActivity[]> {
     return this.httpClient.get<any[]>(`/Activities/stage/${lessonId}`).pipe(
       map(list => (list || []).map(a => this.toFrontend(a))),
-      catchError(() => {
+      catchError((error) => {
+        console.error('Error fetching activities from API:', error);
         // Fallback to fetching all and filtering
         return this.httpClient.get<any[]>(this.endpoint).pipe(
           map(list => (list || []).map(a => this.toFrontend(a)).filter(a => String(a.lessonId) === String(lessonId))),
-          catchError(() => {
+          catchError((error2) => {
+            console.error('Error fetching all activities from API:', error2);
+            // Check localStorage for activities for this lesson
             const data = this.readFromStorage(lessonId);
+            console.log(`Loaded ${data.length} activities from localStorage for lesson ${lessonId}`);
             return of(data);
           })
         );
@@ -105,7 +113,8 @@ export class ActivityApiService {
     const dto = this.toCreateDto(newItem);
     return this.httpClient.post<any, any>(this.endpoint, dto).pipe(
       map(res => this.toFrontend(res)),
-      catchError(() => {
+      catchError((error) => {
+        console.error('Error creating activity via API:', error);
         const arr = this.readFromStorage(newItem.lessonId);
         const newId = arr.length > 0 ? Math.max(...arr.map(a => a.activityId)) + 1 : 1;
         const created: MultilingualActivity = {
@@ -119,6 +128,7 @@ export class ActivityApiService {
         } as any;
         arr.push(created);
         this.writeToStorage(newItem.lessonId, arr);
+        console.log(`Created activity with ID ${newId} and stored in localStorage for lesson ${newItem.lessonId}`);
         return of(created);
       })
     );
@@ -179,7 +189,25 @@ export class ActivityApiService {
   private readFromStorage(lessonId: number | string): MultilingualActivity[] {
     const key = this.storageKey(lessonId);
     const stored = localStorage.getItem(key);
-    return stored ? JSON.parse(stored) : [];
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        // Ensure the parsed data is properly mapped to MultilingualActivity objects
+        return parsed.map((item: any) => ({
+          activityId: item.activityId,
+          lessonId: item.lessonId,
+          title: item.title || { ta: '', en: '', si: '' },
+          sequenceOrder: item.sequenceOrder || 1,
+          activityTypeId: item.activityTypeId || 0,
+          mainActivityId: item.mainActivityId || 0,
+          contentJson: item.contentJson || '[]'
+        }));
+      } catch (e) {
+        console.error('Error parsing activities from localStorage:', e);
+        return [];
+      }
+    }
+    return [];
   }
   private writeToStorage(lessonId: number | string, arr: MultilingualActivity[]): void {
     const key = this.storageKey(lessonId);

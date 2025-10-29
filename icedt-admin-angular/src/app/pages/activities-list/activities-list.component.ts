@@ -62,6 +62,9 @@ export class ActivitiesListPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.routeSubscription = this.route.queryParams.subscribe(params => {
       this.lessonId = params['lessonId'];
+      // Clear existing data before loading new data
+      this.activities = [];
+      this.lesson = null;
       this.loadData();
     });
   }
@@ -93,6 +96,9 @@ export class ActivitiesListPageComponent implements OnInit, OnDestroy {
       
       this.lesson = lessonData!;
       this.activities = activitiesData!;
+      
+      // Log the activities for debugging
+      console.log('Loaded activities:', this.activities);
     } catch (err) {
       console.error(err);
       this.error = err instanceof Error ? err.message : "Failed to load data for this lesson.";

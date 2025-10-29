@@ -23,7 +23,7 @@ namespace TES_Learning_App.Application_Layer.Interfaces.IRepositories
         IGenericRepository<Stage> StageRepository { get; }
         IGenericRepository<MainActivity> MainActivityRepository { get; }
         IGenericRepository<ActivityType> ActivityTypeRepository { get; }
-        IGenericRepository<Activity> ActivityRepository { get; }
+        IActivityRepository ActivityRepository { get; }
 
         // Bridge Repository
         IGenericRepository<StudentProgress> StudentProgressRepository { get; } // <-- ADD THIS
