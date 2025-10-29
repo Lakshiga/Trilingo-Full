@@ -62,13 +62,19 @@ export class ActivityApiService {
     return this.toCreateDto(item as ActivityCreateDto);
   }
 
-  // GET all activities for a specific lesson (filter client-side from backend list)
+  // GET all activities for a specific lesson (use the proper endpoint)
   getActivitiesByLessonId(lessonId: number | string): Observable<MultilingualActivity[]> {
-    return this.httpClient.get<any[]>(this.endpoint).pipe(
-      map(list => (list || []).map(a => this.toFrontend(a)).filter(a => String(a.lessonId) === String(lessonId))),
+    return this.httpClient.get<any[]>(`/Activities/stage/${lessonId}`).pipe(
+      map(list => (list || []).map(a => this.toFrontend(a))),
       catchError(() => {
-        const data = this.readFromStorage(lessonId);
-        return of(data);
+        // Fallback to fetching all and filtering
+        return this.httpClient.get<any[]>(this.endpoint).pipe(
+          map(list => (list || []).map(a => this.toFrontend(a)).filter(a => String(a.lessonId) === String(lessonId))),
+          catchError(() => {
+            const data = this.readFromStorage(lessonId);
+            return of(data);
+          })
+        );
       })
     );
   }

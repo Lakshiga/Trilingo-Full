@@ -23,6 +23,14 @@ namespace TES_Learning_App.API.Controllers
             return Ok(await _activityService.GetAllAsync());
         }
 
+        // GET: api/activities/stage/5
+        [HttpGet("stage/{stageId}")]
+        public async Task<ActionResult<IEnumerable<ActivityDto>>> GetByStageId(int stageId)
+        {
+            var activities = await _activityService.GetByStageIdAsync(stageId);
+            return Ok(activities);
+        }
+
         // GET: api/activities/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ActivityDto>> GetById(int id)

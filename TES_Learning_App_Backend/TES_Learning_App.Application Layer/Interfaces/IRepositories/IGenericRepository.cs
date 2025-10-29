@@ -15,6 +15,7 @@ namespace TES_Learning_App.Application_Layer.Interfaces.IRepositories
         Task<T?> GetByIdAsync(Guid id); // Overload for Guid
         Task<IReadOnlyList<T>> GetAllAsync();
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression);
+        Task<IEnumerable<T>> FindByPropertyAsync(string propertyName, object value);
         Task<T> AddAsync(T entity);
         Task UpdateAsync(T entity); 
         Task DeleteAsync(T entity);

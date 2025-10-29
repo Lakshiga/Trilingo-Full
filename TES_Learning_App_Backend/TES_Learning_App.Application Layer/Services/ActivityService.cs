@@ -53,6 +53,12 @@ namespace TES_Learning_App.Application_Layer.Services
             return activities.Select(MapToDto);
         }
 
+        public async Task<IEnumerable<ActivityDto>> GetByStageIdAsync(int stageId)
+        {
+            var activities = await _unitOfWork.ActivityRepository.GetByStageIdAsync(stageId);
+            return activities.Select(MapToDto);
+        }
+
         public async Task<ActivityDto?> GetByIdAsync(int id)
         {
             var activity = await _unitOfWork.ActivityRepository.GetByIdAsync(id);

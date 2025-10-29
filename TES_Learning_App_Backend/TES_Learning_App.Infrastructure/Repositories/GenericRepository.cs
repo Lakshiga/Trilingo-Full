@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using TES_Learning_App.Application_Layer.Interfaces.IServices;
 using TES_Learning_App.Application_Layer.Interfaces.IRepositories;
@@ -39,6 +40,18 @@ namespace TES_Learning_App.Infrastructure.Repositories
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression)
         {
             return await _context.Set<T>().Where(expression).ToListAsync();
+        }
+
+        // --- Implementation of FindByPropertyAsync method ---
+        public async Task<IEnumerable<T>> FindByPropertyAsync(string propertyName, object value)
+        {
+            var parameter = Expression.Parameter(typeof(T), "x");
+            var property = Expression.Property(parameter, propertyName);
+            var constant = Expression.Constant(value);
+            var equal = Expression.Equal(property, constant);
+            var lambda = Expression.Lambda<Func<T, bool>>(equal, parameter);
+
+            return await _context.Set<T>().Where(lambda).ToListAsync();
         }
 
         // --- Corrected Add, Update, and Delete methods ---

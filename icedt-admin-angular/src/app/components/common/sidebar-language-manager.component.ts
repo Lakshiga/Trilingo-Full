@@ -1,93 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatExpansionModule } from '@angular/material/expansion';
 import { LanguageService } from '../../services/language.service';
-import { LanguageCode, LanguageConfig, SUPPORTED_LANGUAGES } from '../../types/multilingual.types';
+import { LanguageCode, LanguageConfig } from '../../types/multilingual.types';
 
 @Component({
   selector: 'app-sidebar-language-manager',
   standalone: true,
   imports: [
-    CommonModule,
-    MatSelectModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatButtonModule,
-    MatTooltipModule,
-    MatExpansionModule
+    CommonModule
   ],
   template: `
-    <div class="language-manager">
-      <div class="language-manager-header">
-        <mat-icon class="language-icon">🌐</mat-icon>
-        <span class="language-title">Language Management</span>
-      </div>
+    
       
-      <div class="language-switcher">
-        <mat-form-field appearance="outline" class="language-select-field">
-          <mat-label>Current Language</mat-label>
-          <mat-select 
-            [value]="currentLanguage" 
-            (selectionChange)="onLanguageChange($event.value)"
-            class="language-select">
-            <mat-option 
-              *ngFor="let language of supportedLanguages" 
-              [value]="language.code"
-              class="language-option">
-              <span class="language-flag">{{ language.flag }}</span>
-              <span class="language-name">{{ language.nativeName }}</span>
-              <span class="language-english">({{ language.name }})</span>
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
 
-      <mat-expansion-panel class="language-config-panel">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            <mat-icon>settings</mat-icon>
-            JSON Configuration
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        
-        <div class="language-config-content">
-          <div class="config-info">
-            <p class="config-description">
-              The system supports three languages with JSON-based configuration:
-            </p>
-            <div class="language-list">
-              <div *ngFor="let language of supportedLanguages" class="language-item">
-                <span class="language-flag">{{ language.flag }}</span>
-                <span class="language-code">{{ language.code }}</span>
-                <span class="language-name">{{ language.nativeName }}</span>
-                <span class="language-english">({{ language.name }})</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="json-example">
-            <h4>Example JSON Structure:</h4>
-            <pre class="json-code">{{ getJsonExample() }}</pre>
-          </div>
-          
-          <div class="language-actions">
-            <button mat-raised-button color="primary" (click)="showAllLanguages()">
-              <mat-icon>visibility</mat-icon>
-              View All Languages
-            </button>
-            <button mat-stroked-button (click)="resetToDefault()">
-              <mat-icon>refresh</mat-icon>
-              Reset to Default
-            </button>
-          </div>
-        </div>
-      </mat-expansion-panel>
-    </div>
+      
   `,
   styles: [`
     .language-manager {
@@ -269,53 +195,7 @@ import { LanguageCode, LanguageConfig, SUPPORTED_LANGUAGES } from '../../types/m
   `]
 })
 export class SidebarLanguageManagerComponent implements OnInit {
-  currentLanguage: LanguageCode = 'en';
-  supportedLanguages: LanguageConfig[] = [];
-
   constructor(private languageService: LanguageService) {}
 
-  ngOnInit() {
-    this.supportedLanguages = this.languageService.getSupportedLanguages();
-    this.currentLanguage = this.languageService.getCurrentLanguage();
-    
-    // Subscribe to language changes
-    this.languageService.currentLanguage$.subscribe(language => {
-      this.currentLanguage = language;
-    });
-  }
-
-  onLanguageChange(language: LanguageCode) {
-    this.languageService.setLanguage(language);
-  }
-
-  getJsonExample(): string {
-    return `{
-  "title": {
-    "ta": "உடல் உறுப்புகள்",
-    "en": "Body Parts", 
-    "si": "ශරීරයේ කොටස්"
-  },
-  "word": {
-    "ta": "கண்",
-    "en": "Eye",
-    "si": "ඇස"
-  },
-  "audioUrl": {
-    "ta": "/audio/kan.mp3",
-    "en": "/audio/eye.mp3", 
-    "si": "/audio/esa.mp3"
-  }
-}`;
-  }
-
-  showAllLanguages() {
-    // This could open a modal or navigate to a detailed language management page
-    console.log('Show all languages clicked');
-    // TODO: Implement detailed language view
-  }
-
-  resetToDefault() {
-    this.languageService.setLanguage('en');
-    console.log('Reset to default language (English)');
-  }
+  ngOnInit() {}
 }

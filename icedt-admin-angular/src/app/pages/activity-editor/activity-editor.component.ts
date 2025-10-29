@@ -146,11 +146,32 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
 
       if (loadedActivity) {
         loadedActivity.contentJson = JSON.stringify(exercises, null, 2);
+        // Ensure all IDs are properly converted to numbers
+        if (loadedActivity.mainActivityId) {
+          loadedActivity.mainActivityId = Number(loadedActivity.mainActivityId);
+        }
+        if (loadedActivity.activityTypeId) {
+          loadedActivity.activityTypeId = Number(loadedActivity.activityTypeId);
+        }
+        if (loadedActivity.lessonId) {
+          loadedActivity.lessonId = Number(loadedActivity.lessonId);
+        }
+        if (loadedActivity.sequenceOrder) {
+          loadedActivity.sequenceOrder = Number(loadedActivity.sequenceOrder);
+        }
+        
         this.activity = loadedActivity;
         this.previewContent = { ...loadedActivity, contentJson: JSON.stringify(exercises[0] || {}, null, 2) };
         // Track initial type to detect changes later
         this.lastActivityTypeId = Number(loadedActivity.activityTypeId || 0) || null;
+        
+        // If this is a new activity and an activity type is already selected, auto-populate the template
+        if (!this.isEditMode && this.activity.activityTypeId && this.activity.activityTypeId > 0) {
+          this.autoPopulateTemplate(this.activity.activityTypeId);
+        }
       }
+      
+      // console.log('Loaded data:', { mainActivities: this.mainActivities, activityTypes: this.activityTypes, activity: this.activity });
     } catch (error) {
       console.error("Failed to load data", error);
       this.snackBar.open('Failed to load data', 'Close', { duration: 5000 });
@@ -160,6 +181,7 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
   }
 
   handleFormChange(updatedActivityData: Partial<MultilingualActivity>): void {
+    // console.log('Activity form changed:', updatedActivityData);
     const previousTypeId = this.lastActivityTypeId;
     const nextTypeId = Number(updatedActivityData.activityTypeId || (this.activity?.activityTypeId || 0));
 
@@ -172,29 +194,64 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
       contentJson: '[]',
       lessonId: parseInt(this.lessonId || '0', 10)
     } as Partial<MultilingualActivity>;
-    this.activity = { ...current, ...updatedActivityData };
+    
+    // Ensure all IDs are properly converted to numbers
+    const mergedData = { ...current, ...updatedActivityData };
+    if (mergedData.mainActivityId !== undefined && mergedData.mainActivityId !== null) {
+      mergedData.mainActivityId = Number(mergedData.mainActivityId);
+    }
+    if (mergedData.activityTypeId !== undefined && mergedData.activityTypeId !== null) {
+      mergedData.activityTypeId = Number(mergedData.activityTypeId);
+    }
+    if (mergedData.lessonId !== undefined && mergedData.lessonId !== null) {
+      mergedData.lessonId = Number(mergedData.lessonId);
+    }
+    if (mergedData.sequenceOrder !== undefined && mergedData.sequenceOrder !== null) {
+      mergedData.sequenceOrder = Number(mergedData.sequenceOrder);
+    }
+    
+    this.activity = mergedData;
 
     // Auto-generate template when activity type changes
-    if (nextTypeId && previousTypeId !== nextTypeId) {
-      try {
-        const templateString = MultilingualActivityTemplates.getTemplate(nextTypeId);
-        const templateObject = JSON.parse(templateString);
-        const exercisesArray = [templateObject];
-        const prettyArray = JSON.stringify(exercisesArray, null, 2);
-        this.activity = { ...this.activity, activityTypeId: nextTypeId, contentJson: prettyArray };
-
-        // Update preview to first exercise immediately
-        this.previewContent = this.activity ? { ...this.activity, contentJson: JSON.stringify(templateObject, null, 2) } : null;
-        this.expandedExercise = 0;
-      } catch {
-        // If template parse fails, keep whatever user has
-      }
+    // Only auto-populate if we have a valid activity type ID
+    if (nextTypeId && nextTypeId > 0 && previousTypeId !== nextTypeId) {
+      // console.log('Activity type changed, auto-populating template:', nextTypeId);
+      this.autoPopulateTemplate(nextTypeId);
     }
 
     this.lastActivityTypeId = nextTypeId || null;
   }
 
+  private autoPopulateTemplate(activityTypeId: number): void {
+    // Ensure we have a valid activity type ID
+    if (!activityTypeId || activityTypeId <= 0) {
+      return;
+    }
+    
+    try {
+      const templateString = MultilingualActivityTemplates.getTemplate(activityTypeId);
+      const templateObject = JSON.parse(templateString);
+      const exercisesArray = [templateObject];
+      const prettyArray = JSON.stringify(exercisesArray, null, 2);
+      this.activity = { ...this.activity, activityTypeId: activityTypeId, contentJson: prettyArray };
+
+      // Update preview to first exercise immediately
+      this.previewContent = this.activity ? { ...this.activity, contentJson: JSON.stringify(templateObject, null, 2) } : null;
+      this.expandedExercise = 0;
+      
+      // Show a message to the user that the template has been auto-populated
+      const activityType = this.activityTypes.find(at => at.activityTypeId === activityTypeId);
+      const activityTypeName = activityType ? activityType.activityName : 'selected';
+      this.snackBar.open(`Activity template for ${activityTypeName} auto-populated`, 'Close', { duration: 3000 });
+    } catch (error) {
+      console.error('Failed to auto-populate template:', error);
+      // If template parse fails, keep whatever user has
+      this.snackBar.open('Failed to auto-populate template. Using existing content.', 'Close', { duration: 3000 });
+    }
+  }
+
   handlePreviewExercise(exerciseJsonString: string): void {
+    // console.log('Preview exercise updated:', exerciseJsonString);
     if (!this.activity) return;
     this.previewContent = { ...this.activity, contentJson: exerciseJsonString };
     this.snackBar.open('Preview updated', 'Close', { duration: 1500 });
@@ -213,18 +270,32 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
 
     // Construct payload with strong coercion and fallbacks
     const coercedLessonId = Number(this.activity.lessonId || this.lessonId || 0);
+    const coercedActivityTypeId = Number(this.activity.activityTypeId || 0);
+    const coercedMainActivityId = Number(this.activity.mainActivityId || 0);
+    
     const payload: ActivityCreateDto = {
       title: this.activity.title || { ta: '', en: '', si: '' },
       sequenceOrder: Number(this.activity.sequenceOrder || 1),
       contentJson: this.activity.contentJson,
       lessonId: coercedLessonId,
-      activityTypeId: Number(this.activity.activityTypeId || 0),
-      mainActivityId: Number(this.activity.mainActivityId || 0)
+      activityTypeId: coercedActivityTypeId,
+      mainActivityId: coercedMainActivityId
     };
 
-    // Validate required IDs
-    if (!payload.lessonId || !payload.activityTypeId || !payload.mainActivityId) {
-      this.snackBar.open('Lesson, Activity Type, and Main Activity must be selected.', 'Close', { duration: 5000 });
+    // Validate required IDs (check for null, undefined, or invalid values)
+    // IDs should be greater than 0 to be valid
+    if (!coercedLessonId || coercedLessonId <= 0) {
+      this.snackBar.open('Please select a valid Lesson.', 'Close', { duration: 5000 });
+      return;
+    }
+    
+    if (!coercedActivityTypeId || coercedActivityTypeId <= 0) {
+      this.snackBar.open('Please select a valid Activity Type.', 'Close', { duration: 5000 });
+      return;
+    }
+    
+    if (!coercedMainActivityId || coercedMainActivityId <= 0) {
+      this.snackBar.open('Please select a valid Main Activity.', 'Close', { duration: 5000 });
       return;
     }
 
@@ -333,10 +404,12 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
 
   // Wrapper methods to handle type conversion
   handleFormChangeWrapper(event: any): void {
+    // console.log('Form change wrapper called:', event);
     this.handleFormChange(event as Partial<MultilingualActivity>);
   }
 
   handlePreviewExerciseWrapper(event: any): void {
+    // console.log('Preview exercise wrapper called:', event);
     this.handlePreviewExercise(event as string);
   }
 

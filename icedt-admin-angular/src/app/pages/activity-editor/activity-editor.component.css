@@ -68,6 +68,7 @@ app-sidebar-language-manager {
   position: sticky;
   top: 24px;
   height: calc(100vh - 120px);
+  overflow-y: auto;
 }
 
 .template-section {
@@ -177,5 +178,9 @@ app-sidebar-language-manager {
   .form-column,
   .preview-column {
     position: static;
+  }
+  
+  .preview-column {
+    height: auto;
   }
 }

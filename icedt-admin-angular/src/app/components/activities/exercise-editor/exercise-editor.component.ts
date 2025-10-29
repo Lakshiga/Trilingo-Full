@@ -90,7 +90,8 @@ export class ExerciseEditorComponent implements OnInit, OnChanges {
 
   addExercise(): void {
     const typeId = Number(this.activityData.activityTypeId || 0);
-    if (typeId) {
+    // Ensure we have a valid activity type ID
+    if (typeId && typeId > 0) {
       try {
         const templateString = MultilingualActivityTemplates.getTemplate(typeId);
         const parsed = JSON.parse(templateString);
@@ -121,6 +122,7 @@ export class ExerciseEditorComponent implements OnInit, OnChanges {
 
   onPreviewExercise(exerciseJson: string, event: Event): void {
     event.stopPropagation();
+    // console.log('Preview exercise requested:', exerciseJson);
     this.previewExercise.emit(exerciseJson);
   }
 

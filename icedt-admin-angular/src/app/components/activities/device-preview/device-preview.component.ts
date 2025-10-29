@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,11 +19,15 @@ import { ActivityRendererComponent } from '../activity-renderer/activity-rendere
   templateUrl: './device-preview.component.html',
   styleUrls: ['./device-preview.component.css']
 })
-export class DevicePreviewComponent {
+export class DevicePreviewComponent implements OnChanges {
   @Input() activityData: Partial<Activity> = {};
 
   device: 'phone' | 'tablet' = 'phone';
   orientation: 'portrait' | 'landscape' = 'portrait';
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // console.log('Device preview data changed:', changes);
+  }
 
   get parsedContent(): any {
     if (!this.activityData.contentJson) {
@@ -32,6 +36,7 @@ export class DevicePreviewComponent {
 
     try {
       const parsed = JSON.parse(this.activityData.contentJson);
+      // If it's an array, use the first element, otherwise use the object directly
       return Array.isArray(parsed) ? (parsed[0] || null) : parsed;
     } catch (e) {
       return { error: 'Invalid JSON' };
@@ -59,5 +64,10 @@ export class DevicePreviewComponent {
     const height = isLandscape ? currentDimensions.width : currentDimensions.height;
 
     return `width: ${width}px; height: ${height}px;`;
+  }
+  
+  // Check if we have valid data to display
+  get hasValidData(): boolean {
+    return !!(this.activityData.activityTypeId && this.parsedContent);
   }
 }

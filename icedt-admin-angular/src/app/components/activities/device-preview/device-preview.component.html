@@ -32,13 +32,19 @@
       [style]="getFrameStyles()">
       <div class="content-area">
         <app-activity-renderer 
-          *ngIf="activityData.activityTypeId && parsedContent" 
-          [activityTypeId]="activityData.activityTypeId"
+          *ngIf="hasValidData" 
+          [activityTypeId]="activityData.activityTypeId!"
           [content]="parsedContent">
         </app-activity-renderer>
-        <p *ngIf="!activityData.activityTypeId || !parsedContent" class="placeholder">
-          Select an activity type and provide JSON.
-        </p>
+        <div *ngIf="!hasValidData" class="placeholder-container">
+          <p class="placeholder">
+            Select an activity type and provide valid JSON content to see the preview.
+          </p>
+          <div class="preview-instructions" *ngIf="activityData.activityTypeId && !parsedContent">
+            <p>Tip: After selecting an activity type, a template will be auto-populated.</p>
+            <p>Fill in the required fields in the JSON editor and the preview will update automatically.</p>
+          </div>
+        </div>
       </div>
     </mat-card>
   </div>

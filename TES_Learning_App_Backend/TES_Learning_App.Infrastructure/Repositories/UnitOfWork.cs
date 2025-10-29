@@ -18,7 +18,7 @@ namespace TES_Learning_App.Infrastructure.Repositories
         public IGenericRepository<Stage> StageRepository { get; private set; }
         public IGenericRepository<MainActivity> MainActivityRepository { get; private set; }
         public IGenericRepository<ActivityType> ActivityTypeRepository { get; private set; }
-        public IGenericRepository<Activity> ActivityRepository { get; private set; }
+        public IActivityRepository ActivityRepository { get; private set; }
         public IGenericRepository<StudentProgress> StudentProgressRepository { get; private set; }
 
         public UnitOfWork(ApplicationDbContext context)
@@ -34,7 +34,7 @@ namespace TES_Learning_App.Infrastructure.Repositories
             StageRepository = new GenericRepository<Stage>(_context);
             MainActivityRepository = new GenericRepository<MainActivity>(_context);
             ActivityTypeRepository = new GenericRepository<ActivityType>(_context);
-            ActivityRepository = new GenericRepository<Activity>(_context);
+            ActivityRepository = new ActivityRepository(_context);
             StudentProgressRepository = new GenericRepository<StudentProgress>(_context);
         }
 

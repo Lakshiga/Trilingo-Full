@@ -35,7 +35,7 @@
         <mat-select 
           name="mainActivityId" 
           [(ngModel)]="activityData.mainActivityId" 
-          (ngModelChange)="onDataChange()"
+          (selectionChange)="onMainActivityChange($event)"
           required>
           <mat-option *ngFor="let ma of mainActivities" [value]="ma.id">
             {{ ma.name }}
@@ -51,7 +51,7 @@
         <mat-select 
           name="activityTypeId" 
           [(ngModel)]="activityData.activityTypeId" 
-          (ngModelChange)="onDataChange()"
+          (selectionChange)="onActivityTypeChange($event)"
           required>
           <mat-option *ngFor="let at of activityTypes" [value]="at.activityTypeId">
             {{ at.activityName }}
