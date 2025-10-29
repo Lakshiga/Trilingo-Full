@@ -1,0 +1,39 @@
+
+    <div class="container">
+      <div class="question-card">
+        <h2 class="question">{{ content.question }}</h2>
+      </div>
+
+      <div class="choices-container">
+        <button
+          *ngFor="let choice of content.choices"
+          mat-button
+          [class.mat-raised-button]="getButtonVariant(choice) === 'raised'"
+          [class.mat-outlined-button]="getButtonVariant(choice) === 'outlined'"
+          [color]="getButtonColor(choice)"
+          (click)="handleChoiceClick(choice)"
+          class="choice-button"
+        >
+          <span class="choice-text">{{ choice.text }}</span>
+          <mat-icon 
+            *ngIf="isAnswered && choice.isCorrect" 
+            class="result-icon correct-icon"
+          >
+            check_circle
+          </mat-icon>
+          <mat-icon 
+            *ngIf="isAnswered && selectedChoiceId === choice.id && !choice.isCorrect" 
+            class="result-icon incorrect-icon"
+          >
+            cancel
+          </mat-icon>
+        </button>
+      </div>
+      
+      <div *ngIf="isAnswered" class="actions">
+        <button mat-raised-button (click)="handleTryAgain()" class="try-again-button">
+          Try Again
+        </button>
+      </div>
+    </div>
+  

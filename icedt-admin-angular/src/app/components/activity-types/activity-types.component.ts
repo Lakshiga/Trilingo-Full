@@ -4,10 +4,9 @@ import { ActivityTypesTableComponent } from '../common/activity-types-table.comp
 
 @Component({
   selector: 'app-activity-types',
+  standalone: true,
   imports: [CommonModule, ActivityTypesTableComponent],
-  template: `
-    <app-activity-types-table></app-activity-types-table>
-  `
+  templateUrl: './activity-types.component.html'
 })
 export class ActivityTypesComponent {
 }

@@ -1,0 +1,37 @@
+
+    <div class="media-spotlight-multiple">
+      <h1>{{ content.title }}</h1>
+      
+      <!-- Spotlight Letter -->
+      <div class="spotlight-letter">
+        <span>{{ content.spotlightLetter }}</span>
+      </div>
+      
+      <!-- Grid of word cards -->
+      <div class="items-grid">
+        <mat-card 
+          *ngFor="let item of content.items; let i = index"
+          class="item-card">
+          <img 
+            [src]="getImageUrl(item.imageUrl)" 
+            [alt]="item.text"
+            class="item-image">
+          <mat-card-content class="item-content">
+            <div class="word-container">
+              <span class="highlighted-word" [innerHTML]="getHighlightedWord(item.text)"></span>
+              <button 
+                *ngIf="item.audioUrl"
+                mat-icon-button 
+                color="primary" 
+                (click)="playAudio(item.audioUrl)"
+                class="audio-button">
+                <mat-icon>volume_up</mat-icon>
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      
+      <audio #audioPlayer style="display: none;"></audio>
+    </div>
+  

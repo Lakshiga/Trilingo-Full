@@ -12,6 +12,7 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 import { LevelApiService, LevelResponse, LevelCreateDto } from '../../services/level-api.service';
 import { LanguageApiService, LanguageResponse } from '../../services/language-api.service';
 import { MultilingualFormComponent, MultilingualFormData } from '../common/multilingual-form.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-levels-table',
@@ -24,9 +25,8 @@ import { MultilingualFormComponent, MultilingualFormData } from '../common/multi
     MatCardModule,
     MatDialogModule,
     MatProgressSpinnerModule,
-    MatSelectModule,
-    MatFormFieldModule,
-    MultilingualFormComponent
+    MultilingualFormComponent,
+    RouterLink
   ],
   template: `
     <mat-card>
@@ -70,16 +70,13 @@ import { MultilingualFormComponent, MultilingualFormData } from '../common/multi
               <td mat-cell *matCellDef="let level">{{ level.name_si }}</td>
             </ng-container>
 
-            <!-- Language Column -->
-            <ng-container matColumnDef="language">
-              <th mat-header-cell *matHeaderCellDef>Language</th>
-              <td mat-cell *matCellDef="let level">{{ getLanguageName(level.languageId) }}</td>
-            </ng-container>
-
             <!-- Actions Column -->
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef>Actions</th>
               <td mat-cell *matCellDef="let level">
+                <button mat-button color="primary" [routerLink]="['/lessons']" [queryParams]="{ levelId: level.id }">
+                  MANAGE LESSONS
+                </button>
                 <button mat-icon-button (click)="openEditDialog(level)" color="primary">
                   <mat-icon>edit</mat-icon>
                 </button>
@@ -113,15 +110,6 @@ import { MultilingualFormComponent, MultilingualFormData } from '../common/multi
         </app-multilingual-form>
         
         <div class="dialog-actions">
-          <mat-form-field appearance="outline" class="language-selector">
-            <mat-label>Language</mat-label>
-            <mat-select [(value)]="selectedLanguageId">
-              <mat-option *ngFor="let lang of languages" [value]="lang.id">
-                {{ lang.languageName }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-          
           <div class="action-buttons">
             <button mat-button (click)="closeDialog()">Cancel</button>
             <button mat-raised-button 
@@ -205,24 +193,22 @@ import { MultilingualFormComponent, MultilingualFormData } from '../common/multi
 })
 export class LevelsTableComponent implements OnInit, OnDestroy {
   levels: LevelResponse[] = [];
-  languages: LanguageResponse[] = [];
   isLoading = false;
   showDialog = false;
   dialogMode: 'add' | 'edit' = 'add';
   currentLevel: LevelResponse | null = null;
-  selectedLanguageId: number = 1; // Default to first language
+  selectedLanguageId: number = 1; // Default language (hidden from UI)
   currentFormData: MultilingualFormData = {
     name_en: '',
     name_ta: '',
     name_si: ''
   };
   
-  displayedColumns: string[] = ['id', 'name_en', 'name_ta', 'name_si', 'language', 'actions'];
+  displayedColumns: string[] = ['id', 'name_en', 'name_ta', 'name_si', 'actions'];
   private destroy$ = new Subject<void>();
 
   constructor(
-    private levelApiService: LevelApiService,
-    private languageApiService: LanguageApiService
+    private levelApiService: LevelApiService
   ) {}
 
   ngOnInit(): void {
@@ -240,29 +226,15 @@ export class LevelsTableComponent implements OnInit, OnDestroy {
 
   loadData(): void {
     this.isLoading = true;
-    
-    // Load both levels and languages
-    const levelsPromise = this.levelApiService.getAll().toPromise();
-    const languagesPromise = this.languageApiService.getAll().toPromise();
-    
-    Promise.all([levelsPromise, languagesPromise])
-      .then(([levels, languages]) => {
+    this.levelApiService.getAll().toPromise()
+      .then(levels => {
         this.levels = levels || [];
-        this.languages = languages || [];
-        if (this.languages.length > 0) {
-          this.selectedLanguageId = this.languages[0].id;
-        }
         this.isLoading = false;
       })
       .catch(error => {
         console.error('Error loading data:', error);
         this.isLoading = false;
       });
-  }
-
-  getLanguageName(languageId: number): string {
-    const language = this.languages.find(l => l.id === languageId);
-    return language ? language.languageName : 'Unknown';
   }
 
   openAddDialog(): void {
@@ -279,7 +251,8 @@ export class LevelsTableComponent implements OnInit, OnDestroy {
   openEditDialog(level: LevelResponse): void {
     this.dialogMode = 'edit';
     this.currentLevel = level;
-    this.selectedLanguageId = level.languageId;
+    // Keep existing languageId internally but do not expose selector
+    this.selectedLanguageId = level.languageId ?? 1;
     this.currentFormData = {
       name_en: level.name_en,
       name_ta: level.name_ta,

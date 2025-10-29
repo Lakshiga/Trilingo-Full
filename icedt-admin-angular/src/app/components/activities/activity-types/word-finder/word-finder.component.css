@@ -1,0 +1,75 @@
+
+    .word-finder-container {
+      padding: 24px;
+      font-family: sans-serif;
+      text-align: center;
+    }
+
+    .title {
+      margin-bottom: 24px;
+      margin-top: 0;
+    }
+
+    .target-card {
+      margin-bottom: 32px;
+      background-color: #9c27b0;
+      color: white;
+    }
+
+    .instruction {
+      margin-bottom: 16px;
+      font-size: 1.2rem;
+    }
+
+    .target-letter {
+      font-size: 4rem;
+      font-weight: bold;
+    }
+
+    .words-grid {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    mat-chip {
+      font-size: 1.5rem;
+      padding: 24px 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    mat-chip.found {
+      background-color: #4caf50 !important;
+      color: white !important;
+    }
+
+    mat-chip.incorrect {
+      background-color: #f44336 !important;
+      color: white !important;
+    }
+
+    .completion-section {
+      margin-top: 32px;
+    }
+
+    .completion-message {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .success-icon {
+      font-size: 2rem;
+      color: #4caf50;
+    }
+
+    .success-text {
+      color: #4caf50;
+      margin: 0;
+    }
+  

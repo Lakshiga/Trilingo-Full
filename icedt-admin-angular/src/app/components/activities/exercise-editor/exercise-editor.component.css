@@ -1,0 +1,41 @@
+.exercise-editor {
+  margin: 16px 0;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.exercise-title {
+  font-weight: bold;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.preview-button {
+  margin-right: 8px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.add-exercise-button {
+  width: 100%;
+  margin-top: 16px;
+}
+
+textarea.error {
+  border-color: #f44336;
+}
+
+mat-expansion-panel {
+  margin-bottom: 8px;
+}

@@ -1,0 +1,48 @@
+
+    <div class="recognition-grid-container">
+      <h1 class="title">{{ content.title }}</h1>
+
+      <mat-card class="instruction-card">
+        <mat-card-content>
+          <div class="instruction-content">
+            <span class="instruction-text">Listen:</span>
+            <button 
+              mat-icon-button 
+              (click)="playCurrentAudio()" 
+              [disabled]="isComplete"
+              class="audio-button"
+            >
+              <mat-icon>volume_up</mat-icon>
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="grid-container">
+        <div class="image-grid">
+          <div
+            *ngFor="let item of content.gridItems"
+            class="image-item"
+            (click)="handleImageClick(item.id)"
+          >
+            <img [src]="item.imageUrl" [alt]="'item ' + item.id" class="item-image" />
+            <div *ngIf="foundItems.includes(item.id)" class="checkmark-overlay">
+              <mat-icon class="checkmark-icon">check_circle</mat-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="completion-area">
+        <div *ngIf="isComplete" class="completion-message">
+          <h2 class="success-text">Well Done!</h2>
+          <button mat-stroked-button (click)="handleReset()">
+            <mat-icon>replay</mat-icon>
+            Play Again
+          </button>
+        </div>
+      </div>
+
+      <audio #audioElement style="display: none;"></audio>
+    </div>
+  

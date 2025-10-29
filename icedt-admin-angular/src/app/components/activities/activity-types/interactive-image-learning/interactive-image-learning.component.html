@@ -1,0 +1,73 @@
+
+    <div class="interactive-image-container">
+      <h1 class="title">{{ content.title }}</h1>
+      
+      <!-- Display current object name and audio controls -->
+      <mat-card class="info-card">
+        <mat-card-content>
+          <div *ngIf="showObjectName; else defaultMessage" class="object-info">
+            <span class="object-name">{{ showObjectName.name }}</span>
+            <button mat-icon-button (click)="playObjectAudio()" class="audio-button">
+              <mat-icon>volume_up</mat-icon>
+            </button>
+          </div>
+          <ng-template #defaultMessage>
+            <p class="instruction">
+              படத்தில் உள்ள பொருட்களை அழுத்தி கேளுங்கள் (Click on objects in the image to learn)
+            </p>
+          </ng-template>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Progress indicator -->
+      <div class="progress-section">
+        <p class="progress-text">
+          Progress: {{ clickedObjects.length }} / {{ content.objects.length }} objects explored
+        </p>
+      </div>
+
+      <!-- The Interactive Image Container -->
+      <div class="image-container">
+        <img 
+          [src]="getImageUrl()" 
+          [alt]="content.title" 
+          class="main-image"
+        />
+        
+        <!-- Overlay for Interactive Objects -->
+        <div
+          *ngFor="let object of content.objects"
+          class="interactive-object"
+          [class.clicked]="clickedObjects.includes(object.id)"
+          [class.playing]="currentlyPlaying === object.id"
+          [style.top.%]="object.y"
+          [style.left.%]="object.x"
+          [style.width.%]="object.width"
+          [style.height.%]="object.height"
+          (click)="handleObjectClick(object)"
+        >
+          <div *ngIf="clickedObjects.includes(object.id) && currentlyPlaying !== object.id" class="checkmark">
+            ✓
+          </div>
+        </div>
+      </div>
+      
+      <!-- Control buttons -->
+      <div class="controls">
+        <button 
+          mat-stroked-button 
+          (click)="handleReset()"
+          [disabled]="clickedObjects.length === 0"
+        >
+          <mat-icon>replay</mat-icon>
+          Reset
+        </button>
+        
+        <div *ngIf="allObjectsClicked" class="completion-message">
+          🎉 All objects explored! Well done!
+        </div>
+      </div>
+      
+      <audio #audioElement style="display: none;"></audio>
+    </div>
+  

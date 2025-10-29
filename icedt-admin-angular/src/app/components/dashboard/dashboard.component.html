@@ -1,0 +1,144 @@
+
+    <div class="dashboard-container">
+      <div class="dashboard-header">
+        <h1>Dashboard Overview</h1>
+        <p class="welcome-message">Welcome back! Here's what's happening with your Tamil learning platform.</p>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="summary-cards">
+        <mat-card class="summary-card">
+          <mat-card-content>
+            <div class="card-content">
+              <div class="card-icon">
+                <mat-icon>extension</mat-icon>
+              </div>
+              <div class="card-info">
+                <h3>TOTAL ACTIVITIES</h3>
+                <div class="card-value">{{ totalActivities }}</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="summary-card">
+          <mat-card-content>
+            <div class="card-content">
+              <div class="card-icon">
+                <mat-icon>games</mat-icon>
+              </div>
+              <div class="card-info">
+                <h3>TOTAL GAMES</h3>
+                <div class="card-value">{{ totalGames }}</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="summary-card">
+          <mat-card-content>
+            <div class="card-content">
+              <div class="card-icon">
+                <mat-icon>people</mat-icon>
+              </div>
+              <div class="card-info">
+                <h3>TOTAL USERS</h3>
+                <div class="card-value">{{ totalUsers }}</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="summary-card">
+          <mat-card-content>
+            <div class="card-content">
+              <div class="card-icon">
+                <mat-icon>attach_money</mat-icon>
+              </div>
+              <div class="card-info">
+                <h3>TOTAL REVENUE</h3>
+                <div class="card-value">{{ totalRevenue }}</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="charts-section">
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>Activities Overview</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="chart-container">
+              <div class="chart-placeholder">
+                <mat-icon>show_chart</mat-icon>
+                <p>Activities Growth Chart</p>
+                <div class="chart-data">
+                  <div class="chart-line"></div>
+                  <div class="chart-points">
+                    <span class="point" style="left: 10%; bottom: 20%;"></span>
+                    <span class="point" style="left: 30%; bottom: 40%;"></span>
+                    <span class="point" style="left: 50%; bottom: 60%;"></span>
+                    <span class="point" style="left: 70%; bottom: 80%;"></span>
+                    <span class="point" style="left: 90%; bottom: 70%;"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>User Engagement Distribution</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="chart-container">
+              <div class="pie-chart-placeholder">
+                <div class="pie-chart">
+                  <div class="pie-slice slice-1" style="--percentage: 60%; --color: #4CAF50;"></div>
+                  <div class="pie-slice slice-2" style="--percentage: 25%; --color: #2196F3;"></div>
+                  <div class="pie-slice slice-3" style="--percentage: 15%; --color: #FF9800;"></div>
+                </div>
+                <div class="pie-legend">
+                  <div class="legend-item">
+                    <span class="legend-color" style="background: #4CAF50;"></span>
+                    <span>Active Users (60%)</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color" style="background: #2196F3;"></span>
+                    <span>New Users (25%)</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color" style="background: #FF9800;"></span>
+                    <span>Returning Users (15%)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="action-buttons">
+          <button mat-raised-button color="primary" (click)="navigateTo('/levels')">
+            <mat-icon>school</mat-icon>
+            Manage Levels
+          </button>
+          <button mat-raised-button color="accent" (click)="navigateTo('/main-activities')">
+            <mat-icon>extension</mat-icon>
+            Manage Activities
+          </button>
+          <button mat-raised-button color="warn" (click)="navigateTo('/games')">
+            <mat-icon>games</mat-icon>
+            Manage Games
+          </button>
+        </div>
+      </div>
+    </div>
+  

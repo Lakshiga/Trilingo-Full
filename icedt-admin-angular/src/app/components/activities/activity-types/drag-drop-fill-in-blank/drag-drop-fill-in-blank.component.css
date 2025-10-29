@@ -1,0 +1,94 @@
+
+    .drag-drop-container {
+      padding: 24px;
+      font-family: sans-serif;
+      text-align: center;
+    }
+
+    .title {
+      margin-bottom: 16px;
+      margin-top: 0;
+    }
+
+    .instruction {
+      margin-bottom: 32px;
+      color: #666;
+    }
+
+    .sentence-card {
+      margin-bottom: 32px;
+    }
+
+    .sentence-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 80px;
+    }
+
+    .sentence-part {
+      font-size: 1.5rem;
+    }
+
+    .drop-zone {
+      min-width: 150px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 2px dashed #ccc;
+      transition: all 0.3s;
+      background-color: white;
+    }
+
+    .drop-zone.active {
+      background-color: #e3f2fd;
+    }
+
+    .drop-zone.correct {
+      border-color: #4caf50;
+      background-color: #e8f5e9;
+    }
+
+    .drop-zone.incorrect {
+      border-color: #f44336;
+      background-color: #ffebee;
+    }
+
+    .drop-text {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .choices-title {
+      margin-bottom: 16px;
+    }
+
+    .choices-container {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .choice-item {
+      padding: 10px 20px;
+      background-color: #1976d2;
+      color: white;
+      border-radius: 4px;
+      cursor: grab;
+      font-size: 1.2rem;
+      transition: transform 0.2s;
+    }
+
+    .choice-item:hover {
+      transform: scale(1.05);
+    }
+
+    .choice-item:active {
+      cursor: grabbing;
+    }
+  

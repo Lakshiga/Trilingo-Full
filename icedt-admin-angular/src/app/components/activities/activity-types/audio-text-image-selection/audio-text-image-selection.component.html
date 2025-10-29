@@ -1,0 +1,67 @@
+
+    <div class="container" *ngIf="content; else noContent">
+      <!-- Title -->
+      <h2 class="title">{{ content.title }}</h2>
+
+      <!-- Text Display with Audio Button -->
+      <div class="text-audio-container">
+        <div class="text-display">{{ content.text }}</div>
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="playAudio()"
+          class="audio-button"
+        >
+          <mat-icon>volume_up</mat-icon>
+        </button>
+      </div>
+
+      <!-- Result Display -->
+      <div class="result-alert" *ngIf="showResult" [class.success]="isCorrect" [class.error]="!isCorrect">
+        <mat-icon>{{ isCorrect ? 'check_circle' : 'cancel' }}</mat-icon>
+        <span>{{ isCorrect ? 'சரியான பதில்! (Correct Answer!)' : 'தவறான பதில். மீண்டும் முயற்சி செய்யுங்கள். (Wrong Answer. Try Again.)' }}</span>
+      </div>
+
+      <!-- Images Display -->
+      <div class="images-container">
+        <mat-card
+          *ngFor="let image of content.images"
+          class="image-card"
+          [class.selected]="selectedImageId === image.id"
+          [class.matched]="showResult"
+          [class.correct]="showResult && image.isCorrect"
+          [class.incorrect]="showResult && !image.isCorrect"
+          (click)="!showResult && handleImageSelect(image.id)"
+        >
+          <img mat-card-image [src]="image.imageUrl" [alt]="'Option ' + image.id">
+        </mat-card>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="actions">
+        <button
+          *ngIf="showResult"
+          mat-raised-button
+          color="primary"
+          (click)="resetActivity()"
+          class="action-button"
+        >
+          மீண்டும் முயற்சி செய் (Try Again)
+        </button>
+        <button
+          mat-stroked-button
+          (click)="playAudio()"
+          class="action-button"
+        >
+          <mat-icon>volume_up</mat-icon>
+          மீண்டும் கேள் (Listen Again)
+        </button>
+      </div>
+
+      <audio #audioPlayer style="display: none;"></audio>
+    </div>
+
+    <ng-template #noContent>
+      <div class="error-message">No content to display.</div>
+    </ng-template>
+  

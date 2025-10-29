@@ -1,0 +1,95 @@
+<div class="activities-list-page">
+  <div class="header">
+    <div class="breadcrumb">
+      <a href="#" (click)="goBack()">← BACK TO LIST</a>
+    </div>
+    
+    <div class="title-section">
+      <h1>{{ isLoading ? 'Loading...' : 'Activities for: "' + (lesson ? languageService.getText(lesson.lessonName) : '') + '"' }}</h1>
+      <button 
+        mat-raised-button 
+        color="primary"
+        [routerLink]="['/activity-edit']"
+        [queryParams]="{lessonId: lessonId}"
+        [disabled]="!lessonId || isLoading">
+        + ADD NEW ACTIVITY
+      </button>
+    </div>
+  </div>
+  
+  <app-sidebar-language-manager></app-sidebar-language-manager>
+
+  <div class="table-container" *ngIf="!error">
+    <table mat-table [dataSource]="activities" class="activities-table">
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let activity">{{ activity.activityId }}</td>
+      </ng-container>
+      
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef>Activity Title</th>
+        <td mat-cell *matCellDef="let activity">{{ getDisplayText(activity.title) }}</td>
+      </ng-container>
+      
+      <ng-container matColumnDef="order">
+        <th mat-header-cell *matHeaderCellDef>Sequence Order</th>
+        <td mat-cell *matCellDef="let activity">{{ activity.sequenceOrder }}</td>
+      </ng-container>
+      
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let activity">
+          <button 
+            mat-button 
+            color="primary"
+            (click)="openPreview(activity.activityId)"
+            title="Preview Activity">
+            <mat-icon>visibility</mat-icon>
+            PREVIEW
+          </button>
+          <button 
+            mat-icon-button 
+            color="primary"
+            [routerLink]="['/activity-edit']"
+            [queryParams]="{activityId: activity.activityId}"
+            title="Edit Activity">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button 
+            mat-icon-button 
+            color="warn"
+            (click)="deleteActivity(activity.activityId)"
+            title="Delete Activity">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    
+    <div class="loading-row" *ngIf="isLoading">
+      <mat-spinner></mat-spinner>
+    </div>
+    
+    <div class="no-data-row" *ngIf="!isLoading && activities.length === 0">
+      <p>No activities found for this lesson.</p>
+    </div>
+  </div>
+  
+  <div class="error-message" *ngIf="error">
+    <mat-card>
+      <mat-card-content>
+        <p>{{ error }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  
+  <app-activity-player-modal
+    [isOpen]="isPreviewOpen"
+    (onClose)="closePreview()"
+    [activity]="activityToPreview"
+    [isLoading]="isPreviewLoading">
+  </app-activity-player-modal>
+</div>

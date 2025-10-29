@@ -1,0 +1,34 @@
+
+    <div class="container" *ngIf="content; else noContent">
+      <h2 class="title">{{ content.title }}</h2>
+      
+      <mat-card class="flashcard">
+        <img 
+          mat-card-image 
+          [src]="getImageUrl(content.imageUrl)" 
+          [alt]="content.word"
+          class="card-image"
+        />
+        <mat-card-content class="card-content">
+          <div class="word-container">
+            <span class="word">{{ content.word }}</span>
+            <button
+              *ngIf="content.audioUrl"
+              mat-icon-button
+              color="primary"
+              (click)="playAudio()"
+              class="audio-button"
+            >
+              <mat-icon>volume_up</mat-icon>
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <audio #audioPlayer style="display: none;"></audio>
+    </div>
+
+    <ng-template #noContent>
+      <div class="error-message">No flashcard content to display.</div>
+    </ng-template>
+  

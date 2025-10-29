@@ -1,0 +1,113 @@
+
+    .word-bank-container {
+      padding: 24px;
+      font-family: sans-serif;
+    }
+
+    .title {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .sentences-card {
+      margin-bottom: 24px;
+    }
+
+    .sentence-row {
+      display: flex;
+      align-items: center;
+      margin: 16px 0;
+      flex-wrap: wrap;
+    }
+
+    .sentence-text {
+      font-size: 1rem;
+    }
+
+    .blank-chip {
+      min-width: 120px;
+      height: 40px;
+      font-size: 1rem;
+      cursor: pointer;
+      border: 1px dashed grey;
+      background-color: #eee;
+      border-radius: 16px;
+      padding: 8px 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 4px;
+    }
+
+    .blank-chip.correct {
+      border: 2px solid green;
+      background-color: #e8f5e9;
+    }
+
+    .blank-chip.incorrect {
+      border: 2px solid red;
+      background-color: #ffebee;
+    }
+
+    .instructions {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .word-bank-card {
+      margin-bottom: 24px;
+    }
+
+    .word-bank {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .word-chip {
+      font-size: 1.1rem;
+      cursor: pointer;
+      border: 1px solid #1976d2;
+      background-color: transparent;
+      color: #1976d2;
+      border-radius: 16px;
+      padding: 8px 16px;
+      transition: all 0.2s;
+    }
+
+    .word-chip:hover {
+      background-color: #e3f2fd;
+    }
+
+    .word-chip.selected {
+      background-color: #9c27b0;
+      color: white;
+      border-color: #9c27b0;
+    }
+
+    .word-chip.used {
+      background-color: #1976d2;
+      color: white;
+      cursor: default;
+    }
+
+    .actions {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .result-message {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 500;
+    }
+
+    .result-message.success {
+      color: #4caf50;
+    }
+
+    .result-message.error {
+      color: #f44336;
+    }
+  

@@ -10,11 +10,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Router, ActivatedRoute } from '@angular/router';
 import { LessonApiService, LessonCreateDto, MultilingualLesson } from '../../services/lesson-api.service';
 import { MultilingualText } from '../../types/multilingual.types';
 import { LanguageService } from '../../services/language.service';
 import { MultilingualInputComponent } from '../common/multilingual-input.component';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-lessons',
@@ -33,272 +33,8 @@ import { MultilingualInputComponent } from '../common/multilingual-input.compone
     MatProgressSpinnerModule,
     MultilingualInputComponent
   ],
-  template: `
-    <div class="lessons-container">
-      <div class="header">
-        <div class="breadcrumb">
-          <a href="#" (click)="goBack()">← BACK TO LEVEL #{{ levelId }}</a>
-        </div>
-        <h2>Manage Lessons for: "Level #{{ levelId }}"</h2>
-        <button mat-raised-button color="primary" (click)="openAddLessonDialog()" [disabled]="isLoading">
-          + ADD NEW LESSON
-        </button>
-      </div>
-
-      <div class="content">
-        <div class="loading-container" *ngIf="isLoading">
-          <mat-spinner></mat-spinner>
-          <p>Loading lessons...</p>
-        </div>
-        
-        <div class="error-message" *ngIf="error">
-          <p>{{ error }}</p>
-          <button mat-button color="primary" (click)="loadLessons()">Retry</button>
-        </div>
-        
-        <div class="table-container" *ngIf="!isLoading && !error">
-          <table mat-table [dataSource]="lessons" class="lessons-table">
-            <ng-container matColumnDef="lessonId">
-              <th mat-header-cell *matHeaderCellDef>ID</th>
-              <td mat-cell *matCellDef="let lesson">{{ lesson.lessonId }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="lessonName">
-              <th mat-header-cell *matHeaderCellDef>Lesson Name</th>
-              <td mat-cell *matCellDef="let lesson">{{ getDisplayText(lesson.lessonName) }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="slug">
-              <th mat-header-cell *matHeaderCellDef>Slug</th>
-              <td mat-cell *matCellDef="let lesson">{{ lesson.slug }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="description">
-              <th mat-header-cell *matHeaderCellDef>Description</th>
-              <td mat-cell *matCellDef="let lesson">{{ getDisplayText(lesson.description) || 'No description' }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="sequenceOrder">
-              <th mat-header-cell *matHeaderCellDef>Sequence Order</th>
-              <td mat-cell *matCellDef="let lesson">{{ lesson.sequenceOrder }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>Actions</th>
-              <td mat-cell *matCellDef="let lesson">
-                <button mat-button color="primary" (click)="manageActivities(lesson)" [disabled]="isLoading">
-                  MANAGE ACTIVITIES
-                </button>
-                <button mat-icon-button color="primary" (click)="editLesson(lesson)" [disabled]="isLoading">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button color="warn" (click)="deleteLesson(lesson)" [disabled]="isLoading">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-          </table>
-          
-          <div class="no-data" *ngIf="lessons.length === 0">
-            <p>No lessons found. Create your first lesson!</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Add/Edit Lesson Dialog -->
-    <div class="dialog-overlay" *ngIf="showDialog" (click)="closeDialog()">
-      <div class="dialog-content" (click)="$event.stopPropagation()">
-        <div class="dialog-header">
-          <h3>{{ isEditing ? 'Edit Lesson' : 'Add New Lesson' }}</h3>
-          <button mat-icon-button (click)="closeDialog()">
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
-        
-        <form class="lesson-form" (ngSubmit)="saveLesson()">
-          <app-multilingual-input
-            [value]="currentLesson.lessonName"
-            [label]="'Lesson Name'"
-            [required]="true"
-            (valueChange)="onLessonNameChange($event)">
-          </app-multilingual-input>
-
-          <app-multilingual-input
-            [value]="currentLesson.description || { ta: '', en: '', si: '' }"
-            [label]="'Description'"
-            [required]="false"
-            (valueChange)="onDescriptionChange($event)">
-          </app-multilingual-input>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Sequence Order</mat-label>
-            <input matInput type="number" [(ngModel)]="currentLesson.sequenceOrder" name="sequenceOrder" required>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Slug</mat-label>
-            <input matInput [(ngModel)]="currentLesson.slug" name="slug" required>
-          </mat-form-field>
-
-          <div class="form-actions">
-            <button mat-button type="button" (click)="closeDialog()" [disabled]="isSaving">Cancel</button>
-            <button mat-raised-button color="primary" type="submit" [disabled]="isSaving">
-              <mat-spinner *ngIf="isSaving" diameter="20"></mat-spinner>
-              {{ isEditing ? 'Update' : 'Add' }} Lesson
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .lessons-container {
-      padding: 0;
-      background: white;
-    }
-
-    .header {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 20px;
-      padding: 20px 20px 0 20px;
-    }
-
-    .breadcrumb {
-      margin-bottom: 10px;
-    }
-
-    .breadcrumb a {
-      color: #1976d2;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .breadcrumb a:hover {
-      text-decoration: underline;
-    }
-
-    .header h2 {
-      margin: 0;
-      color: #333;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .content {
-      padding: 0 20px 20px 20px;
-    }
-
-    .table-container {
-      overflow-x: auto;
-    }
-
-    .lessons-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .lessons-table th,
-    .lessons-table td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .lessons-table th {
-      background-color: #f5f5f5;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .lessons-table tr:hover {
-      background-color: #f9f9f9;
-    }
-
-    .loading-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px;
-    }
-
-    .loading-container mat-spinner {
-      margin-bottom: 16px;
-    }
-
-    .error-message {
-      text-align: center;
-      padding: 20px;
-      color: #d32f2f;
-    }
-
-    .error-message button {
-      margin-top: 12px;
-    }
-
-    .no-data {
-      text-align: center;
-      padding: 40px;
-      color: #666;
-    }
-
-    .dialog-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .dialog-content {
-      background: white;
-      border-radius: 8px;
-      padding: 0;
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .dialog-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .dialog-header h3 {
-      margin: 0;
-      color: #333;
-    }
-
-    .lesson-form {
-      padding: 20px;
-    }
-
-    .lesson-form mat-form-field {
-      width: 100%;
-      margin-bottom: 16px;
-    }
-
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      margin-top: 20px;
-    }
-  `]
+  templateUrl: './lessons.component.html',
+  styleUrls: ['./lessons.component.css']
 })
 export class LessonsComponent implements OnInit {
   lessons: MultilingualLesson[] = [];
@@ -308,12 +44,17 @@ export class LessonsComponent implements OnInit {
   isLoading = false;
   isSaving = false;
   error: string | null = null;
-  levelId: number = 1;
+  levelId: number = 1; // Default level ID
   
-  currentLesson: LessonCreateDto = {
-    lessonName: { ta: '', en: '', si: '' },
-    description: { ta: '', en: '', si: '' },
-    sequenceOrder: 1,
+  currentLesson: {
+    lessonName: MultilingualText;
+    description?: MultilingualText;
+    sequenceOrder: number;
+    slug: string;
+    levelId: number;
+  } = {
+    lessonName: { en: '', ta: '', si: '' },
+    sequenceOrder: 0,
     slug: '',
     levelId: 1
   };
@@ -328,8 +69,8 @@ export class LessonsComponent implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
-      this.levelId = params['levelId'] ? parseInt(params['levelId']) : 1;
-      this.currentLesson.levelId = this.levelId;
+      const paramId = parseInt(params['levelId'] ?? '1', 10);
+      this.levelId = Number.isNaN(paramId) ? 1 : paramId;
       this.loadLessons();
     });
   }
@@ -337,9 +78,9 @@ export class LessonsComponent implements OnInit {
   async loadLessons() {
     this.isLoading = true;
     this.error = null;
-    
     try {
-      this.lessons = await this.lessonApiService.getLessonsByLevelId(this.levelId).toPromise() || [];
+      const lessons = await this.lessonApiService.getLessonsByLevelId(this.levelId).toPromise();
+      this.lessons = lessons || [];
     } catch (err) {
       console.error('Error loading lessons:', err);
       this.error = err instanceof Error ? err.message : 'Failed to load lessons';
@@ -351,32 +92,19 @@ export class LessonsComponent implements OnInit {
 
   getDisplayText(content: MultilingualText | undefined): string {
     if (!content) return '';
-    return this.languageService.getText(content);
-  }
-
-  onLessonNameChange(value: MultilingualText) {
-    this.currentLesson.lessonName = value;
-  }
-
-  onDescriptionChange(value: MultilingualText) {
-    this.currentLesson.description = value;
+    return content.en || content.ta || content.si || '';
   }
 
   goBack() {
+    // Navigate back to levels page
     this.router.navigate(['/levels']);
-  }
-
-  manageActivities(lesson: MultilingualLesson) {
-    // Navigate to activities page with lessonId parameter
-    window.location.href = `/activities?lessonId=${lesson.lessonId}`;
   }
 
   openAddLessonDialog() {
     this.isEditing = false;
     this.currentLesson = {
-      lessonName: { ta: '', en: '', si: '' },
-      description: { ta: '', en: '', si: '' },
-      sequenceOrder: this.lessons.length + 1,
+      lessonName: { en: '', ta: '', si: '' },
+      sequenceOrder: 0,
       slug: '',
       levelId: this.levelId
     };
@@ -387,7 +115,7 @@ export class LessonsComponent implements OnInit {
     this.isEditing = true;
     this.currentLesson = {
       lessonName: lesson.lessonName,
-      description: lesson.description || { ta: '', en: '', si: '' },
+      description: lesson.description,
       sequenceOrder: lesson.sequenceOrder,
       slug: lesson.slug,
       levelId: lesson.levelId
@@ -413,29 +141,52 @@ export class LessonsComponent implements OnInit {
     }
   }
 
+  manageActivities(lesson: MultilingualLesson) {
+    // Navigate to activities page for this lesson
+    this.router.navigate(['/activities'], { queryParams: { lessonId: lesson.lessonId } });
+  }
+
   async saveLesson() {
-    if (!this.currentLesson.lessonName || !this.currentLesson.slug) {
-      this.snackBar.open('Lesson name and slug are required', 'Close', { duration: 3000 });
+    if (!this.currentLesson.lessonName.en && !this.currentLesson.lessonName.ta && !this.currentLesson.lessonName.si) {
+      this.snackBar.open('Lesson name is required in at least one language', 'Close', { duration: 3000 });
+      return;
+    }
+
+    if (!this.currentLesson.slug) {
+      this.snackBar.open('Slug is required', 'Close', { duration: 3000 });
       return;
     }
 
     this.isSaving = true;
     
     try {
+      const createDto: LessonCreateDto = {
+        lessonName: this.currentLesson.lessonName,
+        description: this.currentLesson.description,
+        sequenceOrder: this.currentLesson.sequenceOrder,
+        slug: this.currentLesson.slug,
+        levelId: this.currentLesson.levelId
+      };
+
       if (this.isEditing) {
         // Find the lesson to update
-        const lessonToUpdate = this.lessons.find(l => l.slug === this.currentLesson.slug);
+        const lessonToUpdate = this.lessons.find(l => 
+          l.lessonName.en === this.currentLesson.lessonName.en && 
+          l.lessonName.ta === this.currentLesson.lessonName.ta && 
+          l.lessonName.si === this.currentLesson.lessonName.si &&
+          l.levelId === this.currentLesson.levelId
+        );
         if (lessonToUpdate) {
-          await this.lessonApiService.update(lessonToUpdate.lessonId, this.currentLesson).toPromise();
+          await this.lessonApiService.update(lessonToUpdate.lessonId, createDto).toPromise();
           // Update local array
           const index = this.lessons.findIndex(l => l.lessonId === lessonToUpdate.lessonId);
           if (index !== -1) {
-            this.lessons[index] = { ...this.lessons[index], ...this.currentLesson };
+            this.lessons[index] = { ...this.lessons[index], ...createDto };
           }
         }
         this.snackBar.open('Lesson updated successfully', 'Close', { duration: 3000 });
       } else {
-        const newLesson = await this.lessonApiService.create(this.currentLesson).toPromise();
+        const newLesson = await this.lessonApiService.create(createDto).toPromise();
         if (newLesson) {
           this.lessons.push(newLesson);
           this.snackBar.open('Lesson created successfully', 'Close', { duration: 3000 });
@@ -454,13 +205,20 @@ export class LessonsComponent implements OnInit {
     }
   }
 
+  onLessonNameChange(value: MultilingualText) {
+    this.currentLesson.lessonName = value;
+  }
+
+  onDescriptionChange(value: MultilingualText) {
+    this.currentLesson.description = value;
+  }
+
   closeDialog() {
     this.showDialog = false;
     this.isEditing = false;
     this.currentLesson = {
-      lessonName: { ta: '', en: '', si: '' },
-      description: { ta: '', en: '', si: '' },
-      sequenceOrder: 1,
+      lessonName: { en: '', ta: '', si: '' },
+      sequenceOrder: 0,
       slug: '',
       levelId: this.levelId
     };

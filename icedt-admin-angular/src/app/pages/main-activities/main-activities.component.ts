@@ -5,9 +5,7 @@ import { MainActivitiesTableComponent } from '../../components/common/main-activ
 @Component({
   selector: 'app-main-activities',
   imports: [CommonModule, MainActivitiesTableComponent],
-  template: `
-    <app-main-activities-table></app-main-activities-table>
-  `
+  templateUrl: './main-activities.component.html'
 })
 export class MainActivitiesPageComponent {
 }

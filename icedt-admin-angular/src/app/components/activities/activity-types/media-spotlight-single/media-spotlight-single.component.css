@@ -1,0 +1,64 @@
+
+    .media-spotlight-container {
+      padding: 16px;
+      font-family: sans-serif;
+      text-align: center;
+    }
+
+    .spotlight-circle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 120px;
+      height: 120px;
+      background-color: #1976d2;
+      color: white;
+      border-radius: 50%;
+      margin-bottom: 24px;
+    }
+
+    .spotlight-letter {
+      font-size: 5rem;
+      font-weight: bold;
+    }
+
+    .media-card {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .item-card {
+      min-width: 250px;
+      margin: 0 8px;
+    }
+
+    .item-image {
+      height: 180px;
+      object-fit: contain;
+      padding: 8px;
+    }
+
+    .item-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .highlighted-word {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .word-part {
+      display: inline;
+    }
+
+    .word-part.highlighted {
+      color: #f44336;
+    }
+
+    .audio-button {
+      margin-left: 8px;
+    }
+  

@@ -1,0 +1,90 @@
+
+    .letter-shape-matching {
+      padding: 24px;
+      font-family: sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      background: #AD1457;
+      color: white;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-weight: bold;
+    }
+
+    .instruction-card {
+      background: #FCE4EC;
+      padding: 16px;
+      margin-bottom: 24px;
+      border-radius: 8px;
+    }
+
+    .instruction-card h2 {
+      font-weight: 600;
+      color: #880E4F;
+      margin-bottom: 8px;
+    }
+
+    .matching-area {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      gap: 32px;
+    }
+
+    .left-column, .right-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .item-card {
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 1.5rem;
+      border: 2px solid #bdbdbd;
+      transition: all 0.3s ease;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .item-card:hover {
+      transform: scale(1.02);
+    }
+
+    .item-card.selected {
+      border: 3px solid #1976d2;
+      background-color: #e3f2fd;
+    }
+
+    .item-card.matched {
+      border: 3px solid #2e7d32;
+      background-color: #e8f5e9;
+    }
+
+    .lines-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .completion-message {
+      margin-top: 32px;
+      text-align: center;
+      color: #2e7d32;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+  

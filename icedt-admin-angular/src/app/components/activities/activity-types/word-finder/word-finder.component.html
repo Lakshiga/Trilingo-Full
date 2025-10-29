@@ -1,0 +1,35 @@
+
+    <div class="word-finder-container">
+      <h1 class="title">{{ content.title }}</h1>
+
+      <mat-card class="target-card">
+        <mat-card-content>
+          <p class="instruction">Find all words with this letter:</p>
+          <div class="target-letter">{{ content.targetLetter }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="words-grid">
+        <mat-chip
+          *ngFor="let word of content.wordGrid"
+          [class.found]="foundWords.includes(word)"
+          [class.incorrect]="incorrectGuesses.includes(word)"
+          (click)="handleWordClick(word)"
+          [disabled]="foundWords.includes(word)"
+        >
+          {{ word }}
+        </mat-chip>
+      </div>
+
+      <div *ngIf="isComplete" class="completion-section">
+        <div class="completion-message">
+          <mat-icon class="success-icon">check_circle</mat-icon>
+          <h2 class="success-text">Great Job! Challenge Completed!</h2>
+        </div>
+        <button mat-stroked-button (click)="handleReset()">
+          <mat-icon>replay</mat-icon>
+          Reset this challenge
+        </button>
+      </div>
+    </div>
+  

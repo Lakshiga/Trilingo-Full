@@ -1,68 +1,120 @@
-# Monorepo .gitignore for Node/Expo/Angular/.NET
-
-# Dependencies
-node_modules/
-**/node_modules/
-.pnp/
-.pnp.js
-
-# Testing
-coverage/
-
-# Builds
-build/
-dist/
-web-build/
-
-# Expo / React Native
-.expo/
-.expo-shared/
-android/
-ios/
-
-# Angular
-.angular/
-**/dist/
-
-# TypeScript
-*.tsbuildinfo
-
-# Env
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-**/.env*
-
-# Editor/IDE
+# --- General ---
+*.log
+logs/
+*.swp
+*.tmp
+*.temp
+!.vscode/extensions.json
 .vscode/
 .idea/
-*.iml
-
-# Caches
-.eslintcache
-.stylelintcache
-
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# OS junk
+.vs/
 .DS_Store
 Thumbs.db
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 
-# .NET
+# --- Environment files ---
+.env
+*.env
+
+# --- Coverage ---
+coverage/
+coverage.lcov
+
+# --- Node/Frontend (Angular, React Native) ---
+node_modules/
+dist/
+.tmp/
+.cache/
+.next/
+.next-cache/
+.npm/
+
+# Angular output (explicit)
+icedt-admin-angular/dist/
+
+# React Native / Expo
+.expo/
+.expo-shared/
+.expo/*
+.expo/web-cache/
+.packager
+metro-cache/
+# React Native platform folders (not present yet but safe to ignore if generated)
+android/
+ios/
+# Keystores and signing
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+
+# --- Web build outputs ---
+build/
+web-build/
+www/
+
+# --- Images/Design working files ---
+*.psd
+*.ai
+*.sketch
+
+# --- .NET / Visual Studio ---
 **/bin/
 **/obj/
-**/.vs/
-**/*.user
-**/*.suo
+**/TestResults/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
 
-# Maps
-**/*.map
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/
+# Project lock and restore data (allowed): keep *.csproj, *.sln
+
+# Rider / ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# --- OS specific ---
+Icon\r
+$RECYCLE.BIN/
+
+# --- Misc caches ---
+.eslintcache
+.stylelintcache
+.tsbuildinfo
+
+# --- Yarn / PNPM / NPM caches ---
+.pnp.cjs
+.pnp.loader.mjs
+.pnp.data.json
+.yarn/*
+!.yarn/releases/
+!.yarn/plugins/
+!.yarn/sdks/
+!.yarn/versions/
+.pnpm-store/
+.npm/
+
+# --- Local tooling ---
+.env.local
+.env.*.local
+
+# --- Archive blobs (consider LFS) ---
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+
+# --- Media (consider LFS) ---
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.wav
+*.mp3
+
+# --- Editor backups ---
+*~

@@ -1,0 +1,62 @@
+
+    <div class="scene-finder-container">
+      <h1 class="title">{{ content.title }}</h1>
+      
+      <mat-card class="instruction-card">
+        <mat-card-content>
+          <div class="instruction-content">
+            <span class="instruction-text">Find:</span>
+            <span class="target-item">{{ isComplete ? "Well Done!" : currentItem?.name || "..." }}</span>
+            <button 
+              mat-icon-button
+              (click)="playCurrentItemAudio()" 
+              [disabled]="isComplete"
+              class="audio-button"
+            >
+              <mat-icon>volume_up</mat-icon>
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- The Scene Container -->
+      <div class="scene-container">
+        <img 
+          [src]="content.sceneImageUrl" 
+          [alt]="content.title" 
+          class="scene-image"
+        />
+        
+        <!-- Overlay for Hotspots -->
+        <div
+          *ngFor="let hotspot of content.hotspots"
+          class="hotspot"
+          [class.found]="foundItems.includes(hotspot.id)"
+          [style.top.%]="hotspot.y"
+          [style.left.%]="hotspot.x"
+          [style.width.%]="hotspot.width"
+          [style.height.%]="hotspot.height"
+          (click)="handleHotspotClick(hotspot.id)"
+        >
+          <div *ngIf="foundItems.includes(hotspot.id)" class="found-indicator">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Play Again Button -->
+      <div class="action-section">
+        <button 
+          *ngIf="isComplete" 
+          mat-raised-button
+          (click)="handleReset()"
+          class="play-again-button"
+        >
+          <mat-icon>replay</mat-icon>
+          Play Again
+        </button>
+      </div>
+
+      <audio #audioElement style="display: none;"></audio>
+    </div>
+  

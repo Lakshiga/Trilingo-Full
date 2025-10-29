@@ -4,10 +4,9 @@ import { LevelsTableComponent } from '../common/levels-table.component';
 
 @Component({
   selector: 'app-levels',
+  standalone: true,
   imports: [CommonModule, LevelsTableComponent],
-  template: `
-    <app-levels-table></app-levels-table>
-  `
+  templateUrl: './levels.component.html'
 })
 export class LevelsComponent {
 }

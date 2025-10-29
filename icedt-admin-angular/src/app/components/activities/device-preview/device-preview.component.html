@@ -1,0 +1,45 @@
+<div class="device-preview">
+  <div class="controls">
+    <mat-button-toggle-group 
+      [value]="device" 
+      (change)="onDeviceChange($event)"
+      class="control-group">
+      <mat-button-toggle value="phone">
+        <mat-icon>phone_iphone</mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle value="tablet">
+        <mat-icon>tablet_mac</mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+    
+    <mat-button-toggle-group 
+      [value]="orientation" 
+      (change)="onOrientationChange($event)"
+      class="control-group">
+      <mat-button-toggle value="portrait">
+        <mat-icon>stay_current_portrait</mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle value="landscape">
+        <mat-icon>stay_current_landscape</mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+  
+  <div class="preview-container">
+    <mat-card 
+      class="device-frame" 
+      [ngClass]="[device, orientation]"
+      [style]="getFrameStyles()">
+      <div class="content-area">
+        <app-activity-renderer 
+          *ngIf="activityData.activityTypeId && parsedContent" 
+          [activityTypeId]="activityData.activityTypeId"
+          [content]="parsedContent">
+        </app-activity-renderer>
+        <p *ngIf="!activityData.activityTypeId || !parsedContent" class="placeholder">
+          Select an activity type and provide JSON.
+        </p>
+      </div>
+    </mat-card>
+  </div>
+</div>

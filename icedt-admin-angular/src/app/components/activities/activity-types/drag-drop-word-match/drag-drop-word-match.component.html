@@ -1,0 +1,49 @@
+
+    <div class="drag-drop-word-match">
+      <h1>{{ content.title }}</h1>
+      
+      <div class="success-message" *ngIf="isComplete">
+        <mat-icon>check_circle</mat-icon>
+        சரியாகப் பொருத்திவிட்டீர்கள்! (Matched Correctly!)
+      </div>
+      
+      <div class="error-message" *ngIf="error">
+        தவறான பொருத்தம். (Incorrect Match.)
+      </div>
+      
+      <div class="grid-container">
+        <!-- Column for Targets (Drop Zones) -->
+        <div class="targets-column">
+          <h3>{{ content.targetTitle }}</h3>
+          <div 
+            *ngFor="let target of content.targets" 
+            class="target-item"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop($event, target.id)"
+            [class.matched]="matchedPairs[target.id]">
+            <span class="target-text">{{ target.text }}</span>
+            <div 
+              *ngIf="matchedPairs[target.id]" 
+              class="matched-word">
+              {{ getMatchedWordText(target.id) }}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Column for Sources (Draggable Items) -->
+        <div class="sources-column">
+          <h3>{{ content.sourceTitle }}</h3>
+          <div 
+            *ngFor="let source of shuffledSources" 
+            class="source-item"
+            [draggable]="!isMatched(source.id)"
+            (dragstart)="onDragStart($event, source)"
+            [class.dragging]="draggedItem?.id === source.id"
+            [class.matched]="isMatched(source.id)"
+            *ngIf="!isMatched(source.id)">
+            {{ source.text }}
+          </div>
+        </div>
+      </div>
+    </div>
+  

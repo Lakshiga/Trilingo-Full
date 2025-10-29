@@ -1,0 +1,64 @@
+
+    <mat-card class="song-player-card">
+      <!-- Album Art and Song Info -->
+      <div class="song-info">
+        <div class="album-art">
+          <img 
+            [src]="content.albumArtUrl || 'default_album_art.png'" 
+            [alt]="content.title"
+            class="album-image"
+          />
+        </div>
+        <h1 class="song-title">{{ content.title }}</h1>
+        <p *ngIf="content.artist" class="artist-name">{{ content.artist }}</p>
+      </div>
+
+      <!-- Lyrics Area with Auto-Scroll -->
+      <div class="lyrics-container" #lyricsContainer>
+        <div
+          *ngFor="let line of content.lyrics; let i = index"
+          class="lyric-line"
+          [class.active]="i === activeLineIndex"
+          [class.inactive]="i !== activeLineIndex"
+          #lyricLine
+        >
+          {{ line.text }}
+        </div>
+      </div>
+
+      <!-- Audio Player Controls -->
+      <div class="player-controls">
+        <audio 
+          #audioElement 
+          [src]="content.audioUrl" 
+          style="display: none;"
+          (loadedmetadata)="onLoadedMetadata()"
+          (timeupdate)="onTimeUpdate()"
+          (ended)="onEnded()"
+        ></audio>
+        
+        <mat-slider
+          [min]="0"
+          [max]="duration"
+          [step]="1"
+          [ngModel]="currentTime"
+          (ngModelChange)="onSliderChange($event)"
+          class="time-slider"
+        ></mat-slider>
+        
+        <div class="time-display">
+          <span class="current-time">{{ formatTime(currentTime) }}</span>
+          <span class="total-time">{{ formatTime(duration) }}</span>
+        </div>
+        
+        <div class="control-buttons">
+          <button mat-icon-button (click)="togglePlayPause()" class="play-pause-button">
+            <mat-icon>{{ isPlaying ? 'pause' : 'play_arrow' }}</mat-icon>
+          </button>
+          <button mat-icon-button (click)="handleReplay()">
+            <mat-icon>replay</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-card>
+  

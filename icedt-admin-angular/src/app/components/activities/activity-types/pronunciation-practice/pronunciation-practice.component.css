@@ -1,0 +1,76 @@
+
+    .pronunciation-container {
+      padding: 24px;
+      font-family: sans-serif;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: center;
+    }
+
+    .title {
+      margin-bottom: 16px;
+      color: #1976d2;
+      font-size: 2rem;
+    }
+
+    .instruction {
+      margin-bottom: 24px;
+      color: #666;
+    }
+
+    .display-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      background-color: #f8f9fa;
+      min-height: 250px;
+      border-radius: 16px;
+    }
+
+    .text-display {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 24px;
+      color: #333;
+    }
+
+    .play-button {
+      transform: scale(2.5);
+      background-color: #e3f2fd;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      min-width: 80px;
+    }
+
+    .play-button:hover {
+      background-color: #bbdefb;
+    }
+
+    .play-button:disabled {
+      opacity: 0.6;
+    }
+
+    .error-message {
+      padding: 24px;
+      color: #f44336;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .text-display {
+        font-size: 2rem;
+      }
+      
+      .play-button {
+        transform: scale(2);
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
+      }
+    }
+  

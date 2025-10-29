@@ -1,17 +1,21 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 // MatTypographyModule is not available in Angular Material v19
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { ActivityFormComponent } from '../../components/activities/activity-form.component';
-import { DevicePreviewComponent } from '../../components/activities/device-preview.component';
-import { ExerciseEditorComponent } from '../../components/activities/exercise-editor.component';
+import { ActivityFormComponent } from '../../components/activities/activity-form/activity-form.component';
+import { DevicePreviewComponent } from '../../components/activities/device-preview/device-preview.component';
+import { ExerciseEditorComponent } from '../../components/activities/exercise-editor/exercise-editor.component';
 import { MultilingualActivityTemplates } from '../../services/multilingual-activity-templates.service';
+import { SidebarLanguageManagerComponent } from '../../components/common/sidebar-language-manager.component';
 import { ActivityApiService, MultilingualActivity } from '../../services/activity-api.service';
 import { MainActivityApiService, MainActivityResponse } from '../../services/main-activity-api.service';
 import { ActivityTypeApiService, ActivityTypeResponse } from '../../services/activity-type-api.service';
@@ -35,274 +39,22 @@ interface ActivityCreateDto {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatGridListModule,
     ActivityFormComponent,
     DevicePreviewComponent,
     ExerciseEditorComponent,
+    SidebarLanguageManagerComponent,
   ],
-  template: `
-    <div class="activity-editor-page">
-      <div class="header">
-        <h1>{{ isEditMode ? 'Edit Activity #' + activityId : 'Add New Activity' }}</h1>
-        
-        <div class="actions">
-          <button 
-            mat-button 
-            (click)="goBack()">
-            ← BACK TO LIST
-          </button>
-          <button 
-            mat-raised-button 
-            color="primary"
-            (click)="handleSave()">
-            💾 SAVE ENTIRE ACTIVITY
-          </button>
-        </div>
-      </div>
-      
-      <div class="content" *ngIf="!isLoading && activity">
-        <div class="grid-container">
-          <!-- Column 1: Activity Details Form -->
-          <div class="form-column">
-            <mat-card>
-              <mat-card-header>
-                <mat-card-title>Activity Details</mat-card-title>
-              </mat-card-header>
-              <mat-card-content>
-                <app-activity-form
-                  [activityData]="activity"
-                  [mainActivities]="mainActivities"
-                  [activityTypes]="activityTypes"
-                  (onDataChange)="handleFormChangeWrapper($event)">
-                </app-activity-form>
-              </mat-card-content>
-            </mat-card>
-          </div>
-          
-          <!-- Column 2: JSON Template & Exercises -->
-          <div class="editor-column">
-            <div class="template-section">
-              <div class="template-header">
-                <h3>JSON Template</h3>
-                <button 
-                  mat-button 
-                  (click)="handleCopyTemplate()"
-                  [disabled]="!activity.activityTypeId">
-                  COPY TEMPLATE
-                </button>
-              </div>
-              <p class="template-description">
-                This is the required structure for the selected Activity Type.
-              </p>
-              <div class="template-content">
-                <pre><code>{{ getActivityTemplate(activity.activityTypeId || 0) }}</code></pre>
-              </div>
-            </div>
-            
-            <div class="exercises-section">
-              <h3>Exercises</h3>
-              <app-exercise-editor
-                [activityData]="activity"
-                (onDataChange)="handleFormChangeWrapper($event)"
-                (onPreviewExercise)="handlePreviewExerciseWrapper($event)"
-                [expandedExercise]="expandedExercise"
-                (onExpansionChange)="handleExpansionChangeWrapper($event)"
-                (onSetExpanded)="handleSetExpandedWrapper($event)">
-              </app-exercise-editor>
-            </div>
-          </div>
-          
-          <!-- Column 3: Device Preview -->
-          <div class="preview-column">
-            <div class="device-selectors">
-              <div class="device-icon active">📱</div>
-              <div class="device-icon">📱</div>
-              <div class="device-icon">📱</div>
-              <div class="device-icon">📱</div>
-            </div>
-            <div class="preview-content">
-              <p>Select an activity type and provide JSON.</p>
-              <app-device-preview 
-                *ngIf="previewContent"
-                [activityData]="previewContent">
-              </app-device-preview>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <mat-spinner *ngIf="isLoading" class="loading-spinner"></mat-spinner>
-    </div>
-  `,
-  styles: [`
-    .activity-editor-page {
-      padding: 0;
-      background: white;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      padding: 20px 20px 0 20px;
-    }
-
-    .header h1 {
-      margin: 0;
-      color: #333;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .actions {
-      display: flex;
-      gap: 16px;
-    }
-
-    .content {
-      padding: 0 20px 20px 20px;
-    }
-
-    .grid-container {
-      display: grid;
-      grid-template-columns: 1fr 1.5fr 1fr;
-      gap: 24px;
-      align-items: start;
-    }
-
-    .form-column {
-      position: sticky;
-      top: 24px;
-    }
-
-    .editor-column {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .preview-column {
-      position: sticky;
-      top: 24px;
-      height: calc(100vh - 120px);
-    }
-
-    .template-section {
-      background: #f5f5f5;
-      padding: 16px;
-      border-radius: 8px;
-    }
-
-    .template-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .template-header h3 {
-      margin: 0;
-      color: #333;
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .template-description {
-      margin: 0 0 16px 0;
-      color: #666;
-      font-size: 0.875rem;
-    }
-
-    .template-content {
-      max-height: 300px;
-      overflow-y: auto;
-      background: white;
-      padding: 16px;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-    }
-
-    .template-content pre {
-      margin: 0;
-      white-space: pre-wrap;
-      word-break: break-all;
-      font-size: 0.75rem;
-    }
-
-    .exercises-section h3 {
-      margin: 0 0 16px 0;
-      color: #333;
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .device-selectors {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .device-icon {
-      width: 40px;
-      height: 40px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .device-icon.active {
-      border-color: #1976d2;
-      background-color: #e3f2fd;
-    }
-
-    .device-icon:hover {
-      border-color: #1976d2;
-    }
-
-    .preview-content {
-      background: #f8f9fa;
-      border-radius: 8px;
-      padding: 20px;
-      min-height: 400px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
-
-    .preview-content p {
-      color: #666;
-      margin: 0 0 20px 0;
-    }
-
-    .loading-spinner {
-      margin: 32px auto;
-    }
-
-    @media (max-width: 1200px) {
-      .grid-container {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-      
-      .form-column,
-      .preview-column {
-        position: static;
-      }
-    }
-  `]
+  templateUrl: './activity-editor.component.html',
+  styleUrls: ['./activity-editor.component.css']
 })
 export class ActivityEditorPageComponent implements OnInit, OnDestroy {
   activityId: string | null = null;
@@ -318,6 +70,7 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
   activityTypes: ActivityType[] = [];
   
   private routeSubscription?: Subscription;
+  private lastActivityTypeId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -395,6 +148,8 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
         loadedActivity.contentJson = JSON.stringify(exercises, null, 2);
         this.activity = loadedActivity;
         this.previewContent = { ...loadedActivity, contentJson: JSON.stringify(exercises[0] || {}, null, 2) };
+        // Track initial type to detect changes later
+        this.lastActivityTypeId = Number(loadedActivity.activityTypeId || 0) || null;
       }
     } catch (error) {
       console.error("Failed to load data", error);
@@ -405,12 +160,44 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
   }
 
   handleFormChange(updatedActivityData: Partial<MultilingualActivity>): void {
-    this.activity = updatedActivityData;
+    const previousTypeId = this.lastActivityTypeId;
+    const nextTypeId = Number(updatedActivityData.activityTypeId || (this.activity?.activityTypeId || 0));
+
+    // Merge instead of replace to avoid losing required IDs
+    const current = this.activity || {
+      title: { ta: '', en: '', si: '' },
+      sequenceOrder: 1,
+      mainActivityId: 0,
+      activityTypeId: 0,
+      contentJson: '[]',
+      lessonId: parseInt(this.lessonId || '0', 10)
+    } as Partial<MultilingualActivity>;
+    this.activity = { ...current, ...updatedActivityData };
+
+    // Auto-generate template when activity type changes
+    if (nextTypeId && previousTypeId !== nextTypeId) {
+      try {
+        const templateString = MultilingualActivityTemplates.getTemplate(nextTypeId);
+        const templateObject = JSON.parse(templateString);
+        const exercisesArray = [templateObject];
+        const prettyArray = JSON.stringify(exercisesArray, null, 2);
+        this.activity = { ...this.activity, activityTypeId: nextTypeId, contentJson: prettyArray };
+
+        // Update preview to first exercise immediately
+        this.previewContent = this.activity ? { ...this.activity, contentJson: JSON.stringify(templateObject, null, 2) } : null;
+        this.expandedExercise = 0;
+      } catch {
+        // If template parse fails, keep whatever user has
+      }
+    }
+
+    this.lastActivityTypeId = nextTypeId || null;
   }
 
   handlePreviewExercise(exerciseJsonString: string): void {
     if (!this.activity) return;
     this.previewContent = { ...this.activity, contentJson: exerciseJsonString };
+    this.snackBar.open('Preview updated', 'Close', { duration: 1500 });
   }
 
   async handleSave(): Promise<void> {
@@ -424,14 +211,15 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Construct payload
+    // Construct payload with strong coercion and fallbacks
+    const coercedLessonId = Number(this.activity.lessonId || this.lessonId || 0);
     const payload: ActivityCreateDto = {
       title: this.activity.title || { ta: '', en: '', si: '' },
-      sequenceOrder: Number(this.activity.sequenceOrder),
+      sequenceOrder: Number(this.activity.sequenceOrder || 1),
       contentJson: this.activity.contentJson,
-      lessonId: Number(this.activity.lessonId),
-      activityTypeId: Number(this.activity.activityTypeId),
-      mainActivityId: Number(this.activity.mainActivityId)
+      lessonId: coercedLessonId,
+      activityTypeId: Number(this.activity.activityTypeId || 0),
+      mainActivityId: Number(this.activity.mainActivityId || 0)
     };
 
     // Validate required IDs
@@ -455,6 +243,54 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  // --- JSON Editor helpers ---
+  onJsonChanged(value: string): void {
+    // Lightweight live parse to update first-exercise preview safely
+    try {
+      const parsed = JSON.parse(value || '[]');
+      const arr = Array.isArray(parsed) ? parsed : [parsed];
+      const first = arr[0] || {};
+      this.previewContent = this.activity ? { ...this.activity, contentJson: JSON.stringify(first, null, 2) } : null;
+    } catch {
+      // ignore typing errors; keep previous preview
+    }
+  }
+
+  formatJson(): void {
+    if (!this.activity) return;
+    try {
+      const parsed = JSON.parse(this.activity.contentJson || '[]');
+      const pretty = JSON.stringify(parsed, null, 2);
+      this.activity.contentJson = pretty;
+      this.snackBar.open('JSON formatted', 'Close', { duration: 1500 });
+    } catch (e) {
+      this.snackBar.open('Invalid JSON - cannot format', 'Close', { duration: 3000 });
+    }
+  }
+
+  validateJson(): void {
+    if (!this.activity) return;
+    try {
+      JSON.parse(this.activity.contentJson || '[]');
+      this.snackBar.open('JSON is valid', 'Close', { duration: 1500 });
+    } catch (e: any) {
+      this.snackBar.open(`Invalid JSON: ${e?.message || ''}`.trim(), 'Close', { duration: 4000 });
+    }
+  }
+
+  applyJsonToPreview(): void {
+    if (!this.activity) return;
+    try {
+      const parsed = JSON.parse(this.activity.contentJson || '[]');
+      const arr = Array.isArray(parsed) ? parsed : [parsed];
+      const first = arr[0] || {};
+      this.previewContent = { ...this.activity, contentJson: JSON.stringify(first, null, 2) };
+      this.snackBar.open('Preview updated from JSON', 'Close', { duration: 1500 });
+    } catch {
+      this.snackBar.open('Invalid JSON - preview not updated', 'Close', { duration: 3000 });
+    }
+  }
+
   handleExpansionChange(panelIndex: number): void {
     this.expandedExercise = this.expandedExercise === panelIndex ? false : panelIndex;
   }
@@ -465,7 +301,12 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
 
   async handleCopyTemplate(): Promise<void> {
     try {
-      const templateJson = this.getActivityTemplate(this.activity?.activityTypeId || 0);
+      const typeId = this.activity?.activityTypeId || 0;
+      if (!typeId) {
+        this.snackBar.open('Select an Activity Type to copy its template.', 'Close', { duration: 3000 });
+        return;
+      }
+      const templateJson = this.getActivityTemplate(typeId);
       await navigator.clipboard.writeText(templateJson);
       this.snackBar.open('Template JSON copied to clipboard!', 'Close', { duration: 3000 });
     } catch (error) {

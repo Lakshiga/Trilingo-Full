@@ -5,7 +5,9 @@ import { ActivityTypeApiService } from '../../services/activity-type-api.service
 import { ActivityType } from '../../types/activity-type.types';
 
 interface ActivityTypeCreateDto {
-  activityName: string;
+  name_en: string;
+  name_ta: string;
+  name_si: string;
 }
 
 @Component({
@@ -15,24 +17,14 @@ interface ActivityTypeCreateDto {
     CommonModule,
     InlineCrudTableComponent
   ],
-  template: `
-    <app-inline-crud-table
-      entityName="Activity Type"
-      [apiService]="apiService"
-      [columns]="columns"
-      idField="activityTypeId">
-    </app-inline-crud-table>
-  `,
-  styles: [`
-    :host {
-      display: block;
-      padding: 24px;
-    }
-  `]
+  templateUrl: './activity-types.component.html',
+  styleUrls: ['./activity-types.component.css']
 })
 export class ActivityTypesPageComponent {
   columns = [
-    { field: 'activityName' as keyof ActivityType, headerName: 'Activity Type Name', type: 'string' as const }
+    { field: 'name_en' as keyof ActivityType, headerName: 'English Name', type: 'string' as const },
+    { field: 'name_ta' as keyof ActivityType, headerName: 'Tamil Name', type: 'string' as const },
+    { field: 'name_si' as keyof ActivityType, headerName: 'Sinhala Name', type: 'string' as const }
   ];
 
   apiService = {

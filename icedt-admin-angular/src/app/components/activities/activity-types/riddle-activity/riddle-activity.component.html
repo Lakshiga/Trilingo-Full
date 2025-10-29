@@ -1,0 +1,54 @@
+
+    <div class="riddle-container">
+      <h1 class="title">{{ content.title }}</h1>
+      
+      <!-- Riddle Display -->
+      <mat-card class="riddle-card">
+        <mat-card-content>
+          <div class="riddle-content">
+            <p class="riddle-text">{{ content.riddleText }}</p>
+            <button mat-icon-button (click)="playRiddleAudio()" class="audio-button">
+              <mat-icon>volume_up</mat-icon>
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Result Feedback -->
+      <div class="feedback-area">
+        <div *ngIf="showResult" class="feedback-message" [class.correct]="isCorrect" [class.incorrect]="!isCorrect">
+          {{ isCorrect ? 'சரியான விடை!' : 'தவறான விடை, மீண்டும் முயற்சிக்கவும்.' }}
+        </div>
+      </div>
+
+      <!-- Image Choices -->
+      <div class="choices-grid">
+        <mat-card
+          *ngFor="let choice of content.choices"
+          class="choice-card"
+          [class.selected]="selectedId === choice.id"
+          [class.correct]="showResult && content.correctChoiceId === choice.id"
+          [class.incorrect]="showResult && selectedId === choice.id && choice.id !== content.correctChoiceId"
+          [class.disabled]="showResult"
+          (click)="handleChoiceSelect(choice.id)"
+        >
+          <img
+            mat-card-image
+            [src]="choice.imageUrl"
+            [alt]="choice.text"
+            class="choice-image"
+          />
+        </mat-card>
+      </div>
+
+      <!-- Action Buttons -->
+      <div *ngIf="showResult" class="action-buttons">
+        <button mat-raised-button (click)="handleReset()">
+          <mat-icon>replay</mat-icon>
+          மீண்டும் முயற்சி செய் (Try Again)
+        </button>
+      </div>
+
+      <audio #audioElement style="display: none;"></audio>
+    </div>
+  

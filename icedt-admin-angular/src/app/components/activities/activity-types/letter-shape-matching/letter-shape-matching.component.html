@@ -1,0 +1,52 @@
+
+    <div class="letter-shape-matching">
+      <h1>{{ content.title }}</h1>
+      
+      <div class="instruction-card">
+        <h2>{{ content.activityTitle }}</h2>
+        <p>{{ content.instruction }}</p>
+      </div>
+      
+      <div class="matching-area" #container>
+        <div class="left-column">
+          <mat-card 
+            *ngFor="let item of content.leftItems" 
+            class="item-card"
+            [class.matched]="isMatched(item.id, 'left')"
+            [class.selected]="selectedLeft === item.id"
+            (click)="onItemClick(item.id, 'left')"
+            #itemRef>
+            {{ item.content }}
+          </mat-card>
+        </div>
+        
+        <div class="right-column">
+          <mat-card 
+            *ngFor="let item of shuffledRightItems" 
+            class="item-card"
+            [class.matched]="isMatched(item.id, 'right')"
+            (click)="onItemClick(item.id, 'right')"
+            #itemRef>
+            {{ item.content }}
+          </mat-card>
+        </div>
+        
+        <!-- SVG Overlay for Lines -->
+        <svg class="lines-overlay">
+          <line 
+            *ngFor="let line of connectionLines"
+            [attr.x1]="line.x1"
+            [attr.y1]="line.y1"
+            [attr.x2]="line.x2"
+            [attr.y2]="line.y2"
+            [attr.stroke]="line.color"
+            stroke-width="4">
+          </line>
+        </svg>
+      </div>
+      
+      <div class="completion-message" *ngIf="isComplete">
+        <p>🎉 நன்று! நீங்கள் அனைத்தையும் சரியாக இணைத்துவிட்டீர்கள்! 🎉</p>
+      </div>
+    </div>
+  

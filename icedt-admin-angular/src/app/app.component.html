@@ -40,12 +40,7 @@
         <li><a routerLink="/levels" routerLinkActive="active">📚 Levels</a></li>
       </ul>
       
-      <!-- Language Management Section -->
-      <!-- Only show on Activities-related routes (when adding/editing/previewing activities) -->
-      <ng-container *ngIf="router.url.startsWith('/activities') || router.url.startsWith('/activity-edit')">
-        <div class="language-section-separator"></div>
-        <app-sidebar-language-manager></app-sidebar-language-manager>
-      </ng-container>
+      <!-- Language Management is now embedded within activities pages (not in sidebar) -->
     </nav>
     
     <main class="main-content">

@@ -1,0 +1,134 @@
+
+    .listening-matching-container {
+      padding: 16px;
+      font-family: sans-serif;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .title {
+      text-align: center;
+      margin-bottom: 16px;
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+
+    .introduction-card {
+      margin-bottom: 24px;
+      background-color: #f0f7ff;
+    }
+
+    .word-pool-section {
+      margin-bottom: 32px;
+    }
+
+    .pool-title {
+      text-align: center;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .word-pool-card {
+      padding: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      min-height: 60px;
+      border: 2px dashed #ccc;
+    }
+
+    .word-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .word-chip {
+      cursor: grab;
+      font-size: 1.1rem;
+    }
+
+    .sentence-card {
+      margin-bottom: 16px;
+      transition: all 0.3s;
+      border-left: 5px solid transparent;
+    }
+
+    .sentence-card.current-sentence {
+      background-color: #e3f2fd;
+      border-left-color: #0288D1;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .sentence-card.completed-sentence {
+      background-color: #f5f5f5;
+    }
+
+    .sentence-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .playing-icon {
+      color: #0288D1;
+    }
+
+    .completed-icon {
+      color: #2e7d32;
+    }
+
+    .sentence-text {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 1.25rem;
+    }
+
+    .drop-zone {
+      min-width: 150px;
+      height: 40px;
+      border: 2px dashed #ccc;
+      border-radius: 16px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      background-color: transparent;
+      transition: background-color 0.3s;
+    }
+
+    .drop-zone.current-drop-zone {
+      border-color: #0288D1;
+    }
+
+    .drop-zone.completed-drop-zone {
+      border: none;
+    }
+
+    .drop-zone.incorrect-feedback {
+      background-color: #ffebee;
+    }
+
+    .dropped-word-chip {
+      font-size: 1rem;
+    }
+
+    .drop-hint {
+      color: #666;
+      font-size: 0.875rem;
+    }
+
+    .completion-message {
+      text-align: center;
+      padding: 32px;
+    }
+
+    .completion-message h1 {
+      color: #2e7d32;
+      margin-bottom: 16px;
+    }
+  

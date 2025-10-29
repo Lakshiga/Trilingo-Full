@@ -1,0 +1,34 @@
+
+    <div class="pronunciation-container" *ngIf="content; else noContentTemplate">
+      <h1 class="title">{{ content.title }}</h1>
+      
+      <p class="instruction">
+        சொல்லைக் கேட்டு மீண்டும் கூறவும் (Listen to the sound and repeat)
+      </p>
+      
+      <!-- Main Display Area -->
+      <mat-card class="display-card">
+        <mat-card-content>
+          <div class="text-display">{{ content.text }}</div>
+          
+          <button
+            class="play-button"
+            mat-fab
+            color="primary"
+            (click)="handlePlayCurrent()"
+            [disabled]="isPlaying"
+          >
+            <mat-icon>volume_up</mat-icon>
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <audio #audioElement style="display: none;"></audio>
+    </div>
+
+    <ng-template #noContentTemplate>
+      <div class="error-message">
+        <p>No item to display.</p>
+      </div>
+    </ng-template>
+  

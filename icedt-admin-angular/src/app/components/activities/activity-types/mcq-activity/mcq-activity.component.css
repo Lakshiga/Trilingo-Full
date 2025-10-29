@@ -1,0 +1,74 @@
+
+    .container {
+      padding: 24px;
+      font-family: sans-serif;
+    }
+
+    .question-card {
+      background: white;
+      padding: 16px;
+      margin-bottom: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .question {
+      text-align: center;
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+
+    .choices-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .choice-button {
+      justify-content: space-between;
+      text-align: left;
+      padding: 12px 16px;
+      text-transform: none;
+      width: 100%;
+      font-size: 1rem;
+    }
+
+    .choice-text {
+      flex-grow: 1;
+    }
+
+    .result-icon {
+      margin-left: 8px;
+    }
+
+    .correct-icon {
+      color: #4caf50;
+    }
+
+    .incorrect-icon {
+      color: #f44336;
+    }
+
+    .actions {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .try-again-button {
+      font-size: 1.1rem;
+      padding: 12px 24px;
+    }
+
+    /* Override Material Design button styles for correct/incorrect states */
+    :host ::ng-deep .mat-mdc-button.correct {
+      background-color: #4caf50 !important;
+      color: white !important;
+    }
+
+    :host ::ng-deep .mat-mdc-button.incorrect {
+      background-color: #f44336 !important;
+      color: white !important;
+    }
+  

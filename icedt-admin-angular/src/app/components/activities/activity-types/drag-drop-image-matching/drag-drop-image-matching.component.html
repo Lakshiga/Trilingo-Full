@@ -1,0 +1,60 @@
+
+    <div class="drag-drop-image-matching">
+      <h2>{{ content.title }}</h2>
+      
+      <p class="instructions">
+        படங்களை இழுத்து சரியான இடத்தில் விடுங்கள் (Drag images to match them correctly)
+      </p>
+      
+      <div class="game-area">
+        <!-- Left Side - Draggable Images -->
+        <div class="left-side">
+          <h3>இழுக்கவும் (Drag From)</h3>
+          <div class="image-container">
+            <mat-card 
+              *ngFor="let item of availableLeftImages" 
+              class="draggable-card"
+              [draggable]="true"
+              (dragstart)="onDragStart($event, item)"
+              (click)="playAudio(item.audioUrl)"
+              [class.dragging]="draggedItem?.id === item.id">
+              <img [src]="item.imageUrl" [alt]="'Draggable item ' + item.id" class="image">
+            </mat-card>
+          </div>
+        </div>
+        
+        <!-- Right Side - Drop Targets -->
+        <div class="right-side">
+          <h3>விடவும் (Drop Here)</h3>
+          <div class="image-container">
+            <mat-card 
+              *ngFor="let item of availableRightImages"
+              class="drop-target"
+              (dragover)="onDragOver($event, item)"
+              (dragleave)="onDragLeave()"
+              (drop)="onDrop($event, item)"
+              (click)="playAudio(item.audioUrl)"
+              [class.drag-over]="dragOverTarget === item.id">
+              <img [src]="item.imageUrl" [alt]="'Drop target ' + item.id" class="image">
+            </mat-card>
+          </div>
+        </div>
+      </div>
+      
+      <div class="actions" *ngIf="!isComplete">
+        <button 
+          mat-stroked-button 
+          (click)="resetActivity()">
+          <mat-icon>replay</mat-icon>
+          மீண்டும் தொடங்கு (Reset)
+        </button>
+      </div>
+      
+      <div class="completion-message" *ngIf="isComplete">
+        <mat-icon class="success-icon">check_circle</mat-icon>
+        <p>அனைத்து படங்களும் சரியாக பொருத்தப்பட்டன! (All images matched correctly!)</p>
+      </div>
+      
+      <audio #audioPlayer style="display: none;"></audio>
+    </div>
+  

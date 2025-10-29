@@ -1,0 +1,113 @@
+
+    .drag-drop-word-match {
+      padding: 24px;
+      font-family: sans-serif;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 24px;
+      font-size: 2rem;
+    }
+
+    .success-message {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .error-message {
+      background-color: #ffebee;
+      color: #c62828;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .targets-column,
+    .sources-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    h3 {
+      margin: 0 0 16px 0;
+      font-size: 1.25rem;
+    }
+
+    .target-item {
+      padding: 16px;
+      min-height: 60px;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      background-color: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    .target-item.matched {
+      background-color: #e8f5e9;
+      border-color: #4caf50;
+    }
+
+    .target-text {
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+
+    .matched-word {
+      background-color: #1976d2;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 0.875rem;
+    }
+
+    .source-item {
+      padding: 16px;
+      background-color: #1976d2;
+      color: white;
+      border-radius: 8px;
+      cursor: grab;
+      font-size: 1.25rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+
+    .source-item:hover {
+      background-color: #1565c0;
+    }
+
+    .source-item.dragging {
+      opacity: 0.5;
+    }
+
+    .source-item.matched {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .grid-container {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+    }
+  

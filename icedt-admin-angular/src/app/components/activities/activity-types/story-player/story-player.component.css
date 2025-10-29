@@ -1,0 +1,73 @@
+
+    .story-player-container {
+      padding: 16px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .title {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .image-section {
+      flex-grow: 1;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+    }
+
+    .scene-card {
+      width: 100%;
+      border-radius: 12px;
+    }
+
+    .scene-image {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+    }
+
+    .text-card {
+      min-height: 100px;
+      margin-bottom: 16px;
+      border-radius: 8px;
+    }
+
+    .scene-text {
+      text-align: center;
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .player-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .time-slider {
+      width: 100%;
+    }
+
+    .time-display {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    .control-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .play-pause-button mat-icon {
+      font-size: 2.5rem;
+    }
+  

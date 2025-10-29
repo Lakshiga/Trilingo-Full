@@ -1,0 +1,52 @@
+
+    <div class="matching-container">
+      <h2 *ngIf="content.title" class="title">{{ content.title }}</h2>
+      
+      <div class="matching-area">
+        <div class="column">
+          <h3>Column A</h3>
+          <div class="items-container">
+            <button
+              *ngFor="let item of content.columnA"
+              mat-button
+              [class.selected]="selectedA?.id === item.id"
+              [class.matched]="isMatched(item.id)"
+              (click)="selectItemA(item)"
+              class="item-button"
+            >
+              {{ item.content }}
+            </button>
+          </div>
+        </div>
+
+        <div class="column">
+          <h3>Column B</h3>
+          <div class="items-container">
+            <button
+              *ngFor="let item of content.columnB"
+              mat-button
+              [class.selected]="selectedB?.id === item.id"
+              [class.matched]="isMatched(item.id)"
+              (click)="selectItemB(item)"
+              class="item-button"
+            >
+              {{ item.content }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback" *ngIf="showFeedback">
+        <mat-icon [class.success]="isCorrect" [class.error]="!isCorrect">
+          {{ isCorrect ? 'check_circle' : 'cancel' }}
+        </mat-icon>
+        <span>{{ isCorrect ? 'Correct!' : 'Try again!' }}</span>
+      </div>
+
+      <div class="actions" *ngIf="allMatched">
+        <button mat-raised-button color="primary" (click)="resetActivity()">
+          Try Again
+        </button>
+      </div>
+    </div>
+  

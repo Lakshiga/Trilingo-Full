@@ -1,0 +1,71 @@
+<mat-card class="exercise-editor">
+  <mat-card-header>
+    <mat-card-title>Exercises</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <mat-accordion multi="false">
+      <mat-expansion-panel 
+        *ngFor="let exercise of exercises; let i = index"
+        [expanded]="expandedExercise === i"
+        (opened)="onExpansionChange(i, true)"
+        (closed)="onExpansionChange(i, false)">
+        
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <div class="panel-header">
+              <span class="exercise-title">Exercise #{{ i + 1 }}</span>
+              <div class="panel-actions">
+                <button 
+                  mat-button 
+                  (click)="onCopyExercise(exercise, $event)"
+                  class="copy-button">
+                  <mat-icon>content_copy</mat-icon>
+                  Copy
+                </button>
+                <button 
+                  mat-button 
+                  color="primary" 
+                  (click)="onPreviewExercise(exercise, $event)"
+                  [disabled]="!!jsonErrors[i]"
+                  class="preview-button">
+                  <mat-icon>preview</mat-icon>
+                  Preview
+                </button>
+                <button 
+                  mat-icon-button 
+                  color="warn" 
+                  (click)="removeExercise(i, $event)"
+                  [disabled]="exercises.length <= 1"
+                  class="delete-button">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Exercise JSON</mat-label>
+          <textarea 
+            matInput 
+            [ngModel]="exercise"
+            (ngModelChange)="handleExerciseChange(i, $event)"
+            rows="15"
+            [class.error]="!!jsonErrors[i]"
+            placeholder="Enter exercise JSON content...">
+          </textarea>
+          <mat-error *ngIf="jsonErrors[i]">{{ jsonErrors[i] }}</mat-error>
+        </mat-form-field>
+      </mat-expansion-panel>
+    </mat-accordion>
+    
+    <button 
+      mat-stroked-button 
+      (click)="addExercise()" 
+      class="add-exercise-button">
+      <mat-icon>add_circle_outline</mat-icon>
+      Add Another Exercise
+    </button>
+  </mat-card-content>
+</mat-card>

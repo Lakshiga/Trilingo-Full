@@ -7,10 +7,17 @@ import { LevelApiService } from '../../services/level-api.service';
 import { Level } from '../../types/level.types';
 
 interface LevelCreateDto {
-  levelName: string;
-  description?: string;
-  sequenceOrder: number;
-  imageUrl?: string;
+  name_en: string;
+  name_ta: string;
+  name_si: string;
+  languageId: number;
+}
+
+interface LevelCreateDto {
+  name_en: string;
+  name_ta: string;
+  name_si: string;
+  languageId: number;
 }
 
 @Component({
@@ -22,27 +29,15 @@ interface LevelCreateDto {
     RouterLink,
     InlineCrudTableComponent
   ],
-  template: `
-    <app-inline-crud-table
-      entityName="Level"
-      [apiService]="apiService"
-      [columns]="columns"
-      idField="levelId"
-      [renderCustomActions]="renderCustomLevelActions">
-    </app-inline-crud-table>
-  `,
-  styles: [`
-    :host {
-      display: block;
-      padding: 24px;
-    }
-  `]
+  templateUrl: './levels.component.html',
+  styleUrls: ['./levels.component.css']
 })
 export class LevelsPageComponent {
   columns = [
-    { field: 'levelName' as keyof Level, headerName: 'Level Name', type: 'string' as const },
-    { field: 'description' as keyof Level, headerName: 'Description', type: 'string' as const },
-    { field: 'sequenceOrder' as keyof Level, headerName: 'Sequence Order', type: 'number' as const }
+    { field: 'name_en' as keyof Level, headerName: 'English Name', type: 'string' as const },
+    { field: 'name_ta' as keyof Level, headerName: 'Tamil Name', type: 'string' as const },
+    { field: 'name_si' as keyof Level, headerName: 'Sinhala Name', type: 'string' as const },
+    { field: 'languageId' as keyof Level, headerName: 'Language ID', type: 'number' as const }
   ];
 
   apiService = {

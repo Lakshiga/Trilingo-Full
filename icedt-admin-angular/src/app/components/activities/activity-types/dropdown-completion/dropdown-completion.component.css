@@ -1,0 +1,112 @@
+
+    .container {
+      padding: 24px;
+      font-family: sans-serif;
+    }
+
+    .title {
+      text-align: center;
+      margin-bottom: 16px;
+      font-size: 1.5rem;
+      font-weight: 500;
+    }
+
+    .sentences-container {
+      background: white;
+      padding: 24px;
+      margin-bottom: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .sentence-row {
+      display: flex;
+      align-items: center;
+      margin: 20px 0;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .sentence-prefix, .sentence-suffix {
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+
+    .dropdown-field {
+      min-width: 150px;
+    }
+
+    .dropdown-select {
+      font-size: 1rem;
+    }
+
+    .dropdown-select.correct {
+      border-color: #4caf50 !important;
+    }
+
+    .dropdown-select.incorrect {
+      border-color: #f44336 !important;
+    }
+
+    .result-icon {
+      margin-left: 8px;
+    }
+
+    .correct-icon {
+      color: #4caf50;
+    }
+
+    .incorrect-icon {
+      color: #f44336;
+    }
+
+    .actions {
+      text-align: center;
+      margin-top: 32px;
+    }
+
+    .check-button, .retry-button {
+      font-size: 1.1rem;
+      padding: 12px 24px;
+    }
+
+    .retry-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .result-message {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+
+    .result-message.all-correct {
+      color: #4caf50;
+    }
+
+    .result-message.some-incorrect {
+      color: #f44336;
+    }
+
+    /* Override Material Design styles for correct/incorrect states */
+    :host ::ng-deep .mat-mdc-form-field.correct .mat-mdc-form-field-focus-overlay {
+      background-color: #e8f5e9;
+    }
+
+    :host ::ng-deep .mat-mdc-form-field.incorrect .mat-mdc-form-field-focus-overlay {
+      background-color: #ffebee;
+    }
+
+    :host ::ng-deep .mat-mdc-form-field.correct .mat-mdc-outlined-input-notched-outline {
+      border-color: #4caf50 !important;
+      border-width: 2px !important;
+    }
+
+    :host ::ng-deep .mat-mdc-form-field.incorrect .mat-mdc-outlined-input-notched-outline {
+      border-color: #f44336 !important;
+      border-width: 2px !important;
+    }
+  

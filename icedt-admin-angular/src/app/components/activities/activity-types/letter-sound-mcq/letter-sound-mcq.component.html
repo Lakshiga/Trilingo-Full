@@ -1,0 +1,47 @@
+
+    <div class="letter-sound-mcq" *ngIf="!isFinished">
+      <h1>{{ content.title || 'செயல் 04' }}</h1>
+      <p>{{ content.description || 'சரியான படத்தைத் தேர்ந்தெடு' }}</p>
+      
+      <div class="audio-controls">
+        <button 
+          mat-icon-button 
+          color="primary" 
+          (click)="playAudio(currentQuestion?.questionAudioUrl)"
+          [disabled]="!currentQuestion">
+          <mat-icon>volume_up</mat-icon>
+        </button>
+      </div>
+      
+      <div class="options-grid" *ngIf="currentOptions.length > 0">
+        <mat-card 
+          *ngFor="let option of currentOptions" 
+          class="option-card"
+          (click)="handleOptionClick(option)"
+          [class.correct]="isAnswered && option.id === currentQuestion?.correctAnswerId"
+          [class.incorrect]="isAnswered && selectedOptionId === option.id && option.id !== currentQuestion?.correctAnswerId"
+          [class.disabled]="isAnswered">
+          <img [src]="getImageUrl(option.imageUrl)" [alt]="option.letter" class="option-image">
+          <div class="result-icon" *ngIf="isAnswered">
+            <mat-icon *ngIf="option.id === currentQuestion?.correctAnswerId" color="success">check_circle</mat-icon>
+            <mat-icon *ngIf="selectedOptionId === option.id && option.id !== currentQuestion?.correctAnswerId" color="warn">cancel</mat-icon>
+          </div>
+        </mat-card>
+      </div>
+      
+      <mat-spinner *ngIf="currentOptions.length === 0" class="loading-spinner"></mat-spinner>
+      
+      <audio #audioPlayer style="display: none;"></audio>
+    </div>
+    
+    <div class="finished-screen" *ngIf="isFinished">
+      <h2>விளையாட்டு முடிந்தது!</h2>
+      <p>உங்கள் இறுதி மதிப்பெண்: {{ score }} / {{ content.questions.length }}</p>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="restartGame()">
+        மீண்டும் விளையாடு
+      </button>
+    </div>
+  

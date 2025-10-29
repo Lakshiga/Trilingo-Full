@@ -1,0 +1,169 @@
+
+    .sentence-ordering-container {
+      padding: 16px;
+      font-family: sans-serif;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .title {
+      text-align: center;
+      margin-bottom: 16px;
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+
+    .instruction-card {
+      margin-bottom: 24px;
+      background-color: #e3f2fd;
+    }
+
+    .activity-title {
+      font-weight: 600;
+      color: #01579b;
+      margin-bottom: 8px;
+    }
+
+    .instruction-text {
+      margin-top: 8px;
+    }
+
+    .image-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .activity-image {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    .number-pool-section {
+      margin-bottom: 24px;
+    }
+
+    .pool-title {
+      text-align: center;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .number-pool-card {
+      padding: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      min-height: 60px;
+      border: 2px dashed #ccc;
+    }
+
+    .number-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .number-chip {
+      cursor: grab;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .empty-message {
+      color: #666;
+      text-align: center;
+    }
+
+    .sentences-section {
+      margin-bottom: 32px;
+    }
+
+    .sentence-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 16px;
+    }
+
+    .drop-slot {
+      width: 50px;
+      height: 50px;
+      border: 2px dashed #90caf9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .drop-slot.correct {
+      border-color: #2e7d32;
+      background-color: #e8f5e9;
+    }
+
+    .drop-slot.incorrect {
+      border-color: #c62828;
+      background-color: #ffebee;
+    }
+
+    .placed-chip {
+      cursor: grab;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .sentence-text {
+      flex: 1;
+      margin: 0;
+    }
+
+    .action-section {
+      margin-top: 32px;
+      text-align: center;
+    }
+
+    .submit-button {
+      font-size: 1.1rem;
+      padding: 12px 24px;
+    }
+
+    .retry-section {
+      margin-top: 16px;
+    }
+
+    .error-message {
+      color: #f44336;
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+    }
+
+    .retry-button {
+      font-size: 1.1rem;
+      padding: 12px 24px;
+    }
+
+    .success-message {
+      color: #2e7d32;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      .sentence-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .drop-slot {
+        align-self: center;
+      }
+    }
+  

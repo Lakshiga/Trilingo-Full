@@ -1,0 +1,87 @@
+
+    <div class="container" *ngIf="content; else loadingContent">
+      <h1 class="title">{{ content.title }}</h1>
+
+      <div class="instruction-panel">
+        <h2 class="activity-title">{{ content.activityTitle }}</h2>
+        <p class="instruction">{{ content.instruction }}</p>
+      </div>
+
+      <h3 class="words-title">இழுக்க வேண்டிய சொற்கள்</h3>
+      <div 
+        class="word-pool"
+        (dragover)="onDragOver($event)"
+        (drop)="onDropToPool($event)"
+      >
+        <mat-chip
+          *ngFor="let word of wordPool"
+          [draggable]="!allCorrect"
+          (dragstart)="onDragStart($event, word)"
+          class="word-chip"
+          [class.disabled]="allCorrect"
+        >
+          {{ word.text }}
+        </mat-chip>
+        <p *ngIf="wordPool.length === 0" class="empty-message">
+          அனைத்து சொற்களும் நகர்த்தப்பட்டுவிட்டன.
+        </p>
+      </div>
+
+      <div class="categories-grid">
+        <div
+          *ngFor="let category of content.categories"
+          class="category-card"
+          (dragover)="onDragOver($event)"
+          (drop)="onDropToCategory($event, category.id)"
+        >
+          <h3 class="category-title">{{ category.title }}</h3>
+          <div class="category-words">
+            <mat-chip
+              *ngFor="let word of droppedWords[category.id]"
+              [draggable]="!allCorrect"
+              (dragstart)="onDragStart($event, word)"
+              class="word-chip"
+              [class.correct]="isSubmitted && results[word.id] === true"
+              [class.incorrect]="isSubmitted && results[word.id] === false"
+              [class.disabled]="allCorrect"
+            >
+              {{ word.text }}
+            </mat-chip>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button
+          *ngIf="!isSubmitted"
+          mat-raised-button
+          color="primary"
+          (click)="handleSubmit()"
+          [disabled]="wordPool.length > 0"
+          class="submit-button"
+        >
+          சமர்ப்பிக்கவும்
+        </button>
+
+        <div *ngIf="isSubmitted && !allCorrect" class="retry-section">
+          <p class="error-message">சில பதில்கள் தவறானவை. மீண்டும் முயலவும்!</p>
+          <button
+            mat-raised-button
+            color="accent"
+            (click)="handleRetry()"
+            class="retry-button"
+          >
+            மீண்டும் முயலவும்
+          </button>
+        </div>
+
+        <div *ngIf="allCorrect" class="success-message">
+          🎉 நன்று! எல்லா பதில்களும் சரியானவை! 🎉
+        </div>
+      </div>
+    </div>
+
+    <ng-template #loadingContent>
+      <div class="loading-message">செயல்பாடு ஏற்றுகிறது...</div>
+    </ng-template>
+  

@@ -1,0 +1,88 @@
+
+    <div class="main-activities-container">
+      <div class="header">
+        <h2>Manage Main Activitys</h2>
+        <button mat-raised-button color="primary" (click)="openAddMainActivityDialog()" [disabled]="isLoading">
+          + ADD NEW MAIN ACTIVITY
+        </button>
+      </div>
+
+      <div class="content">
+        <div class="loading-container" *ngIf="isLoading">
+          <mat-spinner></mat-spinner>
+          <p>Loading main activities...</p>
+        </div>
+        
+        <div class="error-message" *ngIf="error">
+          <p>{{ error }}</p>
+          <button mat-button color="primary" (click)="loadMainActivities()">Retry</button>
+        </div>
+        
+        <div class="table-container" *ngIf="!isLoading && !error">
+          <table mat-table [dataSource]="mainActivities" class="main-activities-table">
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef>ID</th>
+              <td mat-cell *matCellDef="let activity">{{ activity.id }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="name_en">
+              <th mat-header-cell *matHeaderCellDef>English Name</th>
+              <td mat-cell *matCellDef="let activity">{{ activity.name_en }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="name_ta">
+              <th mat-header-cell *matHeaderCellDef>தமிழ் Name</th>
+              <td mat-cell *matCellDef="let activity">{{ activity.name_ta }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="name_si">
+              <th mat-header-cell *matHeaderCellDef>සිංහල Name</th>
+              <td mat-cell *matCellDef="let activity">{{ activity.name_si }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let activity">
+                <button mat-icon-button color="primary" (click)="editMainActivity(activity)" [disabled]="isLoading">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="deleteMainActivity(activity)" [disabled]="isLoading">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+          
+          <div class="no-data" *ngIf="mainActivities.length === 0">
+            <p>No main activities found. Create your first main activity!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add/Edit Main Activity Dialog -->
+    <div class="dialog-overlay" *ngIf="showDialog" (click)="closeDialog()">
+      <div class="dialog-content" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h3>{{ isEditing ? 'Edit Main Activity' : 'Add New Main Activity' }}</h3>
+          <button mat-icon-button (click)="closeDialog()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        
+        <app-multilingual-form
+          [title]="isEditing ? 'Edit Main Activity' : 'Add New Main Activity'"
+          [fieldLabel]="'Activity Name'"
+          [showDescription]="false"
+          [showActions]="true"
+          [saveButtonText]="isEditing ? 'Update Main Activity' : 'Add Main Activity'"
+          [initialData]="currentMainActivity"
+          (save)="onSave($event)"
+          (cancel)="closeDialog()">
+        </app-multilingual-form>
+      </div>
+    </div>
+  

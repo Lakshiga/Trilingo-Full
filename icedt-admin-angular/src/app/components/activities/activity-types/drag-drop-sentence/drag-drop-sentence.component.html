@@ -1,0 +1,81 @@
+
+    <div class="drag-drop-sentence" *ngIf="content && content.words && content.sentences">
+      <h1>{{ content.title }}</h1>
+      
+      <div class="instruction-card">
+        <h2>{{ content.activityTitle }}</h2>
+        <p>{{ content.instruction }}</p>
+      </div>
+      
+      <div class="activity-area">
+        <div class="sentences-section">
+          <div class="sentence-list">
+            <div 
+              *ngFor="let sentence of content.sentences; let i = index" 
+              class="sentence-item">
+              <span class="sentence-number">{{ i + 1 }}.</span>
+              <span class="sentence-text">{{ sentence.text }}</span>
+              <div 
+                class="drop-zone"
+                (dragover)="onDragOver($event)"
+                (drop)="onDropOnSentence($event, sentence.id)"
+                [class.correct]="isSubmitted && results[sentence.id] === true"
+                [class.incorrect]="isSubmitted && results[sentence.id] === false">
+                <mat-chip 
+                  *ngIf="droppedWords[sentence.id]"
+                  [draggable]="!allCorrect"
+                  (dragstart)="onDragStart($event, droppedWords[sentence.id]!)"
+                  class="dropped-word">
+                  {{ droppedWords[sentence.id]!.text }}
+                </mat-chip>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="words-section">
+          <h3>சொற்கள்</h3>
+          <div 
+            class="word-pool"
+            (dragover)="onDragOver($event)"
+            (drop)="onDropOnPool($event)">
+            <mat-chip 
+              *ngFor="let word of wordPool" 
+              [draggable]="!allCorrect"
+              (dragstart)="onDragStart($event, word)"
+              class="word-chip">
+              {{ word.text }}
+            </mat-chip>
+          </div>
+        </div>
+      </div>
+      
+      <div class="actions" *ngIf="!isSubmitted">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="submit()"
+          [disabled]="!allWordsPlaced">
+          சமர்ப்பிக்கவும்
+        </button>
+      </div>
+      
+      <div class="results" *ngIf="isSubmitted && !allCorrect">
+        <p class="error-message">சில பதில்கள் தவறானவை. மீண்டும் முயலவும்!</p>
+        <button 
+          mat-raised-button 
+          color="accent" 
+          (click)="retry()">
+          மீண்டும் முயலவும்
+        </button>
+      </div>
+      
+      <div class="success" *ngIf="allCorrect">
+        <p class="success-message">🎉 நன்று! எல்லா பதில்களும் சரியானவை! 🎉</p>
+      </div>
+    </div>
+    
+    <div *ngIf="!content || !content.words || !content.sentences" class="loading">
+      செயல்பாடு ஏற்றுகிறது...
+    </div>
+  

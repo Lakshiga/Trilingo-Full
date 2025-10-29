@@ -1,0 +1,67 @@
+
+    <div class="word-pair-container">
+      <audio #audioElement [src]="currentQuestion.promptAudioUrl" style="display: none;"></audio>
+      
+      <mat-card class="instruction-card">
+        <mat-card-content>
+          <p class="instruction-text">Listen and choose the correct word:</p>
+          <button mat-icon-button (click)="playAudio()" class="audio-button">
+            <mat-icon>volume_up</mat-icon>
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="choices-container">
+        <button
+          *ngFor="let choice of currentQuestion.choices"
+          mat-raised-button
+          class="choice-button"
+          [class.selected]="userAnswer === choice"
+          [class.correct]="showResult && choice === currentQuestion.correctAnswer"
+          [class.incorrect]="showResult && userAnswer === choice && choice !== currentQuestion.correctAnswer"
+          [disabled]="showResult && !isCorrect"
+          (click)="handleAnswer(choice)"
+        >
+          {{ choice }}
+          <mat-icon *ngIf="showResult && userAnswer === choice && choice === currentQuestion.correctAnswer" class="result-icon">
+            check_circle
+          </mat-icon>
+          <mat-icon *ngIf="showResult && userAnswer === choice && choice !== currentQuestion.correctAnswer" class="result-icon">
+            cancel
+          </mat-icon>
+        </button>
+      </div>
+
+      <div *ngIf="showResult" class="result-section">
+        <div *ngIf="isCorrect" class="correct-message">
+          ✓ சரியான பதில்! {{ isLastQuestion ? 'செயல்பாடு முடிந்தது!' : 'அடுத்த கேள்விக்குச் செல்லவும்.' }}
+        </div>
+        <div *ngIf="!isCorrect" class="incorrect-message">
+          ✗ தவறான பதில். சரியான பதில்: {{ currentQuestion.correctAnswer }}
+        </div>
+
+        <div class="action-buttons">
+          <button
+            *ngIf="!isCorrect"
+            mat-stroked-button
+            color="primary"
+            (click)="handleReset()"
+          >
+            மீண்டும் முயலவும்
+          </button>
+          <button
+            *ngIf="isCorrect && !isLastQuestion"
+            mat-raised-button
+            color="primary"
+            (click)="handleNext()"
+          >
+            அடுத்த கேள்வி
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="!showResult && userAnswer" class="selection-message">
+        பதிலைத் தேர்ந்தெடுக்கவும்
+      </div>
+    </div>
+  

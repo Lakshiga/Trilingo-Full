@@ -1,0 +1,128 @@
+
+    .drag-drop-sentence {
+      padding: 24px;
+      font-family: sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      background: #0288D1;
+      color: white;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-weight: bold;
+    }
+
+    .instruction-card {
+      background: #e3f2fd;
+      padding: 16px;
+      margin-bottom: 24px;
+      border-radius: 8px;
+    }
+
+    .instruction-card h2 {
+      font-weight: 600;
+      color: #01579b;
+      margin-bottom: 8px;
+    }
+
+    .activity-area {
+      display: flex;
+      gap: 32px;
+    }
+
+    .sentences-section {
+      flex: 1;
+    }
+
+    .words-section {
+      flex: 1;
+    }
+
+    .sentence-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sentence-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sentence-number {
+      font-weight: bold;
+      min-width: 20px;
+    }
+
+    .sentence-text {
+      flex: 1;
+    }
+
+    .drop-zone {
+      width: 150px;
+      height: 40px;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-left: 16px;
+    }
+
+    .drop-zone.correct {
+      border: 2px solid #2e7d32;
+    }
+
+    .drop-zone.incorrect {
+      border: 2px solid #c62828;
+    }
+
+    .dropped-word {
+      cursor: grab;
+    }
+
+    .word-pool {
+      min-height: 200px;
+      padding: 16px;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background-color: #fafafa;
+    }
+
+    .word-chip {
+      cursor: grab;
+      font-size: 1rem;
+      padding: 10px;
+      width: 80%;
+    }
+
+    .actions, .results, .success {
+      text-align: center;
+      margin-top: 32px;
+    }
+
+    .error-message {
+      color: #f44336;
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+    }
+
+    .success-message {
+      color: #2e7d32;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .loading {
+      padding: 24px;
+      text-align: center;
+    }
+  

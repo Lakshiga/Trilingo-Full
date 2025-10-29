@@ -1,0 +1,40 @@
+
+    <div class="media-spotlight-container">
+      <div class="spotlight-circle">
+        <span class="spotlight-letter">{{ content.spotlightLetter }}</span>
+      </div>
+
+      <div class="media-card">
+        <mat-card class="item-card">
+          <img
+            mat-card-image
+            [src]="getImageUrl()"
+            [alt]="content.item.text"
+            class="item-image"
+          />
+          <mat-card-content class="item-content">
+            <div class="highlighted-word">
+              <span
+                *ngFor="let part of highlightedWordParts; let i = index"
+                [class.highlighted]="part.toLowerCase() === content.spotlightLetter.toLowerCase()"
+                class="word-part"
+              >
+                {{ part }}
+              </span>
+            </div>
+            <button
+              *ngIf="content.item.audioUrl"
+              mat-icon-button
+              color="primary"
+              (click)="playAudio()"
+              class="audio-button"
+            >
+              <mat-icon>volume_up</mat-icon>
+            </button>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <audio #audioElement style="display: none;"></audio>
+    </div>
+  
