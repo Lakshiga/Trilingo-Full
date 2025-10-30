@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -101,31 +101,37 @@ import { Observable } from 'rxjs';
       top: 100%;
       right: 0;
       background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      min-width: 180px;
+      border-radius: 0.75rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      min-width: 14rem;
       opacity: 0;
       visibility: hidden;
-      transform: translateY(-10px);
+      transform: scale(0.95);
       transition: all 0.2s ease;
       z-index: 1001;
+      overflow: hidden;
+      transform-origin: top right;
     }
 
-    .dropdown-menu.show {
+    .dropdown-menu.show, .dropdown-menu.opacity-100 {
       opacity: 1;
       visibility: visible;
-      transform: translateY(0);
+      transform: scale(1);
+    }
+
+    .dropdown-arrow.rotate-180 {
+      transform: rotate(180deg);
     }
 
     .dropdown-item {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       padding: 12px 16px;
-      color: #333;
+      color: #374151;
       text-decoration: none;
-      transition: background-color 0.2s;
-      border-bottom: 1px solid #f0f0f0;
+      transition: all 0.2s;
+      border-bottom: 1px solid #f3f4f6;
     }
 
     .dropdown-item:last-child {
@@ -133,7 +139,8 @@ import { Observable } from 'rxjs';
     }
 
     .dropdown-item:hover {
-      background-color: #f8f9fa;
+      background-color: #f3f4f6;
+      color: #4f46e5;
     }
 
     .dropdown-icon {
@@ -146,24 +153,21 @@ import { Observable } from 'rxjs';
     }
 
     .sidebar {
-      width: 280px;
-      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+      width: 250px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      padding: 20px 0;
-      box-shadow: 2px 0 4px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
+      padding: 0;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     }
 
     .sidebar-header {
-      padding: 0 20px 20px;
+      padding: 20px;
       border-bottom: 1px solid rgba(255,255,255,0.1);
-      margin-bottom: 20px;
     }
 
     .sidebar-header h2 {
       margin: 0;
-      font-size: 18px;
+      font-size: 1.5rem;
       font-weight: 600;
     }
 
@@ -171,32 +175,29 @@ import { Observable } from 'rxjs';
       list-style: none;
       padding: 0;
       margin: 0;
-      flex: 1;
     }
 
     .nav-menu li {
-      margin: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
     .nav-menu a {
-      display: flex;
-      align-items: center;
-      padding: 12px 20px;
+      display: block;
+      padding: 15px 20px;
       color: white;
       text-decoration: none;
-      transition: all 0.2s;
-      border-left: 3px solid transparent;
+      transition: all 0.3s ease;
+      font-size: 1rem;
     }
 
     .nav-menu a:hover {
       background-color: rgba(255,255,255,0.1);
-      border-left-color: white;
+      padding-left: 25px;
     }
 
     .nav-menu a.active {
       background-color: rgba(255,255,255,0.2);
-      border-left-color: white;
-      font-weight: 600;
+      border-right: 3px solid #fff;
     }
 
     .language-section-separator {
@@ -207,14 +208,13 @@ import { Observable } from 'rxjs';
 
     .main-content {
       flex: 1;
-      padding: 30px;
-      background-color: #f8f9fa;
-      overflow-y: auto;
+      padding: 20px;
+      background-color: #f5f5f5;
     }
 
     @media (max-width: 768px) {
       .navbar-content {
-        padding: 0 15px;
+        padding: 0 16px;
       }
 
       .admin-title {
@@ -222,11 +222,11 @@ import { Observable } from 'rxjs';
       }
 
       .sidebar {
-        width: 220px;
+        width: 240px;
       }
 
       .main-content {
-        padding: 20px 15px;
+        padding: 20px 16px;
       }
     }
   `]
@@ -245,6 +245,14 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     // Check authentication status on app initialization
     this.authApiService.checkAuthStatus();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const profileDropdown = document.querySelector('.profile-dropdown');
+    if (profileDropdown && !profileDropdown.contains(event.target as Node)) {
+      this.showProfileDropdown = false;
+    }
   }
 
   toggleProfileDropdown(): void {

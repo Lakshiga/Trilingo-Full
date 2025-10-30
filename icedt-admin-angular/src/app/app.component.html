@@ -1,25 +1,36 @@
-<div class="admin-layout">
+<div class="admin-layout flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
   <!-- Top Navigation Bar -->
-  <header class="top-navbar">
-    <div class="navbar-content">
+  <header class="top-navbar w-full bg-white shadow-lg border-b border-gray-200">
+    <div class="navbar-content flex justify-between items-center px-6 py-4">
       <div class="navbar-left">
-        <h1 class="admin-title">Tamil App Admin</h1>
+        <h1 class="admin-title text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Tamil App Admin</h1>
       </div>
       <div class="navbar-right">
-        <div class="profile-dropdown" (click)="toggleProfileDropdown()">
-          <div class="profile-icon">
-            <span class="user-avatar">👤</span>
-            <span class="user-name">Admin</span>
-            <span class="dropdown-arrow">▼</span>
+        <div class="profile-dropdown relative">
+          <div class="profile-icon flex items-center space-x-3 cursor-pointer bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 px-4 py-2 rounded-full transition-all duration-300 shadow-sm border border-indigo-100" (click)="toggleProfileDropdown()">
+            <span class="user-avatar text-2xl">👤</span>
+            <span class="user-name font-semibold text-gray-800 hidden md:inline">Admin User</span>
+            <span class="dropdown-arrow text-gray-600 transition-transform duration-300" [class.rotate-180]="showProfileDropdown">▼</span>
           </div>
-          <div class="dropdown-menu" [class.show]="showProfileDropdown">
-            <a href="#" class="dropdown-item" (click)="updateProfile()">
-              <span class="dropdown-icon">⚙️</span>
-              Update Profile
+          <div class="dropdown-menu absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 z-50 transition-all duration-300 origin-top-right" 
+               [class.opacity-0]="!showProfileDropdown" 
+               [class.opacity-100]="showProfileDropdown" 
+               [class.scale-95]="!showProfileDropdown" 
+               [class.scale-100]="showProfileDropdown"
+               [class.invisible]="!showProfileDropdown"
+               [class.visible]="showProfileDropdown">
+            <a href="#" class="dropdown-item flex items-center px-5 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-200 rounded-lg mx-2">
+              <span class="dropdown-icon mr-3 text-lg">👤</span>
+              <span class="font-medium">My Profile</span>
             </a>
-            <a href="#" class="dropdown-item" (click)="logout()">
-              <span class="dropdown-icon">🚪</span>
-              Logout
+            <a href="#" class="dropdown-item flex items-center px-5 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-200 rounded-lg mx-2">
+              <span class="dropdown-icon mr-3 text-lg">⚙️</span>
+              <span class="font-medium">Settings</span>
+            </a>
+            <div class="border-t border-gray-100 my-2"></div>
+            <a href="#" class="dropdown-item flex items-center px-5 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200 rounded-lg mx-2" (click)="logout(); $event.preventDefault()">
+              <span class="dropdown-icon mr-3 text-lg">🚪</span>
+              <span class="font-medium">Logout</span>
             </a>
           </div>
         </div>
@@ -27,24 +38,50 @@
     </div>
   </header>
 
-  <div class="content-wrapper">
-    <nav class="sidebar">
-      <div class="sidebar-header">
-        <h2>Navigation</h2>
+  <div class="content-wrapper flex flex-1">
+    <nav class="sidebar w-64 bg-gradient-to-b from-indigo-700 to-purple-800 text-white min-h-screen shadow-xl">
+      <div class="sidebar-header py-6 px-6 border-b border-indigo-500">
+        <h2 class="text-xl font-bold text-center">Navigation</h2>
       </div>
-      <ul class="nav-menu">
-        <li><a routerLink="/dashboard" routerLinkActive="active">📊 Dashboard</a></li>
-        <li><a routerLink="/main-activities" routerLinkActive="active">🎯 Main Activities</a></li>
-        <li><a routerLink="/activity-types" routerLinkActive="active">🏷️ Activity Types</a></li>
-        <li><a routerLink="/games" routerLinkActive="active">🎮 Games</a></li>
-        <li><a routerLink="/levels" routerLinkActive="active">📚 Levels</a></li>
+      <ul class="nav-menu py-2">
+        <li>
+          <a routerLink="/dashboard" routerLinkActive="active" class="flex items-center px-6 py-4 text-white hover:bg-indigo-600 transition-all duration-300 rounded-r-full mx-2">
+            <span class="mr-3 text-lg">📊</span>
+            <span class="font-medium">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/main-activities" routerLinkActive="active" class="flex items-center px-6 py-4 text-white hover:bg-indigo-600 transition-all duration-300 rounded-r-full mx-2">
+            <span class="mr-3 text-lg">🎯</span>
+            <span class="font-medium">Main Activities</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/activity-types" routerLinkActive="active" class="flex items-center px-6 py-4 text-white hover:bg-indigo-600 transition-all duration-300 rounded-r-full mx-2">
+            <span class="mr-3 text-lg">🏷️</span>
+            <span class="font-medium">Activity Types</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/games" routerLinkActive="active" class="flex items-center px-6 py-4 text-white hover:bg-indigo-600 transition-all duration-300 rounded-r-full mx-2">
+            <span class="mr-3 text-lg">🎮</span>
+            <span class="font-medium">Games</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/levels" routerLinkActive="active" class="flex items-center px-6 py-4 text-white hover:bg-indigo-600 transition-all duration-300 rounded-r-full mx-2">
+            <span class="mr-3 text-lg">📚</span>
+            <span class="font-medium">Levels</span>
+          </a>
+        </li>
       </ul>
       
       <!-- Language Management is now embedded within activities pages (not in sidebar) -->
     </nav>
     
-    <main class="main-content">
-      <router-outlet />
+    <main class="main-content flex-1 p-6 bg-gradient-to-br from-gray-50 to-gray-100">
+      
+        <router-outlet />
     </main>
   </div>
 </div>
