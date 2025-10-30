@@ -38,24 +38,25 @@ export interface DependentCrudApiService<T, TCreateDto> {
     MatCardModule
   ],
   template: `
-    <mat-card class="crud-table-container">
-      <mat-card-header>
-        <div class="header-content">
+    <mat-card class="crud-table-container rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+      <mat-card-header class="bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-4 border-b border-gray-200">
+        <div class="header-content w-full">
           <button 
             mat-icon-button 
             (click)="navigateBack()" 
-            class="back-button">
+            class="back-button mb-4 text-indigo-600 hover:text-indigo-800 transition-colors duration-200">
             <mat-icon>arrow_back</mat-icon>
             <span>Back to {{ parentName || 'Parent' }}</span>
           </button>
           
-          <div class="title-section">
-            <h1>Manage {{ entityName }}s for: "{{ parentName }}"</h1>
+          <div class="title-section flex justify-between items-center w-full">
+            <h1 class="text-2xl font-bold text-gray-800">Manage {{ entityName }}s for: "{{ parentName }}"</h1>
             <button 
               mat-raised-button 
               color="primary" 
               (click)="startAdding()"
-              [disabled]="isAdding">
+              [disabled]="isAdding"
+              class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-full shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5">
               <mat-icon>add</mat-icon>
               Add New {{ entityName }}
             </button>
@@ -63,33 +64,34 @@ export interface DependentCrudApiService<T, TCreateDto> {
         </div>
       </mat-card-header>
       
-      <mat-card-content>
-        <div class="table-container">
-          <table mat-table [dataSource]="dataSource" class="crud-table">
+      <mat-card-content class="p-0">
+        <div class="table-container overflow-x-auto">
+          <table mat-table [dataSource]="dataSource" class="crud-table min-w-full">
             <!-- ID Column -->
             <ng-container matColumnDef="id">
-              <th mat-header-cell *matHeaderCellDef>ID</th>
-              <td mat-cell *matCellDef="let element">
+              <th mat-header-cell *matHeaderCellDef class="px-6 py-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <td mat-cell *matCellDef="let element" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ element[idField] }}
               </td>
             </ng-container>
             
             <!-- Dynamic Columns -->
             <ng-container *ngFor="let column of columns" [matColumnDef]="getColumnDef(column.field)">
-              <th mat-header-cell *matHeaderCellDef>{{ column.headerName }}</th>
-              <td mat-cell *matCellDef="let element; let i = index">
+              <th mat-header-cell *matHeaderCellDef class="px-6 py-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ column.headerName }}</th>
+              <td mat-cell *matCellDef="let element; let i = index" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 <ng-container *ngIf="!isEditing(element[idField])">
                   {{ element[column.field] }}
                 </ng-container>
                 <ng-container *ngIf="isEditing(element[idField])">
-                  <mat-form-field appearance="outline" class="inline-field">
+                  <mat-form-field appearance="outline" class="inline-field w-full">
                     <input 
                       matInput 
                       [name]="getColumnDef(column.field)"
                       [type]="column.type === 'number' ? 'number' : 'text'"
                       [value]="getEditedValue(column.field)"
                       (input)="onInputChange(column.field, $event)"
-                      [placeholder]="column.headerName">
+                      [placeholder]="column.headerName"
+                      class="rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
                   </mat-form-field>
                 </ng-container>
               </td>
@@ -97,9 +99,9 @@ export interface DependentCrudApiService<T, TCreateDto> {
             
             <!-- Actions Column -->
             <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>Actions</th>
-              <td mat-cell *matCellDef="let element; let i = index">
-                <ng-container *ngIf="!isEditing(element[idField])">
+              <th mat-header-cell *matHeaderCellDef class="px-6 py-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <td mat-cell *matCellDef="let element; let i = index" class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <ng-container *ngIf="!isEditing(element[idField])" class="flex space-x-2">
                   <ng-container *ngIf="renderCustomActions">
                     <ng-container *ngTemplateOutlet="customActions; context: { $implicit: element }"></ng-container>
                   </ng-container>
@@ -107,29 +109,33 @@ export interface DependentCrudApiService<T, TCreateDto> {
                     mat-icon-button 
                     color="primary" 
                     (click)="startEditing(element)"
-                    title="Edit">
+                    title="Edit"
+                    class="bg-indigo-100 hover:bg-indigo-200 text-indigo-600 rounded-full p-2 transition-colors duration-200">
                     <mat-icon>edit</mat-icon>
                   </button>
                   <button 
                     mat-icon-button 
                     color="warn" 
                     (click)="deleteItem(element[idField])"
-                    title="Delete">
+                    title="Delete"
+                    class="bg-red-100 hover:bg-red-200 text-red-600 rounded-full p-2 transition-colors duration-200">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </ng-container>
-                <ng-container *ngIf="isEditing(element[idField])">
+                <ng-container *ngIf="isEditing(element[idField])" class="flex space-x-2">
                   <button 
                     mat-icon-button 
                     color="primary" 
                     (click)="saveEdit()"
-                    title="Save">
+                    title="Save"
+                    class="bg-green-100 hover:bg-green-200 text-green-600 rounded-full p-2 transition-colors duration-200">
                     <mat-icon>save</mat-icon>
                   </button>
                   <button 
                     mat-icon-button 
                     (click)="cancelEdit()"
-                    title="Cancel">
+                    title="Cancel"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full p-2 transition-colors duration-200">
                     <mat-icon>cancel</mat-icon>
                   </button>
                 </ng-container>
@@ -138,32 +144,35 @@ export interface DependentCrudApiService<T, TCreateDto> {
             
             <!-- Add Row Column -->
             <ng-container matColumnDef="addRow">
-              <th mat-header-cell *matHeaderCellDef></th>
-              <td mat-cell *matCellDef="let element; let i = index">
-                <ng-container *ngIf="isAdding && i === items.length">
+              <th mat-header-cell *matHeaderCellDef class="px-6 py-4 bg-gray-50"></th>
+              <td mat-cell *matCellDef="let element; let i = index" class="px-6 py-4 whitespace-nowrap">
+                <ng-container *ngIf="isAdding && i === items.length" class="flex space-x-2">
                   <button 
                     mat-icon-button 
                     color="primary" 
                     (click)="saveAdd()"
-                    title="Save">
+                    title="Save"
+                    class="bg-green-100 hover:bg-green-200 text-green-600 rounded-full p-2 transition-colors duration-200">
                     <mat-icon>save</mat-icon>
                   </button>
                   <button 
                     mat-icon-button 
                     (click)="cancelAdd()"
-                    title="Cancel">
+                    title="Cancel"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full p-2 transition-colors duration-200">
                     <mat-icon>cancel</mat-icon>
                   </button>
                 </ng-container>
               </td>
             </ng-container>
             
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-gray-50"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+                class="bg-white hover:bg-gray-50 transition-colors duration-150"></tr>
             
             <!-- Loading Row -->
             <tr *ngIf="isLoading" class="loading-row">
-              <td [attr.colspan]="displayedColumns.length" class="loading-cell">
+              <td [attr.colspan]="displayedColumns.length" class="loading-cell p-6 text-center">
                 <mat-spinner diameter="30"></mat-spinner>
               </td>
             </tr>

@@ -29,73 +29,88 @@ import { RouterLink } from '@angular/router';
     RouterLink
   ],
   template: `
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Levels Management</mat-card-title>
+    <mat-card class="rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+      <mat-card-header class="bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-4 border-b border-gray-200">
+        <mat-card-title class="text-2xl font-bold text-gray-800">Levels Management</mat-card-title>
         <div class="spacer"></div>
-        <button mat-raised-button color="primary" (click)="openAddDialog()">
+        <button mat-raised-button 
+                class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-full shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
+                (click)="openAddDialog()">
           <mat-icon>add</mat-icon>
           Add Level
         </button>
       </mat-card-header>
       
-      <mat-card-content>
-        <div *ngIf="isLoading" class="loading-container">
+      <mat-card-content class="p-0">
+        <div *ngIf="isLoading" class="loading-container flex justify-center items-center p-12">
           <mat-spinner></mat-spinner>
         </div>
 
-        <div *ngIf="!isLoading" class="table-container">
-          <table mat-table [dataSource]="levels" class="levels-table">
+        <div *ngIf="!isLoading" class="table-container overflow-x-auto">
+          <table mat-table [dataSource]="levels" class="levels-table min-w-full">
             <!-- ID Column -->
             <ng-container matColumnDef="id">
-              <th mat-header-cell *matHeaderCellDef>ID</th>
-              <td mat-cell *matCellDef="let level">{{ level.id }}</td>
+              <th mat-header-cell *matHeaderCellDef class="px-6 py-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <td mat-cell *matCellDef="let level" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ level.id }}</td>
             </ng-container>
 
             <!-- English Name Column -->
             <ng-container matColumnDef="name_en">
-              <th mat-header-cell *matHeaderCellDef>English Name</th>
-              <td mat-cell *matCellDef="let level">{{ level.name_en }}</td>
+              <th mat-header-cell *matHeaderCellDef class="px-6 py-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">English Name</th>
+              <td mat-cell *matCellDef="let level" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ level.name_en }}</td>
             </ng-container>
 
             <!-- Tamil Name Column -->
             <ng-container matColumnDef="name_ta">
-              <th mat-header-cell *matHeaderCellDef>தமிழ் Name</th>
-              <td mat-cell *matCellDef="let level">{{ level.name_ta }}</td>
+              <th mat-header-cell *matHeaderCellDef class="px-6 py-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">தமிழ் Name</th>
+              <td mat-cell *matCellDef="let level" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ level.name_ta }}</td>
             </ng-container>
 
             <!-- Sinhala Name Column -->
             <ng-container matColumnDef="name_si">
-              <th mat-header-cell *matHeaderCellDef>සිංහල Name</th>
-              <td mat-cell *matCellDef="let level">{{ level.name_si }}</td>
+              <th mat-header-cell *matHeaderCellDef class="px-6 py-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">සිංහල Name</th>
+              <td mat-cell *matCellDef="let level" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ level.name_si }}</td>
             </ng-container>
 
             <!-- Actions Column -->
             <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>Actions</th>
-              <td mat-cell *matCellDef="let level">
-                <button mat-button color="primary" [routerLink]="['/lessons']" [queryParams]="{ levelId: level.id }">
-                  MANAGE LESSONS
-                </button>
-                <button mat-icon-button (click)="openEditDialog(level)" color="primary">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button (click)="deleteLevel(level)" color="warn">
-                  <mat-icon>delete</mat-icon>
-                </button>
+              <th mat-header-cell *matHeaderCellDef class="px-6 py-4 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <td mat-cell *matCellDef="let level" class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex space-x-2">
+                  <button mat-button 
+                          color="primary" 
+                          [routerLink]="['/lessons']" 
+                          [queryParams]="{ levelId: level.id }"
+                          class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-medium rounded-full px-4 py-2 transition-colors duration-200">
+                    MANAGE LESSONS
+                  </button>
+                  <button mat-icon-button 
+                          (click)="openEditDialog(level)" 
+                          color="primary"
+                          class="bg-indigo-100 hover:bg-indigo-200 text-indigo-600 rounded-full p-2 transition-colors duration-200">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button 
+                          (click)="deleteLevel(level)" 
+                          color="warn"
+                          class="bg-red-100 hover:bg-red-200 text-red-600 rounded-full p-2 transition-colors duration-200">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
               </td>
             </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-gray-50"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+                class="bg-white hover:bg-gray-50 transition-colors duration-150"></tr>
           </table>
         </div>
       </mat-card-content>
     </mat-card>
 
     <!-- Add/Edit Dialog -->
-    <div *ngIf="showDialog" class="dialog-overlay" (click)="closeDialog()">
-      <div class="dialog-content" (click)="$event.stopPropagation()">
+    <div *ngIf="showDialog" class="dialog-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" (click)="closeDialog()">
+      <div class="dialog-content bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
         <app-multilingual-form
           [title]="dialogTitle"
           [fieldLabel]="'Level Name'"
@@ -109,11 +124,14 @@ import { RouterLink } from '@angular/router';
           (dataChange)="onFormDataChange($event)">
         </app-multilingual-form>
         
-        <div class="dialog-actions">
-          <div class="action-buttons">
-            <button mat-button (click)="closeDialog()">Cancel</button>
+        <div class="dialog-actions p-6 border-t border-gray-200">
+          <div class="action-buttons flex justify-end space-x-3">
+            <button mat-button 
+                    class="px-4 py-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                    (click)="closeDialog()">Cancel</button>
             <button mat-raised-button 
                     color="primary" 
+                    class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
                     (click)="onSave()"
                     [disabled]="!isFormValid()">
               {{ dialogMode === 'add' ? 'Add Level' : 'Update Level' }}
