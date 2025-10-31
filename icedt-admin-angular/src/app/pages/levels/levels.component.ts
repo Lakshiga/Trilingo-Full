@@ -13,13 +13,6 @@ interface LevelCreateDto {
   languageId: number;
 }
 
-interface LevelCreateDto {
-  name_en: string;
-  name_ta: string;
-  name_si: string;
-  languageId: number;
-}
-
 @Component({
   selector: 'app-levels',
   standalone: true,
@@ -32,6 +25,7 @@ interface LevelCreateDto {
   templateUrl: './levels.component.html',
   styleUrls: ['./levels.component.css']
 })
+
 export class LevelsPageComponent {
   columns = [
     { field: 'name_en' as keyof Level, headerName: 'English Name', type: 'string' as const },

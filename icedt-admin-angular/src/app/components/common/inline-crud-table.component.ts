@@ -20,9 +20,9 @@ export interface ColumnDef<T, TCreateDto> {
 
 export interface CrudApiService<T, TCreateDto> {
   getAll(): Observable<T[]>;
-  create(item: TCreateDto): Observable<T>;
-  update(id: number | string, item: Partial<TCreateDto>): Observable<void>;
-  deleteItem(id: number | string): Observable<void>;
+  create(item: TCreateDto): Observable<any>;
+  update(id: number | string, item: Partial<TCreateDto>): Observable<any>;
+  deleteItem(id: number | string): Observable<any>;
 }
 
 @Component({
