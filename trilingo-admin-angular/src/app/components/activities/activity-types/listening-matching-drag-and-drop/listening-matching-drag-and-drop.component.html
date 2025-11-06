@@ -1,0 +1,83 @@
+
+    <div class="listening-matching-container" *ngIf="!isActivityFinished; else completedTemplate">
+      <h2 class="title">{{ processedTitle }}</h2>
+      
+      <mat-card class="introduction-card">
+        <mat-card-content>
+          <p>{{ processedIntroduction }}</p>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Word Choices Pool -->
+      <div class="word-pool-section">
+        <h3 class="pool-title">பொருத்தமான சொல்லை இழுத்துவிடவும்:</h3>
+        <mat-card class="word-pool-card">
+          <mat-card-content>
+            <div class="word-chips">
+              <mat-chip
+                *ngFor="let word of wordChoices"
+                [draggable]="true"
+                (dragstart)="handleDragStart($event, word)"
+                class="word-chip"
+              >
+                {{ word.text }}
+              </mat-chip>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Sentences Area -->
+      <div class="sentences-section">
+        <mat-card
+          *ngFor="let sentence of processedSentences; let index = index"
+          [class.current-sentence]="index === currentSentenceIndex"
+          [class.completed-sentence]="!!droppedWords[sentence.id]"
+          class="sentence-card"
+        >
+          <mat-card-content>
+            <div class="sentence-content">
+              <mat-icon *ngIf="index === currentSentenceIndex && isPlaying" class="playing-icon">volume_up</mat-icon>
+              <mat-icon *ngIf="!!droppedWords[sentence.id]" class="completed-icon">check_circle</mat-icon>
+              
+              <div class="sentence-text">
+                <span>{{ sentence.preBlankText }}</span>
+                <div
+                  class="drop-zone"
+                  [class.current-drop-zone]="index === currentSentenceIndex"
+                  [class.completed-drop-zone]="!!droppedWords[sentence.id]"
+                  [class.incorrect-feedback]="index === currentSentenceIndex && feedback === 'incorrect'"
+                  (dragover)="handleDragOver($event)"
+                  (drop)="handleDrop($event, sentence.id)"
+                >
+                  <mat-chip
+                    *ngIf="droppedWords[sentence.id]"
+                    color="primary"
+                    class="dropped-word-chip"
+                  >
+                    {{ droppedWords[sentence.id]?.text }}
+                  </mat-chip>
+                  <span
+                    *ngIf="!droppedWords[sentence.id] && index === currentSentenceIndex"
+                    class="drop-hint"
+                  >
+                    இங்கே இழுத்துவிடவும்
+                  </span>
+                </div>
+                <span *ngIf="sentence.postBlankText">{{ sentence.postBlankText }}</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <audio #audioElement style="display: none;"></audio>
+    </div>
+
+    <ng-template #completedTemplate>
+      <div class="completion-message">
+        <h1>🎉 வாழ்த்துக்கள்! சிறப்பாகச் செய்தீர்கள்! 🎉</h1>
+        <p>இந்தச் செயல்பாட்டை வெற்றிகரமாக முடித்துவிட்டீர்கள்.</p>
+      </div>
+    </ng-template>
+  

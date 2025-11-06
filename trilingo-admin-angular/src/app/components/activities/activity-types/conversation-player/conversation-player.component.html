@@ -1,0 +1,46 @@
+
+    <div class="container">
+      <h1 class="title">{{ text(content?.title) }}</h1>
+
+      <!-- Chat Messages Area -->
+      <div class="messages-container">
+        <div class="message" *ngFor="let message of content?.messages; let i = index" 
+             [class.sender]="i % 2 === 0" 
+             [class.active]="i === activeMessageIndex">
+          <div class="message-bubble" [class.sender-bubble]="i % 2 === 0">
+            <span class="message-text">{{ text(message?.text) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audio Player Controls -->
+      <div class="player-controls">
+        <audio #audioPlayer [src]="audio(content?.audioUrl)" style="display: none;"></audio>
+        <div class="controls-grid">
+          <button mat-icon-button (click)="togglePlayPause()" class="play-button">
+            <mat-icon>{{ isPlaying ? 'pause' : 'play_arrow' }}</mat-icon>
+          </button>
+          
+          <div class="slider-container">
+            <input
+              type="range"
+              [value]="currentTime"
+              [min]="0"
+              [max]="duration"
+              [step]="1"
+              (input)="onSliderChange($event)"
+              class="time-slider"
+            />
+            <div class="time-display">
+              <span class="current-time">{{ formatTime(currentTime) }}</span>
+              <span class="total-time">{{ formatTime(duration) }}</span>
+            </div>
+          </div>
+          
+          <button mat-icon-button (click)="handleReplay()" class="replay-button">
+            <mat-icon>replay</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  

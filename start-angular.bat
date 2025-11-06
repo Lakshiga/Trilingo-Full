@@ -1,7 +1,6 @@
 @echo off
 echo Starting Angular Admin Panel...
-cd icedt-admin-angular
+cd trilingo-admin-angular
 npm install
 npm start
 pause
-
