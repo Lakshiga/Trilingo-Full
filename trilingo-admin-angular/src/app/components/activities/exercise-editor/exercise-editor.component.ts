@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -7,9 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
-import { Activity } from '../../../types/activity.types';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MultilingualActivityTemplates } from '../../../services/multilingual-activity-templates.service';
+import { Exercise } from '../../../services/exercise-api.service';
 
 @Component({
   selector: 'app-exercise-editor',
@@ -27,122 +26,115 @@ import { MultilingualActivityTemplates } from '../../../services/multilingual-ac
   templateUrl: './exercise-editor.component.html',
   styleUrls: ['./exercise-editor.component.css']
 })
-export class ExerciseEditorComponent implements OnInit, OnChanges {
-  @Input() activityData: Partial<Activity> = {};
+export class ExerciseEditorComponent {
+  @Input() exercises: Exercise[] = [];
+  @Input() activityId: string | null = null;
   @Input() expandedExercise: number | false = false;
-  @Output() dataChange = new EventEmitter<Partial<Activity>>();
+  @Output() addExercise = new EventEmitter<void>();
+  @Output() updateExercise = new EventEmitter<{ exerciseId: number; jsonData: string }>();
+  @Output() deleteExercise = new EventEmitter<number>();
   @Output() previewExercise = new EventEmitter<string>();
   @Output() expansionChange = new EventEmitter<{ index: number; isExpanded: boolean }>();
-  @Output() setExpanded = new EventEmitter<number>();
 
-  exercises: string[] = ['{}'];
-  jsonErrors: string[] = [''];
+  editingExercises: Map<number, string> = new Map();
+  jsonErrors: Map<number, string> = new Map();
 
   constructor(private snackBar: MatSnackBar) {}
 
-  ngOnInit(): void {
-    this.parseExercises();
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['activityData']) {
-      this.parseExercises();
+  getExerciseJson(exercise: Exercise): string {
+    const exerciseId = exercise.id;
+    // If currently editing, return the editing version
+    if (this.editingExercises.has(exerciseId)) {
+      return this.editingExercises.get(exerciseId)!;
     }
-  }
-
-  private parseExercises(): void {
+    // Otherwise return the saved version formatted
     try {
-      const parsed = JSON.parse(this.activityData.contentJson || '[]');
-      const exerciseArray = Array.isArray(parsed) ? parsed : [parsed];
-      const stringifiedExercises = exerciseArray.map(ex => JSON.stringify(ex, null, 2));
-      this.exercises = stringifiedExercises;
-      this.jsonErrors = new Array(stringifiedExercises.length).fill('');
+      const parsed = JSON.parse(exercise.jsonData);
+      return JSON.stringify(parsed, null, 2);
     } catch {
-      this.exercises = ['{}'];
-      this.jsonErrors = [''];
+      return exercise.jsonData;
     }
   }
 
-  private triggerParentUpdate(updatedExercises: string[]): void {
-    try {
-      const parsedObjects = updatedExercises.map(exStr => JSON.parse(exStr));
-      const combinedJsonString = JSON.stringify(parsedObjects, null, 2);
-      this.dataChange.emit({ ...this.activityData, contentJson: combinedJsonString });
-    } catch {
-      // If there's an error, we still pass the raw string up so the user can see the error
-      const rawCombined = `[${updatedExercises.join(',')}]`;
-      this.dataChange.emit({ ...this.activityData, contentJson: rawCombined });
-    }
+  hasJsonError(exercise: Exercise): boolean {
+    return this.jsonErrors.has(exercise.id);
   }
 
-  handleExerciseChange(index: number, value: string): void {
-    this.exercises[index] = value;
+  getJsonError(exercise: Exercise): string {
+    return this.jsonErrors.get(exercise.id) || '';
+  }
+
+  handleExerciseChange(exercise: Exercise, value: string): void {
+    const exerciseId = exercise.id;
+    this.editingExercises.set(exerciseId, value);
 
     try {
       JSON.parse(value);
-      this.jsonErrors[index] = '';
+      this.jsonErrors.delete(exerciseId);
     } catch {
-      this.jsonErrors[index] = 'Invalid JSON';
+      this.jsonErrors.set(exerciseId, 'Invalid JSON');
     }
-
-    this.triggerParentUpdate(this.exercises);
   }
 
-  addExercise(): void {
-    const typeId = Number(this.activityData.activityTypeId || 0);
-    // Ensure we have a valid activity type ID
-    if (typeId && typeId > 0) {
-      try {
-        const templateString = MultilingualActivityTemplates.getTemplate(typeId);
-        const parsed = JSON.parse(templateString);
-        this.exercises.push(JSON.stringify(parsed, null, 2));
-      } catch {
-        this.exercises.push('{}');
-      }
-    } else {
-      this.exercises.push('{}');
-    }
-    this.jsonErrors.push('');
-    this.triggerParentUpdate(this.exercises);
-    this.setExpanded.emit(this.exercises.length - 1);
-  }
-
-  removeExercise(index: number, event: Event): void {
-    event.stopPropagation();
+  saveExercise(exercise: Exercise): void {
+    const exerciseId = exercise.id;
+    const editedJson = this.editingExercises.get(exerciseId);
     
-    if (this.exercises.length <= 1) {
-      alert("An activity must have at least one exercise.");
-      return;
-    }
+    if (!editedJson) return;
 
-    this.exercises.splice(index, 1);
-    this.jsonErrors.splice(index, 1);
-    this.triggerParentUpdate(this.exercises);
+    try {
+      // Validate JSON
+      JSON.parse(editedJson);
+      this.jsonErrors.delete(exerciseId);
+      
+      // Emit update event
+      this.updateExercise.emit({ exerciseId, jsonData: editedJson });
+      
+      // Clear editing state
+      this.editingExercises.delete(exerciseId);
+    } catch {
+      this.jsonErrors.set(exerciseId, 'Invalid JSON');
+      this.snackBar.open('Invalid JSON format', 'Close', { duration: 3000 });
+    }
   }
 
-  onPreviewExercise(exerciseJson: string, event?: Event): void {
+  onAddExercise(): void {
+    this.addExercise.emit();
+  }
+
+  onDeleteExercise(exercise: Exercise, event: Event): void {
+    event.stopPropagation();
+    this.deleteExercise.emit(exercise.id);
+  }
+
+  onPreviewExercise(exercise: Exercise, event?: Event): void {
     if (event) {
       event.stopPropagation();
     }
-    // console.log('Preview exercise requested:', exerciseJson);
+    
+    // Use editing version if available, otherwise use saved version
+    const jsonToPreview = this.editingExercises.get(exercise.id) || exercise.jsonData;
+    
     try {
       // Validate the JSON before emitting
-      JSON.parse(exerciseJson);
-      this.previewExercise.emit(exerciseJson);
+      JSON.parse(jsonToPreview);
+      this.previewExercise.emit(jsonToPreview);
     } catch (error) {
       console.error('Invalid JSON for preview:', error);
-      // Don't emit if JSON is invalid
+      this.snackBar.open('Cannot preview invalid JSON', 'Close', { duration: 2000 });
     }
   }
 
-  async onCopyExercise(exerciseJson: string, event: Event): Promise<void> {
+  async onCopyExercise(exercise: Exercise, event: Event): Promise<void> {
     event.stopPropagation();
+    const jsonToCopy = this.editingExercises.get(exercise.id) || exercise.jsonData;
+    
     try {
-      await navigator.clipboard.writeText(exerciseJson);
+      await navigator.clipboard.writeText(jsonToCopy);
       this.snackBar.open('Exercise JSON copied to clipboard!', 'Close', { duration: 2500 });
     } catch {
       const ta = document.createElement('textarea');
-      ta.value = exerciseJson;
+      ta.value = jsonToCopy;
       document.body.appendChild(ta);
       ta.select();
       document.execCommand('copy');

@@ -19,6 +19,7 @@ import { SidebarLanguageManagerComponent } from '../../components/common/sidebar
 import { ActivityApiService, MultilingualActivity } from '../../services/activity-api.service';
 import { MainActivityApiService, MainActivityResponse } from '../../services/main-activity-api.service';
 import { ActivityTypeApiService, ActivityTypeResponse } from '../../services/activity-type-api.service';
+import { ExerciseApiService, Exercise, CreateExerciseDto } from '../../services/exercise-api.service';
 import { Activity } from '../../types/activity.types';
 import { MainActivity } from '../../types/main-activity.types';
 import { ActivityType } from '../../types/activity-type.types';
@@ -63,6 +64,7 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
   
   activity: Partial<MultilingualActivity> | null = null;
   previewContent: Partial<MultilingualActivity> | null = null;
+  exercises: Exercise[] = [];
   isLoading = true;
   expandedExercise: number | false = 0;
   
@@ -78,6 +80,7 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
     private activityApiService: ActivityApiService,
     private mainActivityApiService: MainActivityApiService,
     private activityTypeApiService: ActivityTypeApiService,
+    private exerciseApiService: ExerciseApiService,
     private snackBar: MatSnackBar
   ) {}
 
@@ -135,17 +138,16 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
         description: undefined
       }));
 
-      let exercises: any[] = [];
-      try {
-        const parsedContent = JSON.parse(loadedActivity?.contentJson || '[]');
-        exercises = Array.isArray(parsedContent) ? parsedContent : [parsedContent];
-        if (exercises.length === 0) exercises.push({});
-      } catch {
-        exercises = [{}];
+      // Load exercises from Exercise API if editing an existing activity
+      if (this.isEditMode && this.activityId) {
+        const exercisesData = await this.exerciseApiService.getByActivityId(parseInt(this.activityId, 10)).toPromise();
+        this.exercises = exercisesData || [];
+      } else {
+        // For new activities, start with an empty exercises array
+        this.exercises = [];
       }
 
       if (loadedActivity) {
-        loadedActivity.contentJson = JSON.stringify(exercises, null, 2);
         // Ensure all IDs are properly converted to numbers
         if (loadedActivity.mainActivityId) {
           loadedActivity.mainActivityId = Number(loadedActivity.mainActivityId);
@@ -161,7 +163,13 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
         }
         
         this.activity = loadedActivity;
-        this.previewContent = { ...loadedActivity, contentJson: JSON.stringify(exercises[0] || {}, null, 2) };
+        // Set preview to first exercise if available
+        const firstExercise = this.exercises[0];
+        if (firstExercise) {
+          this.previewContent = { ...loadedActivity, contentJson: firstExercise.jsonData };
+        } else {
+          this.previewContent = { ...loadedActivity, contentJson: '{}' };
+        }
         // Track initial type to detect changes later
         this.lastActivityTypeId = Number(loadedActivity.activityTypeId || 0) || null;
         
@@ -254,22 +262,21 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
     try {
       const templateString = MultilingualActivityTemplates.getTemplate(activityTypeId);
       const templateObject = JSON.parse(templateString);
-      const exercisesArray = [templateObject];
-      const prettyArray = JSON.stringify(exercisesArray, null, 2);
-      this.activity = { ...this.activity, activityTypeId: activityTypeId, contentJson: prettyArray };
+      
+      // Update activity type
+      this.activity = { ...this.activity, activityTypeId: activityTypeId };
 
-      // Update preview to first exercise immediately
+      // Update preview with template
       this.previewContent = this.activity ? { ...this.activity, contentJson: JSON.stringify(templateObject, null, 2) } : null;
       this.expandedExercise = 0;
       
       // Show a message to the user that the template has been auto-populated
       const activityType = this.activityTypes.find(at => at.activityTypeId === activityTypeId);
       const activityTypeName = activityType ? activityType.activityName : 'selected';
-      this.snackBar.open(`Activity template for ${activityTypeName} auto-populated`, 'Close', { duration: 3000 });
+      this.snackBar.open(`Activity template for ${activityTypeName} loaded. Use "Add Exercise" to create exercises.`, 'Close', { duration: 3000 });
     } catch (error) {
       console.error('Failed to auto-populate template:', error);
-      // If template parse fails, keep whatever user has
-      this.snackBar.open('Failed to auto-populate template. Using existing content.', 'Close', { duration: 3000 });
+      this.snackBar.open('Failed to load template.', 'Close', { duration: 3000 });
     }
   }
 
@@ -288,36 +295,7 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
   }
 
   async handleSave(): Promise<void> {
-    if (!this.activity || !this.activity.contentJson) return;
-
-    // Ensure the JSON template matches the currently selected activity type
-    try {
-      const selectedTypeId = Number(this.activity.activityTypeId || 0);
-      const parsed = JSON.parse(this.activity.contentJson || '[]');
-      const asArray = Array.isArray(parsed) ? parsed : [parsed];
-      const first = asArray[0] || {};
-      const looksLikeFlashcard = first?.title?.en === 'Flashcard';
-
-      // If content is empty, placeholder, or mismatched (e.g., Flashcard while selected type != 1),
-      // regenerate from the template for the selected type.
-      const isEmptyObject = Object.keys(first || {}).length === 0;
-      if (selectedTypeId > 0 && (isEmptyObject || (looksLikeFlashcard && selectedTypeId !== 1))) {
-        const tmpl = MultilingualActivityTemplates.getTemplate(selectedTypeId);
-        const obj = JSON.parse(tmpl);
-        const prettyArray = JSON.stringify([obj], null, 2);
-        this.activity.contentJson = prettyArray;
-      }
-    } catch {
-      // If parsing fails, we'll stop on the validator below
-    }
-
-    // Validate JSON content
-    try {
-      JSON.parse(this.activity.contentJson);
-    } catch (error) {
-      this.snackBar.open('An exercise contains invalid JSON. Please fix it before saving.', 'Close', { duration: 5000 });
-      return;
-    }
+    if (!this.activity) return;
 
     // Construct payload with strong coercion and fallbacks
     const coercedLessonId = Number(this.activity.lessonId || this.lessonId || 0);
@@ -334,14 +312,13 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
         si: (enteredTitle.si || '').toString().trim()
       },
       sequenceOrder: Number(this.activity.sequenceOrder || 1),
-      contentJson: this.activity.contentJson,
+      contentJson: '[]', // Placeholder - exercises are now stored separately
       lessonId: coercedLessonId,
       activityTypeId: coercedActivityTypeId,
       mainActivityId: coercedMainActivityId
     };
 
-    // Validate required IDs (check for null, undefined, or invalid values)
-    // IDs should be greater than 0 to be valid
+    // Validate required IDs
     if (!coercedLessonId || coercedLessonId <= 0) {
       this.snackBar.open('Please select a valid Lesson.', 'Close', { duration: 5000 });
       return;
@@ -363,6 +340,11 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
         createdOrUpdated = await this.activityApiService.update(parseInt(this.activityId, 10), payload).toPromise();
       } else {
         createdOrUpdated = await this.activityApiService.create(payload).toPromise();
+        // Update activityId for new activities so we can save exercises
+        if (createdOrUpdated?.activityId) {
+          this.activityId = createdOrUpdated.activityId.toString();
+          this.isEditMode = true;
+        }
       }
 
       this.snackBar.open('Activity saved successfully!', 'Close', { duration: 3000 });
@@ -377,6 +359,82 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error("Failed to save activity", error);
       this.snackBar.open('An error occurred while saving.', 'Close', { duration: 5000 });
+    }
+  }
+
+  // Exercise CRUD methods
+  async handleAddExercise(): Promise<void> {
+    if (!this.activityId) {
+      this.snackBar.open('Please save the activity first before adding exercises.', 'Close', { duration: 5000 });
+      return;
+    }
+
+    const typeId = Number(this.activity?.activityTypeId || 0);
+    let jsonTemplate = '{}';
+    
+    if (typeId && typeId > 0) {
+      try {
+        jsonTemplate = MultilingualActivityTemplates.getTemplate(typeId);
+      } catch (error) {
+        console.error('Failed to get template:', error);
+      }
+    }
+
+    const createDto: CreateExerciseDto = {
+      activityId: parseInt(this.activityId, 10),
+      jsonData: jsonTemplate,
+      sequenceOrder: this.exercises.length + 1
+    };
+
+    try {
+      const newExercise = await this.exerciseApiService.create(createDto).toPromise();
+      if (newExercise) {
+        this.exercises.push(newExercise);
+        this.expandedExercise = this.exercises.length - 1;
+        this.snackBar.open('Exercise added successfully!', 'Close', { duration: 2000 });
+      }
+    } catch (error) {
+      console.error('Failed to create exercise:', error);
+      this.snackBar.open('Failed to add exercise.', 'Close', { duration: 5000 });
+    }
+  }
+
+  async handleUpdateExercise(exerciseId: number, jsonData: string): Promise<void> {
+    try {
+      // Validate JSON
+      JSON.parse(jsonData);
+      
+      await this.exerciseApiService.update(exerciseId, { jsonData }).toPromise();
+      
+      // Update local exercise
+      const index = this.exercises.findIndex(ex => ex.id === exerciseId);
+      if (index !== -1) {
+        this.exercises[index] = { ...this.exercises[index], jsonData };
+      }
+      
+      this.snackBar.open('Exercise updated!', 'Close', { duration: 1500 });
+    } catch (error) {
+      console.error('Failed to update exercise:', error);
+      this.snackBar.open('Failed to update exercise. Check JSON format.', 'Close', { duration: 5000 });
+    }
+  }
+
+  async handleDeleteExercise(exerciseId: number): Promise<void> {
+    if (this.exercises.length <= 1) {
+      this.snackBar.open('An activity must have at least one exercise.', 'Close', { duration: 3000 });
+      return;
+    }
+
+    const confirmed = confirm('Are you sure you want to delete this exercise?');
+    if (!confirmed) return;
+
+    try {
+      await this.exerciseApiService.delete(exerciseId).toPromise();
+      this.exercises = this.exercises.filter(ex => ex.id !== exerciseId);
+      this.snackBar.open('Exercise deleted successfully!', 'Close', { duration: 2000 });
+    } catch (error) {
+      console.error('Failed to delete exercise:', error);
+      this.snackBar.open('Failed to delete exercise.', 'Close', { duration: 5000 });
     }
   }
 

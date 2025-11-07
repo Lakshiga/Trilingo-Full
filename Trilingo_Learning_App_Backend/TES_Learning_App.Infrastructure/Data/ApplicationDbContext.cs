@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +28,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<MainActivity> MainActivities { get; set; }
     public DbSet<ActivityType> ActivityTypes { get; set; }
     public DbSet<Activity> Activities { get; set; }
+    public DbSet<Exercise> Exercises { get; set; }
 
     // --- The Bridge ---
     public DbSet<StudentProgress> StudentProgresses { get; set; }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using TES_Learning_App.Application_Layer.Interfaces.IRepositories;
 using TES_Learning_App.Domain.Entities;
@@ -19,6 +19,7 @@ namespace TES_Learning_App.Infrastructure.Repositories
         public IGenericRepository<MainActivity> MainActivityRepository { get; private set; }
         public IGenericRepository<ActivityType> ActivityTypeRepository { get; private set; }
         public IActivityRepository ActivityRepository { get; private set; }
+        public IGenericRepository<Exercise> ExerciseRepository { get; private set; }
         public IGenericRepository<StudentProgress> StudentProgressRepository { get; private set; }
 
         public UnitOfWork(ApplicationDbContext context)
@@ -35,6 +36,7 @@ namespace TES_Learning_App.Infrastructure.Repositories
             MainActivityRepository = new GenericRepository<MainActivity>(_context);
             ActivityTypeRepository = new GenericRepository<ActivityType>(_context);
             ActivityRepository = new ActivityRepository(_context);
+            ExerciseRepository = new GenericRepository<Exercise>(_context);
             StudentProgressRepository = new GenericRepository<StudentProgress>(_context);
         }
 
