@@ -47,6 +47,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'exercises',
+    loadComponent: () => import('./pages/exercises-list/exercises-list.component').then(m => m.ExercisesListComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: '',
     redirectTo: '/dashboard',
     pathMatch: 'full'
