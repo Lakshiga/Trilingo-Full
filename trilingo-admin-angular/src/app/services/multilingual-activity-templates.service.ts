@@ -66,7 +66,7 @@ export class MultilingualActivityTemplates {
     return JSON.stringify({
       title: {
         ta: "ஃபிளாஷ் கார்டு",
-        en: "Flashcard",
+        en: "ytgy",
         si: "ෆ්ලෑෂ් කාඩ්"
       },
       instruction: {
