@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, switchMap, map } from 'rxjs';
 import { HttpClientService } from './http-client.service';
+import { MultilingualActivityTemplates } from './multilingual-activity-templates.service';
 
 // Backend-compatible interfaces
 export interface ActivityTypeResponse {
@@ -8,12 +9,14 @@ export interface ActivityTypeResponse {
   name_en: string;
   name_ta: string;
   name_si: string;
+  jsonMethod?: string;
 }
 
 export interface ActivityTypeCreateDto {
   name_en: string;
   name_ta: string;
   name_si: string;
+  jsonMethod?: string;
 }
 
 @Injectable({
@@ -29,11 +32,32 @@ export class ActivityTypeApiService {
   }
 
   create(newItem: ActivityTypeCreateDto): Observable<ActivityTypeResponse> {
-    return this.httpClient.post<ActivityTypeResponse, ActivityTypeCreateDto>(this.endpoint, newItem);
+    // Step 1: Create the record normally
+    return this.httpClient
+      .post<ActivityTypeResponse, ActivityTypeCreateDto>(this.endpoint, newItem)
+      .pipe(
+        // Step 2: After creation, compute JSON from the returned id and update the record
+        switchMap((created) => {
+          const json = MultilingualActivityTemplates.getTemplate(created.id);
+          return this.httpClient
+            .put<void, Partial<ActivityTypeCreateDto>>(`${this.endpoint}/${created.id}`, {
+              name_en: created.name_en,
+              name_ta: created.name_ta,
+              name_si: created.name_si,
+              jsonMethod: json,
+            })
+            .pipe(map(() => ({ ...created, jsonMethod: json })));
+        })
+      );
   }
 
   update(id: number, itemToUpdate: Partial<ActivityTypeCreateDto>): Observable<ActivityTypeResponse> {
-    return this.httpClient.put<ActivityTypeResponse, Partial<ActivityTypeCreateDto>>(`${this.endpoint}/${id}`, itemToUpdate);
+    // Ensure json is present when updating if caller didn't send it
+    const payload: Partial<ActivityTypeCreateDto> = { ...itemToUpdate };
+    if (!payload.jsonMethod) {
+      payload.jsonMethod = MultilingualActivityTemplates.getTemplate(id);
+    }
+    return this.httpClient.put<ActivityTypeResponse, Partial<ActivityTypeCreateDto>>(`${this.endpoint}/${id}`, payload);
   }
 
   deleteItem(id: number): Observable<void> {

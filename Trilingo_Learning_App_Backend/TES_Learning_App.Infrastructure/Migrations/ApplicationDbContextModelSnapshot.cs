@@ -80,6 +80,9 @@ namespace TES_Learning_App.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("JsonMethod")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name_en")
                         .IsRequired()
                         .HasMaxLength(100)

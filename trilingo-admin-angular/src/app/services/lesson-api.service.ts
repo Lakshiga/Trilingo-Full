@@ -9,18 +9,14 @@ export interface MultilingualLesson {
   lessonId: number;
   levelId: number;
   lessonName: MultilingualText;
-  description?: MultilingualText;
   sequenceOrder: number;
-  slug: string;
   level?: { levelId: number; levelName: MultilingualText };
 }
 
 export interface LessonCreateDto {
   levelId: number;
   lessonName: MultilingualText;
-  description?: MultilingualText;
   sequenceOrder: number;
-  slug: string;
 }
 
 @Injectable({
@@ -78,9 +74,7 @@ export class LessonApiService {
       lessonId: stageDto?.id,
       levelId: stageDto?.levelId,
       lessonName: { en: stageDto?.name_en || '', ta: stageDto?.name_ta || '', si: stageDto?.name_si || '' },
-      description: { en: '', ta: '', si: '' },
-      sequenceOrder: 1,
-      slug: ''
+      sequenceOrder: 1
     } as MultilingualLesson;
   }
 

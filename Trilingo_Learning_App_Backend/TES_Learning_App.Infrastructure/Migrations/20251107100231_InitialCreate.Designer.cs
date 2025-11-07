@@ -12,8 +12,8 @@ using TES_Learning_App.Infrastructure.Data;
 namespace TES_Learning_App.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251023110241_AddAdminsTable")]
-    partial class AddAdminsTable
+    [Migration("20251107100231_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,6 +53,9 @@ namespace TES_Learning_App.Infrastructure.Migrations
                     b.Property<string>("Name_ta")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SequenceOrder")
+                        .HasColumnType("int");
 
                     b.Property<int>("StageId")
                         .HasColumnType("int");

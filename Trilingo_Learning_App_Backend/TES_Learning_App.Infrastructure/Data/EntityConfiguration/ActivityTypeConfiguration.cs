@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
@@ -24,6 +24,10 @@ namespace TES_Learning_App.Infrastructure.Data.EntityConfiguration
             // 3. Configure the class-specific 'Description' property
             builder.Property(at => at.Description)
                    .HasMaxLength(255);
+
+            // 4. Configure the JsonMethod property to store JSON templates
+            builder.Property(at => at.JsonMethod)
+                   .HasColumnType("nvarchar(max)"); // Use max for large JSON content
 
         }
     }

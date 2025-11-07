@@ -38,7 +38,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class LessonsComponent implements OnInit {
   lessons: MultilingualLesson[] = [];
-  displayedColumns: string[] = ['lessonId', 'lessonName', 'slug', 'description', 'sequenceOrder', 'actions'];
+  displayedColumns: string[] = ['lessonId', 'lessonName', 'sequenceOrder', 'actions'];
   showDialog = false;
   isEditing = false;
   isLoading = false;
@@ -48,14 +48,11 @@ export class LessonsComponent implements OnInit {
   
   currentLesson: {
     lessonName: MultilingualText;
-    description?: MultilingualText;
     sequenceOrder: number;
-    slug: string;
     levelId: number;
   } = {
     lessonName: { en: '', ta: '', si: '' },
     sequenceOrder: 0,
-    slug: '',
     levelId: 1
   };
 
@@ -105,7 +102,6 @@ export class LessonsComponent implements OnInit {
     this.currentLesson = {
       lessonName: { en: '', ta: '', si: '' },
       sequenceOrder: 0,
-      slug: '',
       levelId: this.levelId
     };
     this.showDialog = true;
@@ -115,9 +111,7 @@ export class LessonsComponent implements OnInit {
     this.isEditing = true;
     this.currentLesson = {
       lessonName: lesson.lessonName,
-      description: lesson.description,
       sequenceOrder: lesson.sequenceOrder,
-      slug: lesson.slug,
       levelId: lesson.levelId
     };
     this.showDialog = true;
@@ -152,19 +146,12 @@ export class LessonsComponent implements OnInit {
       return;
     }
 
-    if (!this.currentLesson.slug) {
-      this.snackBar.open('Slug is required', 'Close', { duration: 3000 });
-      return;
-    }
-
     this.isSaving = true;
     
     try {
       const createDto: LessonCreateDto = {
         lessonName: this.currentLesson.lessonName,
-        description: this.currentLesson.description,
         sequenceOrder: this.currentLesson.sequenceOrder,
-        slug: this.currentLesson.slug,
         levelId: this.currentLesson.levelId
       };
 
@@ -181,7 +168,7 @@ export class LessonsComponent implements OnInit {
           // Update local array
           const index = this.lessons.findIndex(l => l.lessonId === lessonToUpdate.lessonId);
           if (index !== -1) {
-            this.lessons[index] = { ...this.lessons[index], ...createDto };
+            this.lessons[index] = { ...this.lessons[index], lessonName: createDto.lessonName, sequenceOrder: createDto.sequenceOrder, levelId: createDto.levelId } as any;
           }
         }
         this.snackBar.open('Lesson updated successfully', 'Close', { duration: 3000 });
@@ -209,17 +196,12 @@ export class LessonsComponent implements OnInit {
     this.currentLesson.lessonName = value;
   }
 
-  onDescriptionChange(value: MultilingualText) {
-    this.currentLesson.description = value;
-  }
-
   closeDialog() {
     this.showDialog = false;
     this.isEditing = false;
     this.currentLesson = {
       lessonName: { en: '', ta: '', si: '' },
       sequenceOrder: 0,
-      slug: '',
       levelId: this.levelId
     };
   }

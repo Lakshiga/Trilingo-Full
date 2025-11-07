@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TES_Learning_App.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialSchema : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -134,7 +134,7 @@ namespace TES_Learning_App.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Admin",
+                name: "Admins",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -146,9 +146,9 @@ namespace TES_Learning_App.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Admin", x => x.Id);
+                    table.PrimaryKey("PK_Admins", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Admin_Users_UserId",
+                        name: "FK_Admins_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -165,6 +165,8 @@ namespace TES_Learning_App.Infrastructure.Migrations
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
                     NativeLanguageCode = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     TargetLanguageCode = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    XpPoints = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -189,6 +191,7 @@ namespace TES_Learning_App.Infrastructure.Migrations
                     StageId = table.Column<int>(type: "int", nullable: false),
                     MainActivityId = table.Column<int>(type: "int", nullable: false),
                     ActivityTypeId = table.Column<int>(type: "int", nullable: false),
+                    SequenceOrder = table.Column<int>(type: "int", nullable: false),
                     Name_en = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name_ta = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name_si = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -260,8 +263,8 @@ namespace TES_Learning_App.Infrastructure.Migrations
                 column: "StageId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Admin_UserId",
-                table: "Admin",
+                name: "IX_Admins_UserId",
+                table: "Admins",
                 column: "UserId",
                 unique: true);
 
@@ -318,7 +321,7 @@ namespace TES_Learning_App.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Admin");
+                name: "Admins");
 
             migrationBuilder.DropTable(
                 name: "StudentProgresses");

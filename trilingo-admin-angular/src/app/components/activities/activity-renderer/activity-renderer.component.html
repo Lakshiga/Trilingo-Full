@@ -13,6 +13,16 @@
           <video *ngIf="content?.mediaUrl" [src]="content?.mediaUrl" controls style="width:100%; margin-bottom:8px;"></video>
         </div>
 
+        <div *ngIf="content?.mediaItems?.length">
+          <h4 style="margin:8px 0;">Media</h4>
+          <div *ngFor="let m of content.mediaItems" style="margin-bottom:12px;">
+            <img *ngIf="m?.type === 'image'" [src]="m?.url" alt="" style="max-width:100%; display:block; margin-bottom:6px;" />
+            <video *ngIf="m?.type === 'video'" [src]="m?.url" controls style="width:100%; display:block; margin-bottom:6px;"></video>
+            <audio *ngIf="m?.audioUrl" [src]="m?.audioUrl" controls style="width:100%; display:block; margin-bottom:6px;"></audio>
+            <div *ngIf="m?.text">{{ text(m.text) }}</div>
+          </div>
+        </div>
+
         <div *ngIf="content?.words?.length">
           <h4 style="margin:8px 0;">Words</h4>
           <mat-chip-set>
@@ -43,8 +53,8 @@
   <!-- Flashcard -->
   <app-flashcard *ngIf="activityTypeId === 1" [content]="content"></app-flashcard>
   
-  <!-- MediaSpotlightMultiple (case 2) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 2" [ngTemplateOutlet]="generic"></ng-container>
+  <!-- MediaSpotlightMultiple (case 2)  -->
+  <app-media-spotlight-multiple *ngIf="activityTypeId === 2" [content]="mediaSpotlightMultipleContent()"></app-media-spotlight-multiple>
   
   <!-- MediaSpotlightSingle -->
   <app-media-spotlight-single *ngIf="activityTypeId === 3" [content]="content"></app-media-spotlight-single>
@@ -191,6 +201,18 @@
   
   <!-- DragDropCategorization (case 46) - Not implemented yet -->
   <ng-container *ngIf="activityTypeId === 46" [ngTemplateOutlet]="generic"></ng-container>
+
+  <!-- WordBankCompletion -->
+  <app-word-bank-completion *ngIf="activityTypeId === 48" [content]="content"></app-word-bank-completion>
+
+  <!-- FirstLetterMatch -->
+  <app-first-letter-match *ngIf="activityTypeId === 49" [content]="content"></app-first-letter-match>
+
+  <!-- Highlight -->
+  <app-highlight *ngIf="activityTypeId === 50" [content]="content"></app-highlight>
+
+  <!-- Matching -->
+  <app-matching *ngIf="activityTypeId === 51" [content]="content"></app-matching>
   
   <!-- Default case for unknown activity types -->
   <ng-container *ngIf="!isKnownActivityType()" [ngTemplateOutlet]="generic"></ng-container>

@@ -1,5 +1,4 @@
-
-    <div class="lessons-container">
+<div class="lessons-container">
       <div class="header">
         <div class="breadcrumb">
           <a href="#" (click)="goBack()">← BACK TO LEVEL #{{ levelId }}</a>
@@ -31,16 +30,6 @@
             <ng-container matColumnDef="lessonName">
               <th mat-header-cell *matHeaderCellDef>Lesson Name</th>
               <td mat-cell *matCellDef="let lesson">{{ getDisplayText(lesson.lessonName) }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="slug">
-              <th mat-header-cell *matHeaderCellDef>Slug</th>
-              <td mat-cell *matCellDef="let lesson">{{ lesson.slug }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="description">
-              <th mat-header-cell *matHeaderCellDef>Description</th>
-              <td mat-cell *matCellDef="let lesson">{{ getDisplayText(lesson.description) || 'No description' }}</td>
             </ng-container>
 
             <ng-container matColumnDef="sequenceOrder">
@@ -92,21 +81,9 @@
             (valueChange)="onLessonNameChange($event)">
           </app-multilingual-input>
 
-          <app-multilingual-input
-            [value]="currentLesson.description || { ta: '', en: '', si: '' }"
-            [label]="'Description'"
-            [required]="false"
-            (valueChange)="onDescriptionChange($event)">
-          </app-multilingual-input>
-
           <mat-form-field appearance="outline">
             <mat-label>Sequence Order</mat-label>
             <input matInput type="number" [(ngModel)]="currentLesson.sequenceOrder" name="sequenceOrder" required>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Slug</mat-label>
-            <input matInput [(ngModel)]="currentLesson.slug" name="slug" required>
           </mat-form-field>
 
           <div class="form-actions">
@@ -119,4 +96,3 @@
         </form>
       </div>
     </div>
-  

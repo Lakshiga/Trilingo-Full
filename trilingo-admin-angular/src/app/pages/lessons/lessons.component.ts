@@ -13,9 +13,7 @@ import { Subscription } from 'rxjs';
 
 interface LessonCreateDto {
   lessonName: MultilingualText;
-  description?: MultilingualText;
   sequenceOrder: number;
-  slug: string;
   levelId: number;
 }
 
@@ -40,8 +38,6 @@ export class LessonsPageComponent implements OnInit, OnDestroy {
 
   columns = [
     { field: 'lessonName' as keyof Lesson, headerName: 'Lesson Name', type: 'string' as const },
-    { field: 'slug' as keyof Lesson, headerName: 'Slug', type: 'string' as const },
-    { field: 'description' as keyof Lesson, headerName: 'Description', type: 'string' as const },
     { field: 'sequenceOrder' as keyof Lesson, headerName: 'Sequence Order', type: 'number' as const }
   ];
 
@@ -75,8 +71,7 @@ export class LessonsPageComponent implements OnInit, OnDestroy {
       getAllByParentId: () => this.lessonApiService.getLessonsByLevelId(numericLevelId),
       create: (newItem: LessonCreateDto) => this.lessonApiService.create({ 
         ...newItem, 
-        levelId: numericLevelId,
-        description: newItem.description
+        levelId: numericLevelId
       }),
       update: (id: number, item: Partial<LessonCreateDto>) => this.lessonApiService.update(id, item),
       deleteItem: (id: number) => this.lessonApiService.deleteItem(id)

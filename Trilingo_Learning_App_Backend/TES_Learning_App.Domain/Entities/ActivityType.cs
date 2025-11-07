@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -21,6 +21,8 @@ namespace TES_Learning_App.Domain.Entities
 
         [StringLength(255)]
         public string? Description { get; set; }
+
+        public string? JsonMethod { get; set; } // Stores the JSON template for this activity type
 
         public ICollection<Activity> Activities { get; set; } = new List<Activity>();
     }

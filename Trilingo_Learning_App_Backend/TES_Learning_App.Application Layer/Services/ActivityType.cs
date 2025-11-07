@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,7 +29,8 @@ namespace TES_Learning_App.Application_Layer.Services
             {
                 Name_en = dto.Name_en,
                 Name_ta = dto.Name_ta,
-                Name_si = dto.Name_si
+                Name_si = dto.Name_si,
+                JsonMethod = dto.JsonMethod
             };
 
             await _unitOfWork.ActivityTypeRepository.AddAsync(activityType);
@@ -67,6 +68,10 @@ namespace TES_Learning_App.Application_Layer.Services
             activityType.Name_en = dto.Name_en;
             activityType.Name_ta = dto.Name_ta;
             activityType.Name_si = dto.Name_si;
+            if (dto.JsonMethod != null)
+            {
+                activityType.JsonMethod = dto.JsonMethod;
+            }
 
             await _unitOfWork.ActivityTypeRepository.UpdateAsync(activityType);
             await _unitOfWork.CompleteAsync();
@@ -79,7 +84,8 @@ namespace TES_Learning_App.Application_Layer.Services
                 Id = activityType.Id,
                 Name_en = activityType.Name_en,
                 Name_ta = activityType.Name_ta,
-                Name_si = activityType.Name_si
+                Name_si = activityType.Name_si,
+                JsonMethod = activityType.JsonMethod
             };
         }
     }

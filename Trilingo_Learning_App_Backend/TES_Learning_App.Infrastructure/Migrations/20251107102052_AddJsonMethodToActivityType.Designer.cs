@@ -12,8 +12,8 @@ using TES_Learning_App.Infrastructure.Data;
 namespace TES_Learning_App.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251023020432_UpdateModel")]
-    partial class UpdateModel
+    [Migration("20251107102052_AddJsonMethodToActivityType")]
+    partial class AddJsonMethodToActivityType
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,6 +54,9 @@ namespace TES_Learning_App.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("SequenceOrder")
+                        .HasColumnType("int");
+
                     b.Property<int>("StageId")
                         .HasColumnType("int");
 
@@ -79,6 +82,9 @@ namespace TES_Learning_App.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("JsonMethod")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name_en")
                         .IsRequired()
@@ -130,7 +136,7 @@ namespace TES_Learning_App.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Admin");
+                    b.ToTable("Admins");
                 });
 
             modelBuilder.Entity("TES_Learning_App.Domain.Entities.Language", b =>

@@ -39,6 +39,7 @@ import { DragDropImageMatchingComponent } from '../activity-types/drag-drop-imag
 import { LetterShapeMatchingComponent } from '../activity-types/letter-shape-matching/letter-shape-matching.component';
 import { ListeningMatchingDragAndDropComponent } from '../activity-types/listening-matching-drag-and-drop/listening-matching-drag-and-drop.component';
 import { ConversationPlayerComponent } from '../activity-types/conversation-player/conversation-player.component';
+import { MediaSpotlightMultipleComponent } from '../activity-types/media-spotlight-multiple/media-spotlight-multiple.component';
 
 @Component({
   selector: 'app-activity-renderer',
@@ -81,6 +82,7 @@ import { ConversationPlayerComponent } from '../activity-types/conversation-play
     LetterShapeMatchingComponent,
     ListeningMatchingDragAndDropComponent
     , ConversationPlayerComponent
+    , MediaSpotlightMultipleComponent
   ],
   templateUrl: './activity-renderer.component.html',
   styleUrls: ['./activity-renderer.component.css']
@@ -97,7 +99,8 @@ export class ActivityRendererComponent implements OnChanges {
 
   isKnownActivityType(): boolean {
     const knownTypes = [
-      1, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 29, 33, 34, 35, 36, 37, 38, 40, 41, 42, 44, 45, 46
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 29, 33, 34, 35, 36, 37, 38, 40, 41, 42, 44, 45, 46,
+      48, 49, 50, 51
     ];
     return knownTypes.includes(this.activityTypeId);
   }
@@ -129,5 +132,22 @@ export class ActivityRendererComponent implements OnChanges {
       return this.languageService.getAudio(value as any);
     }
     return undefined;
+  }
+
+  // Adapter for Activity Type 2: MediaSpotlightMultiple
+  mediaSpotlightMultipleContent(): any {
+    const c: any = this.content || {};
+    const items = Array.isArray(c.mediaItems)
+      ? c.mediaItems.map((m: any) => ({
+          text: this.text(m?.text || ''),
+          imageUrl: m?.url || m?.imageUrl || '',
+          audioUrl: this.audio(m?.audioUrl)
+        }))
+      : [];
+    return {
+      title: this.text(c?.title),
+      spotlightLetter: '',
+      items
+    };
   }
 }
