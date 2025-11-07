@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs';
 import { ExerciseApiService, Exercise } from '../../services/exercise-api.service';
 import { ActivityApiService } from '../../services/activity-api.service';
 import { Activity } from '../../types/activity.types';
+import { ExercisePreviewModalComponent } from '../../components/exercises/exercise-preview-modal/exercise-preview-modal.component';
 
 @Component({
   selector: 'app-exercises-list',
@@ -23,7 +24,8 @@ import { Activity } from '../../types/activity.types';
     MatIconModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    MatDialogModule
+    MatDialogModule,
+    ExercisePreviewModalComponent
   ],
   templateUrl: './exercises-list.component.html',
   styleUrls: ['./exercises-list.component.css']
@@ -34,6 +36,10 @@ export class ExercisesListComponent implements OnInit, OnDestroy {
   exercises: Exercise[] = [];
   isLoading = true;
   displayedColumns: string[] = ['sequenceOrder', 'preview', 'jsonSnippet', 'createdAt', 'actions'];
+
+  // Preview modal state
+  isPreviewOpen = false;
+  previewExercise: Exercise | null = null;
 
   private routeSubscription?: Subscription;
 
@@ -112,14 +118,18 @@ export class ExercisesListComponent implements OnInit, OnDestroy {
     }
   }
 
-  async handlePreview(exercise: Exercise): Promise<void> {
-    // Navigate to activity editor with preview mode
-    this.router.navigate(['/activity-edit'], {
-      queryParams: {
-        activityId: this.activityId,
-        previewExerciseId: exercise.id
-      }
-    });
+  handlePreview(exercise: Exercise): void {
+    this.previewExercise = exercise;
+    this.isPreviewOpen = true;
+  }
+
+  closePreview(): void {
+    this.isPreviewOpen = false;
+    this.previewExercise = null;
+  }
+
+  getActivityTypeId(): number {
+    return this.activity?.activityTypeId || 0;
   }
 
   async handleEdit(exercise: Exercise): Promise<void> {
