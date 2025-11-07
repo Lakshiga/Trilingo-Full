@@ -68,12 +68,14 @@
         <div class="exercises-section">
           <h3>Exercises</h3>
           <app-exercise-editor
-            [activityData]="activity"
-            (onDataChange)="handleFormChangeWrapper($event)"
-            (onPreviewExercise)="handlePreviewExerciseWrapper($event)"
+            [exercises]="exercises"
+            [activityId]="activityId"
             [expandedExercise]="expandedExercise"
-            (onExpansionChange)="handleExpansionChangeWrapper($event)"
-            (onSetExpanded)="handleSetExpandedWrapper($event)">
+            (addExercise)="handleAddExercise()"
+            (updateExercise)="handleUpdateExercise($event.exerciseId, $event.jsonData)"
+            (deleteExercise)="handleDeleteExercise($event)"
+            (previewExercise)="handlePreviewExercise($event)"
+            (expansionChange)="expandedExercise = $event.isExpanded ? $event.index : false">
           </app-exercise-editor>
         </div>
       </div>

@@ -9,6 +9,12 @@
          Use the template as a guide to fill in your content.</p>
     </div>
     
+    <div *ngIf="exercises.length === 0 && activityId" class="no-exercises-message">
+      <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: #999;">assignment</mat-icon>
+      <p style="margin-top: 16px; font-size: 1.1rem;">No exercises yet</p>
+      <p style="margin-top: 8px; color: #999;">Click "Add Another Exercise" to create your first exercise.</p>
+    </div>
+    
     <mat-accordion multi="false">
       <mat-expansion-panel 
         *ngFor="let exercise of exercises; let i = index"
@@ -32,7 +38,7 @@
                   mat-button 
                   color="primary" 
                   (click)="onPreviewExercise(exercise, $event)"
-                  [disabled]="!!jsonErrors[i]"
+                  [disabled]="hasJsonError(exercise)"
                   class="preview-button">
                   <mat-icon>preview</mat-icon>
                   Preview
@@ -40,7 +46,7 @@
                 <button 
                   mat-icon-button 
                   color="warn" 
-                  (click)="removeExercise(i, $event)"
+                  (click)="onDeleteExercise(exercise, $event)"
                   [disabled]="exercises.length <= 1"
                   class="delete-button">
                   <mat-icon>delete</mat-icon>
@@ -54,20 +60,29 @@
           <mat-label>Exercise JSON</mat-label>
           <textarea 
             matInput 
-            [ngModel]="exercise"
-            (ngModelChange)="handleExerciseChange(i, $event)"
+            [ngModel]="getExerciseJson(exercise)"
+            (ngModelChange)="handleExerciseChange(exercise, $event)"
             rows="15"
-            [class.error]="!!jsonErrors[i]"
+            [class.error]="hasJsonError(exercise)"
             placeholder="Enter exercise JSON content based on the template...">
           </textarea>
-          <mat-error *ngIf="jsonErrors[i]">{{ jsonErrors[i] }}</mat-error>
+          <mat-error *ngIf="hasJsonError(exercise)">{{ getJsonError(exercise) }}</mat-error>
         </mat-form-field>
         
         <div class="exercise-actions">
           <button 
+            mat-raised-button 
+            color="accent"
+            (click)="saveExercise(exercise)"
+            [disabled]="hasJsonError(exercise)"
+            class="save-button">
+            <mat-icon>save</mat-icon>
+            Save Changes
+          </button>
+          <button 
             mat-button 
             (click)="onPreviewExercise(exercise)"
-            [disabled]="!!jsonErrors[i]"
+            [disabled]="hasJsonError(exercise)"
             class="preview-full-button">
             <mat-icon>preview</mat-icon>
             Preview This Exercise
@@ -76,12 +91,19 @@
       </mat-expansion-panel>
     </mat-accordion>
     
+    <div *ngIf="!activityId" class="info-message" style="margin-bottom: 16px;">
+      <mat-icon style="vertical-align: middle; margin-right: 8px;">info</mat-icon>
+      <strong>Save the activity first</strong> by clicking the "💾 SAVE ENTIRE ACTIVITY" button at the top of the page, then you can add exercises here.
+    </div>
+    
     <button 
-      mat-stroked-button 
-      (click)="addExercise()" 
+      mat-raised-button 
+      [color]="activityId ? 'primary' : 'default'"
+      (click)="onAddExercise()" 
+      [disabled]="!activityId"
       class="add-exercise-button">
       <mat-icon>add_circle_outline</mat-icon>
-      Add Another Exercise
+      Add Exercise
     </button>
   </mat-card-content>
 </mat-card>

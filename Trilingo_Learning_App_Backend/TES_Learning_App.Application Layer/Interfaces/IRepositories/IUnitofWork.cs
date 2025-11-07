@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +24,7 @@ namespace TES_Learning_App.Application_Layer.Interfaces.IRepositories
         IGenericRepository<MainActivity> MainActivityRepository { get; }
         IGenericRepository<ActivityType> ActivityTypeRepository { get; }
         IActivityRepository ActivityRepository { get; }
+        IGenericRepository<Exercise> ExerciseRepository { get; }
 
         // Bridge Repository
         IGenericRepository<StudentProgress> StudentProgressRepository { get; } // <-- ADD THIS

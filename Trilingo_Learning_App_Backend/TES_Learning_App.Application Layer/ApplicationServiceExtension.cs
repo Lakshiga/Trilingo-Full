@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using TES_Learning_App.Application_Layer.Interfaces.IRepositories;
 using TES_Learning_App.Application_Layer.Interfaces.IServices;
@@ -19,6 +19,7 @@ namespace TES_Learning_App.Application_Layer
             services.AddScoped<IMainActivityService, MainActivityService>();
             services.AddScoped<IActivityTypeService, ActivityTypeService>();
             services.AddScoped<IActivityService, ActivityService>();
+            services.AddScoped<IExerciseService, ExerciseService>();
             services.AddScoped<IRoleService, RoleService>();
             // Add other services here later (e.g., IStudentService)
 
