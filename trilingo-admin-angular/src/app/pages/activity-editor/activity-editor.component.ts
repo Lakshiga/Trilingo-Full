@@ -324,6 +324,16 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
     
     const enteredTitle = this.activity.title || { ta: '', en: '', si: '' } as MultilingualText;
 
+    // Get the default JSON template for the activity type
+    let defaultJsonTemplate = '[]';
+    if (coercedActivityTypeId > 0) {
+      try {
+        defaultJsonTemplate = MultilingualActivityTemplates.getTemplate(coercedActivityTypeId);
+      } catch (error) {
+        console.error('Failed to get template for activity type:', error);
+      }
+    }
+
     const payload: ActivityCreateDto = {
       // Save exactly what the user typed (trimmed). No template fallback.
       title: {
@@ -332,7 +342,7 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
         si: (enteredTitle.si || '').toString().trim()
       },
       sequenceOrder: Number(this.activity.sequenceOrder || 1),
-      contentJson: '[]', // Placeholder - exercises are now stored separately
+      contentJson: defaultJsonTemplate, // Use the default template from activity type
       lessonId: coercedLessonId,
       activityTypeId: coercedActivityTypeId,
       mainActivityId: coercedMainActivityId
