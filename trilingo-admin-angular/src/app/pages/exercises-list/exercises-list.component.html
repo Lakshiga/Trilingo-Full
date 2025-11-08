@@ -1,0 +1,123 @@
+<div class="exercises-list-page">
+  <div class="header">
+    <div class="header-content">
+      <button mat-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Activities
+      </button>
+      <h1>Exercises for: {{ getActivityTitle() }}</h1>
+      <button 
+        mat-raised-button 
+        color="primary"
+        (click)="handleAddExercise()"
+        [disabled]="isLoading">
+        <mat-icon>add</mat-icon>
+        Add New Exercise
+      </button>
+    </div>
+  </div>
+
+  <mat-card *ngIf="!isLoading && exercises.length > 0">
+    <mat-card-content>
+      <table mat-table [dataSource]="exercises" class="exercises-table">
+        
+        <!-- Sequence Order Column -->
+        <ng-container matColumnDef="sequenceOrder">
+          <th mat-header-cell *matHeaderCellDef>#</th>
+          <td mat-cell *matCellDef="let exercise">
+            <span class="exercise-number">{{ exercise.sequenceOrder }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Preview Column -->
+        <ng-container matColumnDef="preview">
+          <th mat-header-cell *matHeaderCellDef>Preview</th>
+          <td mat-cell *matCellDef="let exercise">
+            <button 
+              mat-icon-button 
+              color="primary"
+              (click)="handlePreview(exercise)"
+              title="Preview Exercise">
+              <mat-icon>visibility</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <!-- JSON Snippet Column -->
+        <ng-container matColumnDef="jsonSnippet">
+          <th mat-header-cell *matHeaderCellDef>JSON Content</th>
+          <td mat-cell *matCellDef="let exercise">
+            <div class="json-snippet">
+              <code>{{ getJsonSnippet(exercise) }}</code>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Created At Column -->
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef>Created</th>
+          <td mat-cell *matCellDef="let exercise">
+            <span class="date-text">{{ formatDate(exercise.createdAt) }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let exercise">
+            <div class="action-buttons">
+              <button 
+                mat-icon-button 
+                color="accent"
+                (click)="handleEdit(exercise)"
+                title="Edit Exercise">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button 
+                mat-icon-button 
+                color="warn"
+                (click)="handleDelete(exercise)"
+                [disabled]="exercises.length <= 1"
+                title="Delete Exercise">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="exercise-row"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card *ngIf="!isLoading && exercises.length === 0" class="empty-state">
+    <mat-card-content>
+      <div class="empty-content">
+        <mat-icon>assignment</mat-icon>
+        <h2>No Exercises Yet</h2>
+        <p>This activity doesn't have any exercises yet.</p>
+        <button 
+          mat-raised-button 
+          color="primary"
+          (click)="handleAddExercise()">
+          <mat-icon>add</mat-icon>
+          Add First Exercise
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading exercises...</p>
+  </div>
+
+  <!-- Exercise Preview Modal -->
+  <app-exercise-preview-modal
+    [isOpen]="isPreviewOpen"
+    [exercise]="previewExercise"
+    [activityTypeId]="getActivityTypeId()"
+    (onClose)="closePreview()">
+  </app-exercise-preview-modal>
+</div>

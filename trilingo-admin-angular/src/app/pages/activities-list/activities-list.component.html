@@ -67,6 +67,14 @@
             title="Delete Activity">
             <mat-icon>delete</mat-icon>
           </button>
+          <button 
+            mat-icon-button 
+            color="accent"
+            [routerLink]="['/exercises']"
+            [queryParams]="{activityId: activity.activityId}"
+            title="View Exercises">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
         </td>
       </ng-container>
       

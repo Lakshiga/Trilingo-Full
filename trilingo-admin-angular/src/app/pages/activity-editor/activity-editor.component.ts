@@ -85,11 +85,31 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.routeSubscription = this.route.queryParams.subscribe(params => {
+    this.routeSubscription = this.route.queryParams.subscribe(async params => {
       this.activityId = params['activityId'];
       this.lessonId = params['lessonId'];
       this.isEditMode = !!this.activityId;
-      this.loadData();
+      await this.loadData();
+      
+      // Handle special query params from exercises list
+      if (params['editExerciseId']) {
+        const exerciseId = parseInt(params['editExerciseId'], 10);
+        const exerciseIndex = this.exercises.findIndex(ex => ex.id === exerciseId);
+        if (exerciseIndex !== -1) {
+          this.expandedExercise = exerciseIndex;
+        }
+      } else if (params['previewExerciseId']) {
+        const exerciseId = parseInt(params['previewExerciseId'], 10);
+        const exercise = this.exercises.find(ex => ex.id === exerciseId);
+        if (exercise) {
+          this.handlePreviewExercise(exercise.jsonData);
+        }
+      } else if (params['addExercise']) {
+        // Scroll to exercises section or auto-expand add functionality
+        setTimeout(() => {
+          this.expandedExercise = false;
+        }, 500);
+      }
     });
   }
 

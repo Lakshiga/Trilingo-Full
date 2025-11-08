@@ -1,0 +1,165 @@
+.exercises-list-page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 24px;
+  background: white;
+  padding: 20px 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.header h1 {
+  margin: 0;
+  flex: 1;
+  color: #333;
+  font-size: 1.75rem;
+  font-weight: 500;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.exercises-table {
+  width: 100%;
+  background: white;
+}
+
+.exercises-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+  padding: 16px;
+}
+
+.exercises-table td {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.exercise-row {
+  transition: background-color 0.2s;
+}
+
+.exercise-row:hover {
+  background-color: #f9f9f9;
+}
+
+.exercise-number {
+  display: inline-block;
+  background-color: #2196f3;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 32px;
+  font-weight: 600;
+}
+
+.json-snippet {
+  max-width: 500px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  background-color: #f5f5f5;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border-left: 3px solid #2196f3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.json-snippet code {
+  color: #333;
+}
+
+.date-text {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.empty-state {
+  margin-top: 24px;
+}
+
+.empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.empty-content mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #999;
+  margin-bottom: 16px;
+}
+
+.empty-content h2 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-weight: 500;
+}
+
+.empty-content p {
+  margin: 0 0 24px 0;
+  color: #666;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  gap: 16px;
+}
+
+.loading-container p {
+  color: #666;
+  margin: 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .exercises-list-page {
+    padding: 16px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
+  .json-snippet {
+    max-width: 200px;
+  }
+}
