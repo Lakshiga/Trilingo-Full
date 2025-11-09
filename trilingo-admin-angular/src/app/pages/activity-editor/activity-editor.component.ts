@@ -324,13 +324,44 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
     
     const enteredTitle = this.activity.title || { ta: '', en: '', si: '' } as MultilingualText;
 
-    // Get the default JSON template for the activity type
-    let defaultJsonTemplate = '[]';
-    if (coercedActivityTypeId > 0) {
+    // Collect actual JSON from exercises (user's data)
+    let contentJsonToSave = '[]';
+    if (this.exercises && this.exercises.length > 0) {
       try {
-        defaultJsonTemplate = MultilingualActivityTemplates.getTemplate(coercedActivityTypeId);
+        // Get JSON data from all exercises and combine into an array
+        const exercisesJsonArray = this.exercises
+          .map(ex => {
+            try {
+              // Parse to validate, then return as object
+              return JSON.parse(ex.jsonData);
+            } catch (e) {
+              console.error('Invalid JSON in exercise:', ex.id, e);
+              return null;
+            }
+          })
+          .filter(json => json !== null); // Remove invalid JSON entries
+        
+        // Convert array to JSON string
+        contentJsonToSave = JSON.stringify(exercisesJsonArray);
       } catch (error) {
-        console.error('Failed to get template for activity type:', error);
+        console.error('Failed to combine exercises JSON:', error);
+        // Fallback to default template if exercises JSON is invalid
+        if (coercedActivityTypeId > 0) {
+          try {
+            contentJsonToSave = MultilingualActivityTemplates.getTemplate(coercedActivityTypeId);
+          } catch (templateError) {
+            console.error('Failed to get template:', templateError);
+          }
+        }
+      }
+    } else {
+      // No exercises, use default template
+      if (coercedActivityTypeId > 0) {
+        try {
+          contentJsonToSave = MultilingualActivityTemplates.getTemplate(coercedActivityTypeId);
+        } catch (error) {
+          console.error('Failed to get template for activity type:', error);
+        }
       }
     }
 
@@ -342,7 +373,7 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
         si: (enteredTitle.si || '').toString().trim()
       },
       sequenceOrder: Number(this.activity.sequenceOrder || 1),
-      contentJson: defaultJsonTemplate, // Use the default template from activity type
+      contentJson: contentJsonToSave, // Use actual exercises JSON or default template
       lessonId: coercedLessonId,
       activityTypeId: coercedActivityTypeId,
       mainActivityId: coercedMainActivityId

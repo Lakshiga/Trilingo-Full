@@ -70,6 +70,7 @@
           <app-exercise-editor
             [exercises]="exercises"
             [activityId]="activityId"
+            [activityTypeId]="activity?.activityTypeId || 0"
             [expandedExercise]="expandedExercise"
             (addExercise)="handleAddExercise()"
             (updateExercise)="handleUpdateExercise($event.exerciseId, $event.jsonData)"

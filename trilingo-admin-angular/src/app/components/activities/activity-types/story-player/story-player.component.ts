@@ -1,120 +1,172 @@
-import { Component, Input, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
+import { Component, Input, signal, computed, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSliderModule } from '@angular/material/slider';
+import { MatIconModule } from '@angular/material/icon';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
-export interface StoryScene {
+// --- Interfaces ---
+type Language = 'ta' | 'en' | 'si';
+
+interface MultiLingualText { [key: string]: string; }
+
+interface Scene {
   imageUrl: string;
-  text: string;
-  timestamp: number;
+  content: MultiLingualText;
+  timestamp: number; // in seconds
 }
 
-export interface StoryContent {
-  title: string;
-  audioUrl: string;
-  scenes: StoryScene[];
+interface StoryData {
+  title: MultiLingualText;
+  audioUrl: MultiLingualText;
+  scenes: Scene[];
 }
 
+interface ActivityContent {
+  title: MultiLingualText;
+  instruction: MultiLingualText;
+  storyData: StoryData;
+}
+
+// --- Component Definition ---
 @Component({
   selector: 'app-story-player',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatCardModule, MatIconModule, MatButtonModule, MatSliderModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule],
   templateUrl: './story-player.component.html',
   styleUrls: ['./story-player.component.css']
 })
-export class StoryPlayerComponent implements OnInit, OnDestroy {
-  @Input() content!: StoryContent;
-  @ViewChild('audioElement') audioElement!: ElementRef<HTMLAudioElement>;
+export class StoryPlayerComponent implements AfterViewInit, OnDestroy {
 
-  isPlaying = false;
-  currentTime = 0;
-  duration = 0;
-  activeSceneIndex = 0;
+  @Input() content!: ActivityContent;
+  @Input() currentLang: Language = 'ta';
+  @ViewChild('audioPlayer') audioPlayerRef!: ElementRef<HTMLAudioElement>;
 
-  get currentScene(): StoryScene | undefined {
-    return this.content.scenes[this.activeSceneIndex];
-  }
+  // --- Signals ---
+  isPlaying = signal(false);
+  currentTime = signal(0);
+  duration = signal(0);
+  currentSceneIndex = signal(0);
 
-  ngOnInit(): void {
-    this.resetState();
+  // --- Computed Values ---
+  currentStoryData = computed(() => this.content?.storyData || null);
+
+  currentScene = computed(() => {
+    const data = this.currentStoryData();
+    const index = this.currentSceneIndex();
+    return data && data.scenes ? data.scenes[index] : null;
+  });
+
+  currentAudioUrl: SafeUrl = '';
+
+  constructor(private sanitizer: DomSanitizer) {}
+
+  ngAfterViewInit(): void {
+    if (this.audioPlayerRef) {
+      this.updateAudioSource();
+    }
   }
 
   ngOnDestroy(): void {
-    if (this.audioElement) {
-      this.audioElement.nativeElement.pause();
+    // Optional cleanup
+  }
+
+  // --- Audio Source & Events ---
+  updateAudioSource(): void {
+    const audioPath = this.getAudioPath();
+    if (audioPath) {
+      this.currentAudioUrl = this.sanitizer.bypassSecurityTrustUrl(audioPath);
+    }
+    this.setupAudioEvents();
+  }
+
+  setupAudioEvents(): void {
+    const player = this.audioPlayerRef?.nativeElement;
+    if (!player) return;
+
+    player.onloadedmetadata = () => this.duration.set(player.duration);
+
+    player.ontimeupdate = () => {
+      this.currentTime.set(player.currentTime);
+      this.syncScenes(player.currentTime);
+    };
+
+    player.onplay = () => this.isPlaying.set(true);
+    player.onpause = () => this.isPlaying.set(false);
+    player.onended = () => {
+      this.isPlaying.set(false);
+      this.currentSceneIndex.set(0);
+      this.currentTime.set(0);
+    };
+  }
+
+  // --- Playback Controls ---
+  togglePlay(): void {
+    const player = this.audioPlayerRef?.nativeElement;
+    if (!player) return;
+
+    if (this.isPlaying()) {
+      player.pause();
+    } else {
+      if (!player.src) this.updateAudioSource();
+      player.play().catch(e => console.error('Audio playback failed:', e));
     }
   }
 
-  private resetState(): void {
-    this.activeSceneIndex = 0;
-    this.currentTime = 0;
-    this.isPlaying = false;
-    if (this.audioElement) {
-      this.audioElement.nativeElement.currentTime = 0;
+  seek(event: Event): void {
+    const player = this.audioPlayerRef?.nativeElement;
+    if (!player) return;
+
+    const target = event.target as HTMLInputElement;
+    const seekTime = parseFloat(target.value);
+    player.currentTime = seekTime;
+    this.currentTime.set(seekTime);
+    this.syncScenes(seekTime, true);
+  }
+
+  // --- Scene Sync Logic ---
+  syncScenes(time: number, isSeek = false): void {
+    const scenes = this.currentStoryData()?.scenes || [];
+    if (scenes.length === 0) return;
+
+    const currentIndex = this.currentSceneIndex();
+    const nextScene = scenes[currentIndex + 1];
+
+    // Move forward
+    if (nextScene && time >= nextScene.timestamp) {
+      this.currentSceneIndex.set(currentIndex + 1);
+      return;
     }
-  }
 
-  onLoadedMetadata(): void {
-    this.duration = this.audioElement.nativeElement.duration;
-  }
-
-  onTimeUpdate(): void {
-    this.currentTime = this.audioElement.nativeElement.currentTime;
-    this.updateActiveScene();
-  }
-
-  onEnded(): void {
-    this.isPlaying = false;
-    this.activeSceneIndex = this.content.scenes.length - 1;
-  }
-
-  onSliderChange(newTime: number): void {
-    this.audioElement.nativeElement.currentTime = newTime;
-    this.currentTime = newTime;
-  }
-
-  private updateActiveScene(): void {
-    const time = this.currentTime;
-    const currentSceneIndex = this.content.scenes.findIndex((scene, index) => {
-      const nextScene = this.content.scenes[index + 1];
-      return time >= scene.timestamp && (!nextScene || time < nextScene.timestamp);
-    });
-    
-    if (currentSceneIndex !== -1 && currentSceneIndex !== this.activeSceneIndex) {
-      this.activeSceneIndex = currentSceneIndex;
-    }
-  }
-
-  togglePlayPause(): void {
-    if (this.audioElement) {
-      if (this.isPlaying) {
-        this.audioElement.nativeElement.pause();
-      } else {
-        this.audioElement.nativeElement.play();
+    // Handle rewind
+    if (isSeek && time < scenes[currentIndex].timestamp) {
+      for (let i = currentIndex; i >= 0; i--) {
+        if (time >= scenes[i].timestamp) {
+          this.currentSceneIndex.set(i);
+          return;
+        }
       }
-      this.isPlaying = !this.isPlaying;
+      if (time < scenes[0].timestamp) {
+        this.currentSceneIndex.set(0);
+      }
     }
   }
 
-  handleReplay(): void {
-    if (this.audioElement) {
-      this.audioElement.nativeElement.currentTime = 0;
-      this.activeSceneIndex = 0;
-      this.audioElement.nativeElement.play();
-      this.isPlaying = true;
-    }
+  // --- Helpers ---
+  text(multiLingual: MultiLingualText | undefined): string {
+    if (!multiLingual) return 'N/A';
+    return multiLingual[this.currentLang] || multiLingual['en'] || 'N/A';
   }
 
-  formatTime(time: number): string {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  getAudioPath(): string {
+    const audioContent = this.currentStoryData()?.audioUrl;
+    if (!audioContent) return '';
+    return audioContent[this.currentLang] || audioContent['ta'] || '';
   }
 
-  getImageAlt(): string {
-    return this.currentScene ? `Scene for "${this.currentScene.text.substring(0, 20)}..."` : '';
+  formatTime(seconds: number): string {
+    if (isNaN(seconds) || seconds < 0) return '00:00';
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
   }
 }

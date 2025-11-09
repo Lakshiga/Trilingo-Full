@@ -47,8 +47,20 @@ namespace TES_Learning_App.Application_Layer.Services
             var activity = await _unitOfWork.ActivityRepository.GetByIdAsync(id);
             if (activity == null) throw new Exception("Activity not found.");
 
-            await _unitOfWork.ActivityRepository.DeleteAsync(activity);
-            await _unitOfWork.CompleteAsync();
+            try
+            {
+                await _unitOfWork.ActivityRepository.DeleteAsync(activity);
+                await _unitOfWork.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                // Handle database constraint violations and other errors
+                if (ex.Message.Contains("foreign key") || ex.Message.Contains("constraint") || ex.Message.Contains("reference"))
+                {
+                    throw new Exception($"Cannot delete activity. It may be referenced by other records. Details: {ex.InnerException?.Message ?? ex.Message}");
+                }
+                throw new Exception($"Error deleting activity: {ex.Message}");
+            }
         }
 
         public async Task<IEnumerable<ActivityDto>> GetAllAsync()

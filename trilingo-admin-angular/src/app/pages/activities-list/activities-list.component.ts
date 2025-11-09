@@ -134,16 +134,24 @@ export class ActivitiesListPageComponent implements OnInit, OnDestroy {
   async deleteActivity(activityId: number): Promise<void> {
     if (confirm("Are you sure you want to delete this activity?")) {
       try {
-        await this.activityApiService.deleteItem(activityId);
-        this.activities = this.activities.filter(act => act.activityId !== activityId);
+        // Convert Observable to Promise and wait for completion
+        await this.activityApiService.deleteItem(activityId).toPromise();
+        // Reload data from server to ensure UI reflects actual database state
+        await this.loadData();
         this.snackBar.open('Activity deleted successfully', 'Close', { duration: 3000 });
-      } catch (err) {
-        console.error(err);
-        this.snackBar.open(
-          err instanceof Error ? err.message : "Failed to delete activity.",
-          'Close',
-          { duration: 5000 }
-        );
+      } catch (err: any) {
+        console.error('Delete activity error:', err);
+        let errorMessage = "Failed to delete activity.";
+        
+        if (err instanceof Error) {
+          errorMessage = err.message;
+        } else if (err?.error?.message) {
+          errorMessage = err.error.message;
+        } else if (err?.message) {
+          errorMessage = err.message;
+        }
+        
+        this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
       }
     }
   }

@@ -1,73 +1,29 @@
+/* Custom CSS for layout consistency */
 
-    .story-player-container {
-      padding: 16px;
-      margin: auto;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
+.scene-image-container img {
+    /* Ensures image fills the container height in a consistent ratio */
+    height: 400px; 
+    width: 100%;
+}
 
-    .title {
-      text-align: center;
-      margin-bottom: 16px;
-    }
+/* Custom range slider styling for better appearance */
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%; 
+    background: #4f46e5; /* Tailwind indigo-600 */
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
 
-    .image-section {
-      flex-grow: 1;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-    }
-
-    .scene-card {
-      width: 100%;
-      border-radius: 12px;
-    }
-
-    .scene-image {
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      object-fit: cover;
-    }
-
-    .text-card {
-      min-height: 100px;
-      margin-bottom: 16px;
-      border-radius: 8px;
-    }
-
-    .scene-text {
-      text-align: center;
-      font-size: 1.2rem;
-      margin: 0;
-    }
-
-    .player-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .time-slider {
-      width: 100%;
-    }
-
-    .time-display {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      color: #666;
-    }
-
-    .control-buttons {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 8px;
-    }
-
-    .play-pause-button mat-icon {
-      font-size: 2.5rem;
-    }
-  
+input[type=range]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%; 
+    background: #4f46e5;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    border: none;
+}

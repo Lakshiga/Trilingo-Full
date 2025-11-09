@@ -53,166 +53,60 @@
   <!-- Flashcard -->
   <app-flashcard *ngIf="activityTypeId === 1" [content]="content"></app-flashcard>
   
-  <!-- MediaSpotlightMultiple (case 2)  -->
-  <app-media-spotlight-multiple *ngIf="activityTypeId === 2" [content]="mediaSpotlightMultipleContent()"></app-media-spotlight-multiple>
+  <!-- Matching -->
+  <app-matching *ngIf="activityTypeId === 2" [content]="content"></app-matching>
   
-  <!-- MediaSpotlightSingle -->
-  <app-media-spotlight-single *ngIf="activityTypeId === 3" [content]="content"></app-media-spotlight-single>
+  <!-- Fill in the Blanks -->
+  <app-fill-in-the-blanks *ngIf="activityTypeId === 3" [content]="content"></app-fill-in-the-blanks>
   
-  <!-- Equation Fill in the Blank -->
-  <app-equation-learn *ngIf="activityTypeId === 4" [content]="content"></app-equation-learn>
-  
-  <!-- ConversationPlayer -->
-  <app-conversation-player *ngIf="activityTypeId === 5" [content]="content"></app-conversation-player>
-  
-  <!-- SongPlayer -->
+  <!-- MCQ Activity -->
+  <app-mcq-activity *ngIf="activityTypeId === 4" [content]="content"></app-mcq-activity>
+
+  <!-- True False -->
+  <app-true-false *ngIf="activityTypeId === 5" [content]="content"></app-true-false>
+
+  <!-- Song Player -->
   <app-song-player *ngIf="activityTypeId === 6" [content]="content"></app-song-player>
   
-  <!-- RecognitionGrid -->
-  <app-recognition-grid *ngIf="activityTypeId === 7" [content]="content"></app-recognition-grid>
-  
-  <!-- CharacterGrid -->
-  <app-character-grid *ngIf="activityTypeId === 8" [content]="content"></app-character-grid>
-  
-  <!-- WordPairMCQ -->
-  <app-word-pair-mcq *ngIf="activityTypeId === 9" [content]="content"></app-word-pair-mcq>
-  
-  <!-- WordFinder -->
-  <app-word-finder *ngIf="activityTypeId === 10" [content]="content"></app-word-finder>
-  
-  <!-- SceneFinder (case 11) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 11" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- StoryPlayer -->
-  <app-story-player *ngIf="activityTypeId === 12" [content]="content"></app-story-player>
-  
-  <!-- MultipleChoiceQuestion -->
-  <app-mcq-activity *ngIf="activityTypeId === 13" [content]="content"></app-mcq-activity>
-  
-  <!-- AudioTextImageSelection -->
-  <app-audio-text-image-selection *ngIf="activityTypeId === 14" [content]="content"></app-audio-text-image-selection>
-  
-  <!-- DragDropImageMatching -->
-  <app-drag-drop-image-matching *ngIf="activityTypeId === 15" [content]="content"></app-drag-drop-image-matching>
-  
-  <!-- Video Player -->
-  <app-video-player *ngIf="activityTypeId === 16" [content]="content"></app-video-player>
-  
-  <!-- LetterFill -->
-  <app-letter-fill *ngIf="activityTypeId === 17" [content]="content"></app-letter-fill>
-  
-  <!-- LetterSoundMcq (case 18) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 18" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- Drag and Drop Activity (case 19) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 19" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- InteractiveImageLearning -->
-  <app-interactive-image-learning *ngIf="activityTypeId === 20" [content]="content"></app-interactive-image-learning>
-  
-  <!-- Letter Shape Matching -->
-  <app-letter-shape-matching *ngIf="activityTypeId === 21" [content]="content"></app-letter-shape-matching>
-  
-  
-  
-  <!-- Words Learning (case 27) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 27" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- Word Splitter (case 38) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 38" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- Drag Drop Categorization (case 46) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 46" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- Drag Drop Sentence (case 33) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 33" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- Drag Drop Text Sort (case 35) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 35" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- Multi Drag Drop Fill In Blank (case 36) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 36" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- Sentence Scramble Exercise (case 25) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 25" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- WordScrambleExercise -->
-  <app-word-scramble-exercise *ngIf="activityTypeId === 22" [content]="content"></app-word-scramble-exercise>
-  
-  <!-- TamilVowels -->
-  <app-tamil-vowels *ngIf="activityTypeId === 23" [content]="content"></app-tamil-vowels>
-  
-  <!-- EquationLearn -->
-  <app-equation-learn *ngIf="activityTypeId === 24" [content]="content"></app-equation-learn>
-  
-  <!-- SentenceBuilder -->
-  <app-sentence-builder *ngIf="activityTypeId === 26" [content]="content"></app-sentence-builder>
-  
-  <!-- WordsLearning (case 27) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 27" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- PronunciationPractice (case 28) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 28" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- RiddleActivity -->
-  <app-riddle-activity *ngIf="activityTypeId === 29" [content]="content"></app-riddle-activity>
-  
-  <!-- DragDropWordMatch (case 30) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 30" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- ReadingComprehensionMatch (case 31) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 31" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- DragDropSentence (case 33) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 33" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- DragDropFillInBlank -->
-  <app-drag-drop-fill-in-blank *ngIf="activityTypeId === 34" [content]="content"></app-drag-drop-fill-in-blank>
-  
-  <!-- DragDropTextSort (case 35) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 35" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- MultiDragDropFillInBlank (case 36) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 36" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- HighlightingActivity (case 37) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 37" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- WordSplitter (case 38) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 38" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- TrueFalseQuiz -->
-  <app-true-false-quiz *ngIf="activityTypeId === 40" [content]="content"></app-true-false-quiz>
-  
-  <!-- ImageWordMatch (case 41) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 41" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- SoundImageMatch -->
-  <app-sound-image-match *ngIf="activityTypeId === 42" [content]="content"></app-sound-image-match>
-  
-  <!-- SentenceOrderingActivity (case 43) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 43" [ngTemplateOutlet]="generic"></ng-container>
-  
-  <!-- PositionalSceneBuilder -->
-  <app-positional-scene-builder *ngIf="activityTypeId === 44" [content]="content"></app-positional-scene-builder>
-  
-  <!-- ListeningMatchingActivity (case 45) -->
-  <app-listening-matching-drag-and-drop *ngIf="activityTypeId === 45" [content]="content"></app-listening-matching-drag-and-drop>
-  
-  <!-- DragDropCategorization (case 46) - Not implemented yet -->
-  <ng-container *ngIf="activityTypeId === 46" [ngTemplateOutlet]="generic"></ng-container>
+  <!-- Story Player -->
+  <app-story-player *ngIf="activityTypeId === 7" [content]="content"></app-story-player>
 
-  <!-- WordBankCompletion -->
-  <app-word-bank-completion *ngIf="activityTypeId === 48" [content]="content"></app-word-bank-completion>
+  <!-- Pronunciation Activity -->
+  <app-pronunciation-activity *ngIf="activityTypeId === 8" [content]="content"></app-pronunciation-activity>
+  
+  <!-- Scrumble Activity -->
+  <app-scrumble-activity *ngIf="activityTypeId === 9" [content]="content"></app-scrumble-activity>
 
-  <!-- FirstLetterMatch -->
-  <app-first-letter-match *ngIf="activityTypeId === 49" [content]="content"></app-first-letter-match>
+  <!-- Triple Blast Activity -->
+  <app-triple-blast *ngIf="activityTypeId === 10" [content]="content"></app-triple-blast>
 
-  <!-- Highlight -->
-  <app-highlight *ngIf="activityTypeId === 50" [content]="content"></app-highlight>
+  <!-- Bubble Blast Activity -->
+  <app-bubble-blast *ngIf="activityTypeId === 11" [content]="content"></app-bubble-blast>
 
-  <!-- Matching -->
-  <app-matching *ngIf="activityTypeId === 51" [content]="content"></app-matching>
+  <!-- Memory Pair Activity -->
+  <app-memory-pair *ngIf="activityTypeId === 12" [content]="content"></app-memory-pair>
+
+  <!-- Group Sorter Activity -->
+  <app-group-sorter *ngIf="activityTypeId === 13" [content]="content"></app-group-sorter>
+
+
+  <!-- All other activity types use generic template -->
+  <ng-container *ngIf="
+    activityTypeId !== 1 &&
+    activityTypeId !== 2 && 
+    activityTypeId !== 3 && 
+    activityTypeId !== 4 && 
+    activityTypeId !== 5 &&
+    activityTypeId !== 6 &&
+    activityTypeId !== 7 && 
+    activityTypeId !== 8 && 
+    activityTypeId !== 9 && 
+    activityTypeId !== 10 &&
+    activityTypeId !== 11 && 
+    activityTypeId !== 12 && 
+    activityTypeId !== 13" 
+    [ngTemplateOutlet]="generic">
+  </ng-container>
   
   <!-- Default case for unknown activity types -->
   <ng-container *ngIf="!isKnownActivityType()" [ngTemplateOutlet]="generic"></ng-container>
