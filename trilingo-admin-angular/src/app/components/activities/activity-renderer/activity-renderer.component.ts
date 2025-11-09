@@ -5,41 +5,20 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { LanguageService } from '../../../services/language.service';
 
-// Import all activity type components
+// Import base activity type components only
 import { McqActivityComponent } from '../activity-types/mcq-activity/mcq-activity.component';
-import { EquationLearnComponent } from '../activity-types/equation-learn/equation-learn.component';
-import { MediaSpotlightSingleComponent } from '../activity-types/media-spotlight-single/media-spotlight-single.component';
 import { FlashcardComponent } from '../activity-types/flashcard/flashcard.component';
-import { AudioTextImageSelectionComponent } from '../activity-types/audio-text-image-selection/audio-text-image-selection.component';
-import { CharacterGridComponent } from '../activity-types/character-grid/character-grid.component';
-import { WordFinderComponent } from '../activity-types/word-finder/word-finder.component';
-import { WordPairMCQComponent } from '../activity-types/word-pair-mcq/word-pair-mcq.component';
-import { StoryPlayerComponent } from '../activity-types/story-player/story-player.component';
-import { VideoPlayerComponent } from '../activity-types/video-player/video-player.component';
-import { LetterFillComponent } from '../activity-types/letter-fill/letter-fill.component';
-import { InteractiveImageLearningComponent } from '../activity-types/interactive-image-learning/interactive-image-learning.component';
-import { TamilVowelsComponent } from '../activity-types/tamil-vowels/tamil-vowels.component';
-import { SentenceBuilderComponent } from '../activity-types/sentence-builder/sentence-builder.component';
-import { RiddleActivityComponent } from '../activity-types/riddle-activity/riddle-activity.component';
-import { WordScrambleExerciseComponent } from '../activity-types/word-scramble-exercise/word-scramble-exercise.component';
-import { TrueFalseQuizComponent } from '../activity-types/true-false-quiz/true-false-quiz.component';
-import { ImageWordMatchComponent } from '../activity-types/image-word-match/image-word-match.component';
-import { SoundImageMatchComponent } from '../activity-types/sound-image-match/sound-image-match.component';
-import { PositionalSceneBuilderComponent } from '../activity-types/positional-scene-builder/positional-scene-builder.component';
+import { AppMatchingAdminForm } from '../activity-types/matching/matching.component';
+import { FillInTheBlanksComponent } from '../activity-types/fill-in-the-blanks/fill-in-the-blanks.component';
+import { TrueFalseComponent } from "../activity-types/true-false/true-false.component";
 import { SongPlayerComponent } from '../activity-types/song-player/song-player.component';
-import { RecognitionGridComponent } from '../activity-types/recognition-grid/recognition-grid.component';
-import { HighlightComponent } from '../activity-types/highlight/highlight.component';
-import { WordBankCompletionComponent } from '../activity-types/word-bank-completion/word-bank-completion.component';
-import { FirstLetterMatchComponent } from '../activity-types/first-letter-match/first-letter-match.component';
-import { MatchingComponent } from '../activity-types/matching/matching.component';
-import { LetterSpotlightComponent } from '../activity-types/letter-spotlight/letter-spotlight.component';
-import { DragDropFillInBlankComponent } from '../activity-types/drag-drop-fill-in-blank/drag-drop-fill-in-blank.component';
-import { DropdownCompletionComponent } from '../activity-types/dropdown-completion/dropdown-completion.component';
-import { DragDropImageMatchingComponent } from '../activity-types/drag-drop-image-matching/drag-drop-image-matching.component';
-import { LetterShapeMatchingComponent } from '../activity-types/letter-shape-matching/letter-shape-matching.component';
-import { ListeningMatchingDragAndDropComponent } from '../activity-types/listening-matching-drag-and-drop/listening-matching-drag-and-drop.component';
-import { ConversationPlayerComponent } from '../activity-types/conversation-player/conversation-player.component';
-import { MediaSpotlightMultipleComponent } from '../activity-types/media-spotlight-multiple/media-spotlight-multiple.component';
+import { StoryPlayerComponent } from '../activity-types/story-player/story-player.component';
+import { PronunciationActivityComponent } from '../activity-types/pronunciation-activity/pronunciation-activity.component';
+import { ScrumbleActivityComponent } from '../activity-types/scrumble-activity/scrumble-activity.component';
+import { TripleBlastComponent } from '../activity-types/triple-blast/triple-blast.component';
+import { BubbleBlastComponent } from '../activity-types/bubble-blast/bubble-blast.component';
+import { MemoryPairComponent } from '../activity-types/memory-pair/memory-pair.component';
+import { GroupSorterComponent } from '../activity-types/group-sorter/group-sorter.component';
 
 @Component({
   selector: 'app-activity-renderer',
@@ -49,41 +28,20 @@ import { MediaSpotlightMultipleComponent } from '../activity-types/media-spotlig
     MatCardModule,
     MatChipsModule,
     MatIconModule,
-    McqActivityComponent,
-    EquationLearnComponent,
-    MediaSpotlightSingleComponent,
     FlashcardComponent,
-    AudioTextImageSelectionComponent,
-    CharacterGridComponent,
-    WordFinderComponent,
-    WordPairMCQComponent,
-    StoryPlayerComponent,
-    VideoPlayerComponent,
-    LetterFillComponent,
-    InteractiveImageLearningComponent,
-    TamilVowelsComponent,
-    SentenceBuilderComponent,
-    RiddleActivityComponent,
-    WordScrambleExerciseComponent,
-    TrueFalseQuizComponent,
-    ImageWordMatchComponent,
-    SoundImageMatchComponent,
-    PositionalSceneBuilderComponent,
+    AppMatchingAdminForm,
+    FillInTheBlanksComponent,
+    McqActivityComponent,
+    TrueFalseComponent,
     SongPlayerComponent,
-    RecognitionGridComponent,
-    HighlightComponent,
-    WordBankCompletionComponent,
-    FirstLetterMatchComponent,
-    MatchingComponent,
-    LetterSpotlightComponent,
-    DragDropFillInBlankComponent,
-    DropdownCompletionComponent,
-    DragDropImageMatchingComponent,
-    LetterShapeMatchingComponent,
-    ListeningMatchingDragAndDropComponent
-    , ConversationPlayerComponent
-    , MediaSpotlightMultipleComponent
-  ],
+    StoryPlayerComponent,
+    PronunciationActivityComponent,
+    ScrumbleActivityComponent,
+    TripleBlastComponent,
+    BubbleBlastComponent,
+    MemoryPairComponent,
+    GroupSorterComponent,
+],
   templateUrl: './activity-renderer.component.html',
   styleUrls: ['./activity-renderer.component.css']
 })
@@ -91,17 +49,15 @@ export class ActivityRendererComponent implements OnChanges {
   @Input() activityTypeId!: number;
   @Input() content: any;
 
-  constructor(private languageService: LanguageService) {}
+  constructor(public languageService: LanguageService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     // Force change detection when inputs change
   }
 
   isKnownActivityType(): boolean {
-    const knownTypes = [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 29, 33, 34, 35, 36, 37, 38, 40, 41, 42, 44, 45, 46,
-      48, 49, 50, 51
-    ];
+    // Activity types 1-8 are implemented: 1 (flashcard), 2 (matching), 3 (fill-in-the-blanks), 4 (mcq-activity), 5 (true-false), 6 (song-player), 7 (story-player), 8 (pronunciation-activity)
+    const knownTypes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
     return knownTypes.includes(this.activityTypeId);
   }
 

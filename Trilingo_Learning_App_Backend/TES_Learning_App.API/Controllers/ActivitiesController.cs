@@ -60,8 +60,15 @@ namespace TES_Learning_App.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _activityService.DeleteAsync(id);
-            return NoContent();
+            try
+            {
+                await _activityService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

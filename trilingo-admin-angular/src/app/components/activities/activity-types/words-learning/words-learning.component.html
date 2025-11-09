@@ -1,8 +1,0 @@
-
-    <div class="words-learning" *ngIf="!isAllFinished">
-      <h1>{{ content.title || 'சொற்கள் கற்றல்' }}</h1>
-      <p>{{ content.description || 'சொற்களையும் அவற்றின் எழுத்துக்களையும் கேட்டு கற்றுக்கொள்ளுங்கள்' }}</p>
-      
-      <!-- Activity Progress -->
-      <div class="activity-progress">
-        <p>பயிற்சி {{ currentActivityIndex + 1 }} / {{ content.activities.length }}: {{ currentActivity?.title || 

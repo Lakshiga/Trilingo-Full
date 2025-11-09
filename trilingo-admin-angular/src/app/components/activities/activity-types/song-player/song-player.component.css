@@ -1,96 +1,27 @@
+/* Standard CSS for Angular Material and layout tweaks */
 
-    .song-player-card {
-      padding: 24px;
-      margin: auto;
-      max-width: 450px;
-      border-radius: 16px;
-      display: flex;
-      flex-direction: column;
-      height: 95%;
-    }
+.lyrics-container {
+    scroll-behavior: smooth;
+}
 
-    .song-info {
-      text-align: center;
-      margin-bottom: 16px;
-    }
+/* Custom range slider styling for better appearance */
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%; 
+    background: #4f46e5; /* Tailwind indigo-600 */
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
 
-    .album-art {
-      margin-bottom: 16px;
-    }
-
-    .album-image {
-      width: 150px;
-      height: 150px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-    .song-title {
-      font-weight: bold;
-      margin: 0 0 8px 0;
-    }
-
-    .artist-name {
-      color: #666;
-      margin: 0;
-    }
-
-    .lyrics-container {
-      flex-grow: 1;
-      overflow-y: auto;
-      border: 1px solid #eee;
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 16px;
-      text-align: center;
-      max-height: 300px;
-    }
-
-    .lyric-line {
-      padding: 8px;
-      border-radius: 4px;
-      transition: all 0.3s;
-      margin: 4px 0;
-    }
-
-    .lyric-line.active {
-      background-color: #e3f2fd;
-      color: #1976d2;
-      transform: scale(1.05);
-      font-weight: bold;
-    }
-
-    .lyric-line.inactive {
-      background-color: transparent;
-      transform: scale(1);
-    }
-
-    .player-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .time-slider {
-      width: 100%;
-    }
-
-    .time-display {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      color: #666;
-    }
-
-    .control-buttons {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 8px;
-    }
-
-    .play-pause-button mat-icon {
-      font-size: 2.5rem;
-    }
-  
+input[type=range]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%; 
+    background: #4f46e5;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    border: none;
+}
