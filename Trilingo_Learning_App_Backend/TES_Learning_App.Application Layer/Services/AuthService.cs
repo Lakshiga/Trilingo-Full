@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using TES_Learning_App.Application_Layer.DTOs.Auth.Requests;
 using TES_Learning_App.Application_Layer.DTOs.Auth.Response;
 using TES_Learning_App.Application_Layer.Interfaces.Infrastructure;
@@ -53,7 +55,16 @@ namespace TES_Learning_App.Application_Layer.Services
             }
 
             var token = _tokenService.CreateToken(user);
-            return new AuthResponseDto { IsSuccess = true, Message = "Login successful.", Token = token };
+            return new AuthResponseDto 
+            { 
+                IsSuccess = true, 
+                Message = "Login successful.", 
+                Token = token,
+                Username = user.Username,
+                Email = user.Email,
+                ProfileImageUrl = user.ProfileImageUrl,
+                Role = user.Role?.RoleName
+            };
         }
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
@@ -218,6 +229,144 @@ namespace TES_Learning_App.Application_Layer.Services
             return errors;
         }
 
+        public async Task<AuthResponseDto> UploadProfileImageAsync(string username, IFormFile file)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(username))
+                {
+                    return new AuthResponseDto { IsSuccess = false, Message = "Username is required" };
+                }
+
+                var user = await _unitOfWork.AuthRepository.GetUserByIdentifierAsync(username);
+                if (user == null)
+                {
+                    return new AuthResponseDto { IsSuccess = false, Message = "User not found" };
+                }
+
+                // Create uploads directory if it doesn't exist
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "profiles");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                // Generate unique filename
+                var fileExtension = Path.GetExtension(file.FileName);
+                var uniqueFileName = $"{user.Id}_{Guid.NewGuid()}{fileExtension}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                // Save file
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                // Update user profile image URL
+                var imageUrl = $"/uploads/profiles/{uniqueFileName}";
+                user.ProfileImageUrl = imageUrl;
+                await _unitOfWork.UserRepository.UpdateAsync(user);
+                await _unitOfWork.CompleteAsync();
+
+                return new AuthResponseDto 
+                { 
+                    IsSuccess = true, 
+                    Message = "Profile image uploaded successfully",
+                    ProfileImageUrl = imageUrl
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AuthResponseDto { IsSuccess = false, Message = $"Error uploading profile image: {ex.Message}" };
+            }
+        }
+
+        public async Task<AuthResponseDto> GetUserProfileAsync(string username)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(username))
+                {
+                    return new AuthResponseDto { IsSuccess = false, Message = "Username is required" };
+                }
+
+                var user = await _unitOfWork.AuthRepository.GetUserByIdentifierAsync(username);
+                if (user == null)
+                {
+                    return new AuthResponseDto { IsSuccess = false, Message = "User not found" };
+                }
+
+                return new AuthResponseDto 
+                { 
+                    IsSuccess = true, 
+                    Message = "User profile retrieved successfully"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AuthResponseDto { IsSuccess = false, Message = $"Error getting user profile: {ex.Message}" };
+            }
+        }
+
+        public async Task<AuthResponseDto> UpdateProfileAsync(string username, UpdateProfileDto dto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(username))
+                {
+                    return new AuthResponseDto { IsSuccess = false, Message = "Username is required" };
+                }
+
+                var user = await _unitOfWork.AuthRepository.GetUserByIdentifierAsync(username);
+                if (user == null)
+                {
+                    return new AuthResponseDto { IsSuccess = false, Message = "User not found" };
+                }
+
+                // Update only non-null fields
+                bool updated = false;
+
+                if (!string.IsNullOrEmpty(dto.Email) && dto.Email != user.Email)
+                {
+                    // Check if email is already in use by another user
+                    var existingUser = await _unitOfWork.AuthRepository.GetUserByIdentifierAsync(dto.Email);
+                    if (existingUser != null && existingUser.Id != user.Id)
+                    {
+                        return new AuthResponseDto { IsSuccess = false, Message = "Email already in use" };
+                    }
+                    user.Email = dto.Email;
+                    updated = true;
+                }
+
+                if (!string.IsNullOrEmpty(dto.ProfileImageUrl) && dto.ProfileImageUrl != user.ProfileImageUrl)
+                {
+                    user.ProfileImageUrl = dto.ProfileImageUrl;
+                    updated = true;
+                }
+
+                // Note: Name, Age, NativeLanguage, LearningLanguage are not in the User entity
+                // You may need to add these fields to User entity or create a UserProfile entity
+
+                if (updated)
+                {
+                    await _unitOfWork.UserRepository.UpdateAsync(user);
+                    await _unitOfWork.CompleteAsync();
+                }
+
+                return new AuthResponseDto
+                {
+                    IsSuccess = true,
+                    Message = "Profile updated successfully",
+                    Username = user.Username,
+                    Email = user.Email,
+                    ProfileImageUrl = user.ProfileImageUrl
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AuthResponseDto { IsSuccess = false, Message = $"Error updating profile: {ex.Message}" };
+            }
+        }
 
     }
 }

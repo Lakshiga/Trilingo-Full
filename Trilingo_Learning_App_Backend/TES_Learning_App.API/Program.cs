@@ -4,6 +4,9 @@ using TES_Learning_App.Application_Layer;
 using TES_Learning_App.Infrastructure;
 using TES_Learning_App.Infrastructure.Data;
 using TES_Learning_App.Infrastructure.Data.DbIntializers_Seeds;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
+
 
 namespace TES_Learning_App.API
 
@@ -88,6 +91,22 @@ namespace TES_Learning_App.API
             app.UseAuthentication();
             app.UseAuthorization();
 
+            // Enable static file serving for profile images
+            app.UseStaticFiles();
+
+            // Create uploads directory if it doesn't exist
+            var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "uploads");
+            if (!Directory.Exists(uploadsPath))
+            {
+                Directory.CreateDirectory(uploadsPath);
+            }
+
+            // Custom static files for uploads
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(uploadsPath),
+                RequestPath = "/uploads"
+            });
 
             app.MapControllers();
 
