@@ -1,93 +1,145 @@
-
-    .lessons-container {
-      padding: 0;
-      background: white;
-    }
-
-    .header {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 20px;
-      padding: 20px 20px 0 20px;
-    }
-
-    .breadcrumb {
-      margin-bottom: 10px;
-    }
-
-    .breadcrumb a {
-      color: #1976d2;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .breadcrumb a:hover {
-      text-decoration: underline;
-    }
-
-    .header h2 {
-      margin: 0;
-      color: #333;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .content {
-      padding: 0 20px 20px 20px;
-    }
-
-    .table-container {
-      overflow-x: auto;
-    }
-
-    .lessons-table {
+    .lessons-page-wrapper {
       width: 100%;
-      border-collapse: collapse;
+      max-width: 100%;
+      margin: 0;
+      padding: 0;
     }
 
-    .lessons-table th,
-    .lessons-table td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .lessons-table th {
-      background-color: #f5f5f5;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .lessons-table tr:hover {
-      background-color: #f9f9f9;
+    .lessons-card {
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      display: block;
     }
 
     .loading-container {
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      padding: 40px;
+      padding: 48px;
+      min-height: 300px;
     }
 
-    .loading-container mat-spinner {
-      margin-bottom: 16px;
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+    }
+
+    .lessons-table {
+      width: 100%;
+      min-width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
+      display: table;
+    }
+
+    mat-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0;
+      padding: 20px 24px;
+      width: 100%;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .back-to-levels-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-shrink: 0;
+      font-weight: 500;
+      white-space: nowrap;
+      margin-right: auto;
+    }
+
+    mat-card-title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      pointer-events: none;
+    }
+
+    .spacer {
+      flex: 1 1 auto;
+    }
+
+    .mat-mdc-cell, .mat-mdc-header-cell {
+      padding: 16px 24px;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mat-mdc-header-cell {
+      font-weight: 600;
+      font-size: 14px;
+      color: #374151;
+      background-color: #f9fafb;
+      border-bottom: 2px solid #e5e7eb;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mat-mdc-cell {
+      color: #1f2937;
+      font-size: 14px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .mat-mdc-row:hover .mat-mdc-cell {
+      background-color: #f9fafb;
+    }
+
+    /* Column width distribution */
+    .mat-column-lessonId {
+      width: 10%;
+      min-width: 80px;
+    }
+
+    .mat-column-lessonName {
+      width: 40%;
+      min-width: 200px;
+    }
+
+    .mat-column-sequenceOrder {
+      width: 15%;
+      min-width: 120px;
+    }
+
+    .mat-column-manageActivities {
+      width: 25%;
+      min-width: 200px;
+      text-align: center;
+    }
+
+    .mat-column-manageActivities .mat-mdc-cell {
+      text-align: center;
+    }
+
+    .mat-column-actions {
+      width: 10%;
+      min-width: 120px;
+      text-align: center;
+    }
+
+    .mat-column-actions .mat-mdc-cell {
+      text-align: center;
     }
 
     .error-message {
       text-align: center;
-      padding: 20px;
-      color: #d32f2f;
-    }
-
-    .error-message button {
-      margin-top: 12px;
+      padding: 24px;
     }
 
     .no-data {
       text-align: center;
-      padding: 40px;
-      color: #666;
+      padding: 48px;
     }
 
     .dialog-overlay {

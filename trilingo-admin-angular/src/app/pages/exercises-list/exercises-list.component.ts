@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 import { ExerciseApiService, Exercise } from '../../services/exercise-api.service';
 import { ActivityApiService } from '../../services/activity-api.service';
 import { Activity } from '../../types/activity.types';
-import { ExercisePreviewModalComponent } from '../../components/exercises/exercise-preview-modal/exercise-preview-modal.component';
+import { ActivityPlayerModalComponent } from '../../components/activities/activity-player-modal/activity-player-modal.component';
 
 @Component({
   selector: 'app-exercises-list',
@@ -25,7 +25,7 @@ import { ExercisePreviewModalComponent } from '../../components/exercises/exerci
     MatCardModule,
     MatProgressSpinnerModule,
     MatDialogModule,
-    ExercisePreviewModalComponent
+    ActivityPlayerModalComponent
   ],
   templateUrl: './exercises-list.component.html',
   styleUrls: ['./exercises-list.component.css']
@@ -40,6 +40,7 @@ export class ExercisesListComponent implements OnInit, OnDestroy {
   // Preview modal state
   isPreviewOpen = false;
   previewExercise: Exercise | null = null;
+  previewActivity: Activity | null = null;
 
   private routeSubscription?: Subscription;
 
@@ -120,12 +121,20 @@ export class ExercisesListComponent implements OnInit, OnDestroy {
 
   handlePreview(exercise: Exercise): void {
     this.previewExercise = exercise;
+    // Convert exercise to activity format for activity-player-modal
+    if (this.activity && exercise) {
+      this.previewActivity = {
+        ...this.activity,
+        contentJson: exercise.jsonData, // Use exercise's jsonData as contentJson
+      } as Activity;
+    }
     this.isPreviewOpen = true;
   }
 
   closePreview(): void {
     this.isPreviewOpen = false;
     this.previewExercise = null;
+    this.previewActivity = null;
   }
 
   getActivityTypeId(): number {
@@ -177,9 +186,9 @@ export class ExercisesListComponent implements OnInit, OnDestroy {
   goBack(): void {
     const lessonId = this.activity?.lessonId;
     if (lessonId) {
-      this.router.navigate(['/activities'], { queryParams: { lessonId } });
+      this.router.navigate(['activities'], { queryParams: { lessonId } });
     } else {
-      this.router.navigate(['/activities']);
+      this.router.navigate(['activities']);
     }
   }
 }

@@ -15,7 +15,7 @@ import { ActivityFormComponent } from '../../components/activities/activity-form
 import { DevicePreviewComponent } from '../../components/activities/device-preview/device-preview.component';
 import { ExerciseEditorComponent } from '../../components/activities/exercise-editor/exercise-editor.component';
 import { MultilingualActivityTemplates } from '../../services/multilingual-activity-templates.service';
-import { SidebarLanguageManagerComponent } from '../../components/common/sidebar-language-manager.component';
+import { SidebarLanguageManagerComponent } from '../../components/common/sidebar-language-manager/sidebar-language-manager.component';
 import { ActivityApiService, MultilingualActivity } from '../../services/activity-api.service';
 import { MainActivityApiService, MainActivityResponse } from '../../services/main-activity-api.service';
 import { ActivityTypeApiService, ActivityTypeResponse } from '../../services/activity-type-api.service';
@@ -588,11 +588,10 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
   goBack(): void {
     const lessonId = this.activity?.lessonId || this.lessonId;
     if (lessonId) {
-      const backUrl = `/activities?lessonId=${lessonId}`;
-      this.router.navigate([backUrl]);
+      this.router.navigate(['activities'], { queryParams: { lessonId } });
     } else {
-      // Fallback to lessons page if no lesson ID
-      this.router.navigate(['/lessons']);
+      // Fallback to levels page if no lesson ID
+      this.router.navigate(['levels']);
     }
   }
 

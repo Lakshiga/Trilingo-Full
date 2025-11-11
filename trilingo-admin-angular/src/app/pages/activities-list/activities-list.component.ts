@@ -9,7 +9,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { ActivityPlayerModalComponent } from '../../components/activities/activity-player-modal/activity-player-modal.component';
-import { SidebarLanguageManagerComponent } from '../../components/common/sidebar-language-manager.component';
+import { SidebarLanguageManagerComponent } from '../../components/common/sidebar-language-manager/sidebar-language-manager.component';
 import { ActivityApiService, MultilingualActivity } from '../../services/activity-api.service';
 import { LessonApiService, MultilingualLesson } from '../../services/lesson-api.service';
 import { ActivityTypeApiService, ActivityTypeResponse } from '../../services/activity-type-api.service';
@@ -47,7 +47,7 @@ export class ActivitiesListPageComponent implements OnInit, OnDestroy {
   activityToPreview: MultilingualActivity | null = null;
   isPreviewLoading = false;
   
-  displayedColumns: string[] = ['id', 'title', 'type', 'order', 'actions'];
+  displayedColumns: string[] = ['id', 'title', 'type', 'order', 'preview', 'actions'];
   activityTypeMap: Record<number, string> = {};
   
   private routeSubscription?: Subscription;
@@ -185,9 +185,23 @@ export class ActivitiesListPageComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    const backToLessonsUrl = this.lesson ? 
-      `/lessons?levelId=${this.lesson.levelId}` : 
-      '/levels';
-    this.router.navigate([backToLessonsUrl]);
+    try {
+      if (this.lesson && this.lesson.levelId) {
+        this.router.navigate(['lessons'], { queryParams: { levelId: this.lesson.levelId } })
+          .catch(err => {
+            console.error('Navigation error:', err);
+            // Fallback to levels if navigation fails
+            this.router.navigate(['levels']);
+          });
+      } else {
+        this.router.navigate(['levels']).catch(err => {
+          console.error('Navigation error:', err);
+        });
+      }
+    } catch (error) {
+      console.error('Navigation error:', error);
+      // Fallback to levels page
+      this.router.navigate(['levels']);
+    }
   }
 }

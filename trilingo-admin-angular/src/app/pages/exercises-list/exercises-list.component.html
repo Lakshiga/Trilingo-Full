@@ -114,10 +114,10 @@
   </div>
 
   <!-- Exercise Preview Modal -->
-  <app-exercise-preview-modal
+  <app-activity-player-modal
     [isOpen]="isPreviewOpen"
-    [exercise]="previewExercise"
-    [activityTypeId]="getActivityTypeId()"
+    [activity]="previewActivity"
+    [isLoading]="false"
     (onClose)="closePreview()">
-  </app-exercise-preview-modal>
+  </app-activity-player-modal>
 </div>
