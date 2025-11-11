@@ -13,7 +13,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LessonApiService, LessonCreateDto, MultilingualLesson } from '../../services/lesson-api.service';
 import { MultilingualText } from '../../types/multilingual.types';
 import { LanguageService } from '../../services/language.service';
-import { MultilingualInputComponent } from '../common/multilingual-input.component';
+import { MultilingualInputComponent } from '../common/multilingual-input/multilingual-input.component';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -38,7 +38,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class LessonsComponent implements OnInit {
   lessons: MultilingualLesson[] = [];
-  displayedColumns: string[] = ['lessonId', 'lessonName', 'sequenceOrder', 'actions'];
+  displayedColumns: string[] = ['lessonId', 'lessonName', 'sequenceOrder', 'manageActivities', 'actions'];
   showDialog = false;
   isEditing = false;
   isLoading = false;
@@ -93,8 +93,15 @@ export class LessonsComponent implements OnInit {
   }
 
   goBack() {
-    // Navigate back to levels page
-    this.router.navigate(['/levels']);
+    try {
+      // Navigate back to levels page
+      this.router.navigate(['levels']).catch(err => {
+        console.error('Navigation error:', err);
+      });
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
+    return false; // Prevent default anchor behavior
   }
 
   openAddLessonDialog() {

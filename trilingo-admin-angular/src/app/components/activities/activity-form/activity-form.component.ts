@@ -10,7 +10,7 @@ import { Activity } from '../../../types/activity.types';
 import { MainActivity } from '../../../types/main-activity.types';
 import { ActivityType } from '../../../types/activity-type.types';
 import { MultilingualText } from '../../../types/multilingual.types';
-import { MultilingualInputComponent } from '../../common/multilingual-input.component';
+import { MultilingualInputComponent } from '../../common/multilingual-input/multilingual-input.component';
 
 @Component({
   selector: 'app-activity-form',

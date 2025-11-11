@@ -13,7 +13,7 @@ export const routes: Routes = [
   },
   {
     path: 'levels',
-    loadComponent: () => import('./components/levels/levels.component').then(m => m.LevelsComponent),
+    loadComponent: () => import('./components/common/levels-table/levels-table.component').then(m => m.LevelsTableComponent),
     canActivate: [AuthGuard]
   },
   {
@@ -23,17 +23,12 @@ export const routes: Routes = [
   },
   {
     path: 'main-activities',
-    loadComponent: () => import('./components/main-activities/main-activities.component').then(m => m.MainActivitiesComponent),
+    loadComponent: () => import('./components/common/main-activities-table/main-activities-table.component').then(m => m.MainActivitiesTableComponent),
     canActivate: [AuthGuard]
   },
   {
     path: 'activity-types',
-    loadComponent: () => import('./components/activity-types/activity-types.component').then(m => m.ActivityTypesComponent),
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'games',
-    loadComponent: () => import('./components/games/games.component').then(m => m.GamesComponent),
+    loadComponent: () => import('./components/common/activity-types-table/activity-types-table.component').then(m => m.ActivityTypesTableComponent),
     canActivate: [AuthGuard]
   },
   {
@@ -53,11 +48,11 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: '/dashboard',
+    redirectTo: '/login',
     pathMatch: 'full'
   },
   {
     path: '**',
-    redirectTo: '/dashboard'
+    redirectTo: '/login'
   }
 ];

@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 // MatTypographyModule is not available in Angular Material v19
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { DependentInlineCrudTableComponent } from '../../components/common/dependent-inline-crud-table.component';
+import { DependentInlineCrudTableComponent } from '../../components/common/dependent-inline-crud-table/dependent-inline-crud-table.component';
 import { LessonApiService } from '../../services/lesson-api.service';
 import { Lesson } from '../../types/lesson.types';
 import { MultilingualText } from '../../types/multilingual.types';
@@ -85,6 +85,6 @@ export class LessonsPageComponent implements OnInit, OnDestroy {
   };
 
   goBackToLevels(): void {
-    this.router.navigate(['/levels']);
+    this.router.navigate(['levels']);
   }
 }

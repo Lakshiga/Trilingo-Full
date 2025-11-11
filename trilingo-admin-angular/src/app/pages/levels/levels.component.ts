@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { InlineCrudTableComponent } from '../../components/common/inline-crud-table.component';
+import { InlineCrudTableComponent } from '../../components/common/inline-crud-table/inline-crud-table.component';
 import { LevelApiService } from '../../services/level-api.service';
 import { Level } from '../../types/level.types';
 

@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 // MatTypographyModule is not available in Angular Material v19
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
@@ -22,6 +23,7 @@ import { LoginRequest } from '../../types/auth.types';
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
+    MatIconModule,
     MatProgressSpinnerModule,
     MatSnackBarModule
   ],
@@ -32,6 +34,7 @@ export class LoginPageComponent {
   loginForm: FormGroup;
   isLoading = false;
   error: string | null = null;
+  hidePassword = true;
 
   constructor(
     private fb: FormBuilder,
@@ -43,6 +46,10 @@ export class LoginPageComponent {
       identifier: ['admin', [Validators.required]],
       password: ['Admin123!', [Validators.required]]
     });
+  }
+
+  togglePasswordVisibility(): void {
+    this.hidePassword = !this.hidePassword;
   }
 
   onSubmit(): void {
