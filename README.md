@@ -1,4 +1,4 @@
-# 🎓 ICEDT Multilingual Learning Platform
+# 🎓 Trilingo Multilingual Learning Platform
 
 A comprehensive multilingual learning platform consisting of three interconnected applications for Tamil language education.
 

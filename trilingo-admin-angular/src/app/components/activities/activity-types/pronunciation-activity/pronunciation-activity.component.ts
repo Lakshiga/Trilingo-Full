@@ -171,7 +171,7 @@ export class PronunciationActivityComponent implements OnInit, OnDestroy { // Ch
     // NOTE: This uses the Gemini Multimodal capability (audio + text)
     try {
         const apiKey = ""; 
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
         const response = await fetch(apiUrl, {
             method: 'POST',
