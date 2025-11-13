@@ -81,9 +81,12 @@ namespace TES_Learning_App.API
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                // Do not force HTTPS in Development. Emulators/physical devices often fail on self-signed certs.
             }
-
-            app.UseHttpsRedirection();
+            else
+            {
+                app.UseHttpsRedirection();
+            }
 
             // Enable CORS
             app.UseCors("AllowAll");

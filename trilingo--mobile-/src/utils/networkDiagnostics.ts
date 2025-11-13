@@ -146,8 +146,9 @@ Platform: ${typeof window !== 'undefined' ? 'Web' : 'React Native'}
 2. Check if backend allows CORS requests from mobile apps
 3. Verify firewall is not blocking the connection
 4. For physical devices, use your computer's IP address
-5. For Android emulator, use: http://10.0.2.2:5000/api
-6. For iOS simulator, use: http://localhost:5000/api
+5. For Android emulator, use: http://10.0.2.2:5166/api
+6. For iOS simulator, use: http://localhost:5166/api
+7. Override the URL by setting EXPO_PUBLIC_API_URL or expo.extra.apiBaseUrl
 
 === To Update Configuration ===
 Edit: src/config/apiConfig.ts
