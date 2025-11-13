@@ -1,38 +1,8 @@
 <div class="device-preview">
   <div class="preview-header">
     <h3>Activity Preview</h3>
-    <p>See how your activity will look on student devices</p>
   </div>
   
-  <div class="controls">
-    <mat-button-toggle-group 
-      [value]="device" 
-      (change)="onDeviceChange($event)"
-      class="control-group">
-      <mat-button-toggle value="phone">
-        <mat-icon>phone_iphone</mat-icon>
-        Phone
-      </mat-button-toggle>
-      <mat-button-toggle value="tablet">
-        <mat-icon>tablet_mac</mat-icon>
-        Tablet
-      </mat-button-toggle>
-    </mat-button-toggle-group>
-    
-    <mat-button-toggle-group 
-      [value]="orientation" 
-      (change)="onOrientationChange($event)"
-      class="control-group">
-      <mat-button-toggle value="portrait">
-        <mat-icon>stay_current_portrait</mat-icon>
-        Portrait
-      </mat-button-toggle>
-      <mat-button-toggle value="landscape">
-        <mat-icon>stay_current_landscape</mat-icon>
-        Landscape
-      </mat-button-toggle>
-    </mat-button-toggle-group>
-  </div>
   
   <div class="preview-container">
     <mat-card 
@@ -60,9 +30,5 @@
         </div>
       </div>
     </mat-card>
-  </div>
-  
-  <div class="preview-footer" *ngIf="hasValidData">
-    <p>Click "Preview" on any exercise to see it here</p>
   </div>
 </div>

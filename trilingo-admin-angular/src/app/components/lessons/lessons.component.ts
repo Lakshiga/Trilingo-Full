@@ -12,8 +12,7 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LessonApiService, LessonCreateDto, MultilingualLesson } from '../../services/lesson-api.service';
 import { MultilingualText } from '../../types/multilingual.types';
-import { LanguageService } from '../../services/language.service';
-import { MultilingualInputComponent } from '../common/multilingual-input/multilingual-input.component';
+import { MultilingualFormComponent, MultilingualFormData } from '../common/multilingual-form/multilingual-form.component';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -31,7 +30,7 @@ import { ActivatedRoute, Router } from '@angular/router';
     MatTableModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    MultilingualInputComponent
+    MultilingualFormComponent
   ],
   templateUrl: './lessons.component.html',
   styleUrls: ['./lessons.component.css']
@@ -45,6 +44,12 @@ export class LessonsComponent implements OnInit {
   isSaving = false;
   error: string | null = null;
   levelId: number = 1; // Default level ID
+  lessonFormData: MultilingualFormData = {
+    name_en: '',
+    name_ta: '',
+    name_si: ''
+  };
+  editingLessonId: number | null = null;
   
   currentLesson: {
     lessonName: MultilingualText;
@@ -59,10 +64,13 @@ export class LessonsComponent implements OnInit {
   constructor(
     private lessonApiService: LessonApiService,
     private snackBar: MatSnackBar,
-    private languageService: LanguageService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
+
+  get dialogTitle(): string {
+    return this.isEditing ? 'Edit Lesson' : 'Add New Lesson';
+  }
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -106,20 +114,32 @@ export class LessonsComponent implements OnInit {
 
   openAddLessonDialog() {
     this.isEditing = false;
+    this.editingLessonId = null;
     this.currentLesson = {
       lessonName: { en: '', ta: '', si: '' },
-      sequenceOrder: 0,
+      sequenceOrder: Math.max(this.lessons.length + 1, 1),
       levelId: this.levelId
+    };
+    this.lessonFormData = {
+      name_en: '',
+      name_ta: '',
+      name_si: ''
     };
     this.showDialog = true;
   }
 
   editLesson(lesson: MultilingualLesson) {
     this.isEditing = true;
+    this.editingLessonId = lesson.lessonId;
     this.currentLesson = {
       lessonName: lesson.lessonName,
       sequenceOrder: lesson.sequenceOrder,
       levelId: lesson.levelId
+    };
+    this.lessonFormData = {
+      name_en: lesson.lessonName?.en || '',
+      name_ta: lesson.lessonName?.ta || '',
+      name_si: lesson.lessonName?.si || ''
     };
     this.showDialog = true;
   }
@@ -148,7 +168,8 @@ export class LessonsComponent implements OnInit {
   }
 
   async saveLesson() {
-    if (!this.currentLesson.lessonName.en && !this.currentLesson.lessonName.ta && !this.currentLesson.lessonName.si) {
+    const { name_en, name_ta, name_si } = this.lessonFormData;
+    if (!name_en && !name_ta && !name_si) {
       this.snackBar.open('Lesson name is required in at least one language', 'Close', { duration: 3000 });
       return;
     }
@@ -156,26 +177,25 @@ export class LessonsComponent implements OnInit {
     this.isSaving = true;
     
     try {
+      const lessonName: MultilingualText = {
+        en: name_en.trim(),
+        ta: name_ta.trim(),
+        si: name_si.trim()
+      };
+      const sequenceOrder = Number(this.currentLesson.sequenceOrder) || 1;
+
       const createDto: LessonCreateDto = {
-        lessonName: this.currentLesson.lessonName,
-        sequenceOrder: this.currentLesson.sequenceOrder,
+        lessonName,
+        sequenceOrder,
         levelId: this.currentLesson.levelId
       };
 
-      if (this.isEditing) {
-        // Find the lesson to update
-        const lessonToUpdate = this.lessons.find(l => 
-          l.lessonName.en === this.currentLesson.lessonName.en && 
-          l.lessonName.ta === this.currentLesson.lessonName.ta && 
-          l.lessonName.si === this.currentLesson.lessonName.si &&
-          l.levelId === this.currentLesson.levelId
-        );
-        if (lessonToUpdate) {
-          await this.lessonApiService.update(lessonToUpdate.lessonId, createDto).toPromise();
-          // Update local array
-          const index = this.lessons.findIndex(l => l.lessonId === lessonToUpdate.lessonId);
+      if (this.isEditing && this.editingLessonId !== null) {
+        const updatedLesson = await this.lessonApiService.update(this.editingLessonId, createDto).toPromise();
+        if (updatedLesson) {
+          const index = this.lessons.findIndex(l => l.lessonId === updatedLesson.lessonId);
           if (index !== -1) {
-            this.lessons[index] = { ...this.lessons[index], lessonName: createDto.lessonName, sequenceOrder: createDto.sequenceOrder, levelId: createDto.levelId } as any;
+            this.lessons[index] = updatedLesson;
           }
         }
         this.snackBar.open('Lesson updated successfully', 'Close', { duration: 3000 });
@@ -199,17 +219,23 @@ export class LessonsComponent implements OnInit {
     }
   }
 
-  onLessonNameChange(value: MultilingualText) {
-    this.currentLesson.lessonName = value;
+  onLessonFormDataChange(value: MultilingualFormData) {
+    this.lessonFormData = value;
   }
 
   closeDialog() {
     this.showDialog = false;
     this.isEditing = false;
+    this.editingLessonId = null;
     this.currentLesson = {
       lessonName: { en: '', ta: '', si: '' },
-      sequenceOrder: 0,
+      sequenceOrder: 1,
       levelId: this.levelId
+    };
+    this.lessonFormData = {
+      name_en: '',
+      name_ta: '',
+      name_si: ''
     };
   }
 }

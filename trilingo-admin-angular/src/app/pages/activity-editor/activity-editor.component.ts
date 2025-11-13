@@ -73,6 +73,7 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
   
   private routeSubscription?: Subscription;
   private lastActivityTypeId: number | null = null;
+  private tempExerciseIdCounter = -1;
 
   constructor(
     private route: ActivatedRoute,
@@ -396,6 +397,7 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
     }
 
     try {
+      const hasDraftExercises = this.exercises.some(ex => this.isDraftExercise(ex));
       let createdOrUpdated: MultilingualActivity | undefined;
       if (this.isEditMode && this.activityId) {
         createdOrUpdated = await this.activityApiService.update(parseInt(this.activityId, 10), payload).toPromise();
@@ -406,6 +408,12 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
           this.activityId = createdOrUpdated.activityId.toString();
           this.isEditMode = true;
         }
+      }
+
+      const persistedActivityId = createdOrUpdated?.activityId || (this.activityId ? Number(this.activityId) : undefined);
+      if (hasDraftExercises && persistedActivityId) {
+        await this.persistDraftExercises(persistedActivityId);
+        await this.reloadExercises(persistedActivityId);
       }
 
       this.snackBar.open('Activity saved successfully!', 'Close', { duration: 3000 });
@@ -425,11 +433,6 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
 
   // Exercise CRUD methods
   async handleAddExercise(): Promise<void> {
-    if (!this.activityId) {
-      this.snackBar.open('Please save the activity first before adding exercises.', 'Close', { duration: 5000 });
-      return;
-    }
-
     const typeId = Number(this.activity?.activityTypeId || 0);
     let jsonTemplate = '{}';
     
@@ -439,6 +442,25 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
       } catch (error) {
         console.error('Failed to get template:', error);
       }
+    }
+
+    if (!this.activityId) {
+      const tempId = this.tempExerciseIdCounter--;
+      const now = new Date().toISOString();
+      const draftExercise = {
+        id: tempId,
+        activityId: 0,
+        jsonData: jsonTemplate,
+        sequenceOrder: this.exercises.length + 1,
+        createdAt: now,
+        updatedAt: now,
+        isDraft: true
+      } as Exercise & { isDraft: true };
+
+      this.exercises = [...this.exercises, draftExercise];
+      this.expandedExercise = this.exercises.length - 1;
+      this.snackBar.open('புதிய உடற்பயிற்சி வரைவு உருவாக்கப்பட்டது. செயல்பாட்டைச் சேமிக்கும்போது இது சேமிக்கப்படும்.', 'Close', { duration: 4000 });
+      return;
     }
 
     const createDto: CreateExerciseDto = {
@@ -461,6 +483,18 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
   }
 
   async handleUpdateExercise(exerciseId: number, jsonData: string): Promise<void> {
+    const index = this.exercises.findIndex(ex => ex.id === exerciseId);
+    if (index === -1) {
+      return;
+    }
+
+    const targetExercise = this.exercises[index];
+    if (this.isDraftExercise(targetExercise)) {
+      this.exercises[index] = { ...targetExercise, jsonData, updatedAt: new Date().toISOString() };
+      this.snackBar.open('வரைவு உடற்பயிற்சி புதுப்பிக்கப்பட்டது!', 'Close', { duration: 2000 });
+      return;
+    }
+
     try {
       // Validate JSON
       JSON.parse(jsonData);
@@ -486,12 +520,26 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const index = this.exercises.findIndex(ex => ex.id === exerciseId);
+    if (index === -1) {
+      return;
+    }
+
+    const exercise = this.exercises[index];
+    if (this.isDraftExercise(exercise)) {
+      this.exercises = this.exercises.filter(ex => ex.id !== exerciseId);
+      this.resequenceExercises();
+      this.snackBar.open('வரைவு உடற்பயிற்சி நீக்கப்பட்டது.', 'Close', { duration: 2000 });
+      return;
+    }
+
     const confirmed = confirm('Are you sure you want to delete this exercise?');
     if (!confirmed) return;
 
     try {
       await this.exerciseApiService.delete(exerciseId).toPromise();
       this.exercises = this.exercises.filter(ex => ex.id !== exerciseId);
+      this.resequenceExercises();
       this.snackBar.open('Exercise deleted successfully!', 'Close', { duration: 2000 });
     } catch (error) {
       console.error('Failed to delete exercise:', error);
@@ -612,5 +660,63 @@ export class ActivityEditorPageComponent implements OnInit, OnDestroy {
 
   handleSetExpandedWrapper(event: any): void {
     this.handleSetExpanded(event as number);
+  }
+
+  private isDraftExercise(exercise: Exercise): exercise is Exercise & { isDraft?: boolean } {
+    return (exercise as any).isDraft === true || exercise.id < 0 || !exercise.activityId;
+  }
+
+  private resequenceExercises(): void {
+    this.exercises = this.exercises.map((exercise, index) => ({
+      ...exercise,
+      sequenceOrder: index + 1
+    }));
+  }
+
+  private async persistDraftExercises(activityId: number): Promise<void> {
+    const drafts = this.exercises.filter(ex => this.isDraftExercise(ex));
+    if (drafts.length === 0) {
+      return;
+    }
+
+    const replacementMap = new Map<number, Exercise>();
+    for (const draft of drafts) {
+      const createDto: CreateExerciseDto = {
+        activityId,
+        jsonData: draft.jsonData,
+        sequenceOrder: draft.sequenceOrder
+      };
+
+      try {
+        const created = await this.exerciseApiService.create(createDto).toPromise();
+        if (created) {
+          replacementMap.set(draft.id, created);
+        }
+      } catch (error) {
+        console.error('Failed to persist draft exercise:', error);
+        this.snackBar.open('ஒரு வரைவு உடற்பயிற்சியைச் சேமிக்க முடியவில்லை. பின்னர் முயற்சிக்கவும்.', 'Close', { duration: 5000 });
+      }
+    }
+
+    if (replacementMap.size > 0) {
+      this.exercises = this.exercises.map(exercise => {
+        if (this.isDraftExercise(exercise)) {
+          const replacement = replacementMap.get(exercise.id);
+          return replacement ? replacement : exercise;
+        }
+        return exercise;
+      });
+    }
+  }
+
+  private async reloadExercises(activityId: number): Promise<void> {
+    try {
+      const refreshed = await this.exerciseApiService.getByActivityId(activityId).toPromise();
+      if (refreshed) {
+        this.exercises = refreshed;
+      }
+    } catch (error) {
+      console.error('Failed to reload exercises after saving drafts:', error);
+    }
   }
 }
