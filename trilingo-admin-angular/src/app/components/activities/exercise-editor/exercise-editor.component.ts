@@ -292,4 +292,8 @@ export class ExerciseEditorComponent {
   onExpansionChange(index: number, isExpanded: boolean): void {
     this.expansionChange.emit({ index, isExpanded });
   }
+
+  isDraft(exercise: Exercise): boolean {
+    return (exercise as any).isDraft === true || exercise.id < 0 || !exercise.activityId;
+  }
 }

@@ -1,105 +1,122 @@
-.exercises-list-page {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
+.table-page-wrapper {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-.header {
-  margin-bottom: 24px;
-  background: white;
-  padding: 20px 24px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.table-card {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  display: block;
 }
 
-.header-content {
+.spacer {
+  flex: 1 1 auto;
+}
+
+mat-card-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+  padding: 20px 24px;
+  width: 100%;
+  box-sizing: border-box;
   gap: 16px;
 }
 
-.header h1 {
-  margin: 0;
-  flex: 1;
-  color: #333;
-  font-size: 1.75rem;
-  font-weight: 500;
-}
-
 .back-button {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
+  font-weight: 600;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px;
+  min-height: 300px;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
 }
 
 .exercises-table {
   width: 100%;
-  background: white;
+  min-width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  display: table;
 }
 
-.exercises-table th {
-  background-color: #f5f5f5;
+.mat-mdc-cell, .mat-mdc-header-cell {
+  padding: 16px 24px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mat-mdc-header-cell {
   font-weight: 600;
-  color: #333;
-  padding: 16px;
+  font-size: 14px;
+  color: #374151;
+  background-color: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.exercises-table td {
-  padding: 16px;
-  border-bottom: 1px solid #e0e0e0;
+.mat-mdc-cell {
+  color: #1f2937;
+  font-size: 14px;
+  border-bottom: 1px solid #f3f4f6;
 }
 
-.exercise-row {
-  transition: background-color 0.2s;
-}
-
-.exercise-row:hover {
-  background-color: #f9f9f9;
+.mat-mdc-row:hover .mat-mdc-cell {
+  background-color: #f9fafb;
 }
 
 .exercise-number {
-  display: inline-block;
-  background-color: #2196f3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  text-align: center;
-  line-height: 32px;
   font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .json-snippet {
   max-width: 500px;
   font-family: 'Courier New', monospace;
   font-size: 0.85rem;
-  background-color: #f5f5f5;
+  background-color: #f9fafb;
   padding: 8px 12px;
-  border-radius: 4px;
-  border-left: 3px solid #2196f3;
+  border-radius: 6px;
+  border-left: 3px solid #667eea;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .json-snippet code {
-  color: #333;
-}
-
-.date-text {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 8px;
-  align-items: center;
+  color: #1f2937;
 }
 
 .empty-state {
-  margin-top: 24px;
+  min-height: 300px;
 }
 
 .empty-content {
@@ -107,56 +124,26 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px 24px;
-  text-align: center;
-}
-
-.empty-content mat-icon {
-  font-size: 64px;
-  width: 64px;
-  height: 64px;
-  color: #999;
-  margin-bottom: 16px;
-}
-
-.empty-content h2 {
-  margin: 0 0 8px 0;
-  color: #333;
-  font-weight: 500;
-}
-
-.empty-content p {
-  margin: 0 0 24px 0;
-  color: #666;
-}
-
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 48px;
-  gap: 16px;
-}
-
-.loading-container p {
-  color: #666;
-  margin: 0;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
-  .exercises-list-page {
-    padding: 16px;
-  }
-
-  .header-content {
+  mat-card-header {
     flex-direction: column;
-    align-items: flex-start;
+    gap: 16px;
+    align-items: stretch;
   }
 
-  .header h1 {
-    font-size: 1.5rem;
+  .header-leading,
+  .header-title,
+  .header-trailing {
+    flex: none;
+    justify-content: center;
+  }
+
+  mat-card-title {
+    text-align: center !important;
+    font-size: 1.25rem !important;
   }
 
   .json-snippet {
