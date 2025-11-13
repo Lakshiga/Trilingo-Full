@@ -107,27 +107,43 @@
             <mat-icon>close</mat-icon>
           </button>
         </div>
-        
-        <form class="lesson-form" (ngSubmit)="saveLesson()">
-          <app-multilingual-input
-            [value]="currentLesson.lessonName"
-            [label]="'Lesson Name'"
-            [required]="true"
-            (valueChange)="onLessonNameChange($event)">
-          </app-multilingual-input>
+    
+        <form class="lesson-dialog-form" (ngSubmit)="saveLesson()">
+          <app-multilingual-form
+            [title]="dialogTitle"
+            [fieldLabel]="'Lesson Name'"
+            [showDescription]="false"
+            [showActions]="false"
+            [initialData]="lessonFormData"
+            (dataChange)="onLessonFormDataChange($event)">
+          </app-multilingual-form>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Sequence Order</mat-label>
-            <input matInput type="number" [(ngModel)]="currentLesson.sequenceOrder" name="sequenceOrder" required>
-          </mat-form-field>
+          <div class="sequence-section">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Sequence Order</mat-label>
+              <input
+                matInput
+                type="number"
+                min="1"
+                name="sequenceOrder"
+                [(ngModel)]="currentLesson.sequenceOrder"
+                required>
+            </mat-form-field>
+            <p class="sequence-helper">
+              Determines the lesson position within the selected level.
+            </p>
+          </div>
 
-          <div class="form-actions">
-            <button mat-button type="button" (click)="closeDialog()" [disabled]="isSaving">Cancel</button>
-            <button mat-raised-button color="primary" type="submit" [disabled]="isSaving">
-              <mat-spinner *ngIf="isSaving" diameter="20"></mat-spinner>
-              {{ isEditing ? 'Update' : 'Add' }} Lesson
+          <div class="dialog-actions">
+            <button mat-stroked-button type="button" (click)="closeDialog()" [disabled]="isSaving">
+              Cancel
+            </button>
+            <button mat-flat-button color="primary" type="submit" [disabled]="isSaving">
+              <mat-spinner *ngIf="isSaving" diameter="18"></mat-spinner>
+              <span *ngIf="!isSaving">{{ isEditing ? 'Update' : 'Add' }} Lesson</span>
             </button>
           </div>
         </form>
       </div>
     </div>
+    

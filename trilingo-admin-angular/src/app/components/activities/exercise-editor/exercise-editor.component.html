@@ -3,18 +3,7 @@
     <mat-card-title>Exercises</mat-card-title>
   </mat-card-header>
   
-  <mat-card-content>
-    <div class="exercises-info">
-      <p>Each exercise represents one instance of the selected activity type. 
-         Use the template as a guide to fill in your content.</p>
-    </div>
-    
-    <div *ngIf="exercises.length === 0 && activityId" class="no-exercises-message">
-      <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: #999;">assignment</mat-icon>
-      <p style="margin-top: 16px; font-size: 1.1rem;">No exercises yet</p>
-      <p style="margin-top: 8px; color: #999;">Click "Add Another Exercise" to create your first exercise.</p>
-    </div>
-    
+  <mat-card-content>   
     <mat-accordion multi="false">
       <mat-expansion-panel 
         *ngFor="let exercise of exercises; let i = index"
@@ -90,17 +79,12 @@
         </div>
       </mat-expansion-panel>
     </mat-accordion>
-    
-    <div *ngIf="!activityId" class="info-message" style="margin-bottom: 16px;">
-      <mat-icon style="vertical-align: middle; margin-right: 8px;">info</mat-icon>
-      <strong>Save the activity first</strong> by clicking the "💾 SAVE ENTIRE ACTIVITY" button at the top of the page, then you can add exercises here.
-    </div>
+  
     
     <button 
       mat-raised-button 
-      [color]="activityId ? 'primary' : 'default'"
-      (click)="onAddExercise()" 
-      [disabled]="!activityId"
+      [color]="activityId ? 'primary' : 'accent'"
+      (click)="onAddExercise()"
       class="add-exercise-button">
       <mat-icon>add_circle_outline</mat-icon>
       Add Exercise
