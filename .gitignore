@@ -38,6 +38,7 @@ icedt-admin-angular/dist/
 .expo/web-cache/
 .packager
 metro-cache/
+
 # React Native platform folders (not present yet but safe to ignore if generated)
 android/
 ios/

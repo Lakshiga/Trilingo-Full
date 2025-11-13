@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -36,6 +36,10 @@ namespace TES_Learning_App.Domain.Entities
         //public Student? Student { get; set; }
         // A User (Parent) can have a collection of Student (Child) profiles.
         public ICollection<Student> StudentProfiles { get; set; } = new List<Student>();
+
+        // Profile image URL
+        [StringLength(500)]
+        public string? ProfileImageUrl { get; set; }
 
         // One-to-one relationship with an Admin profile
         public Admin? AdminProfile { get; set; }
