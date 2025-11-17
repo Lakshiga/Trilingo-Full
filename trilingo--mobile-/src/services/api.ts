@@ -52,10 +52,42 @@ export interface User {
   isGuest: boolean;
 }
 
+// Activity DTO from backend
+export interface ActivityDto {
+  id: number;
+  details_JSON?: string;
+  stageId: number;
+  mainActivityId: number;
+  activityTypeId: number;
+  name_en: string;
+  name_ta: string;
+  name_si: string;
+  sequenceOrder: number;
+}
+
+// Exercise DTO from backend
+export interface ExerciseDto {
+  id: number;
+  activityId: number;
+  jsonData: string;
+  sequenceOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// MainActivity DTO from backend (for Songs/Videos)
+export interface MainActivityDto {
+  id: number;
+  name_en: string;
+  name_ta: string;
+  name_si: string;
+}
+
 class ApiService {
   private api: AxiosInstance;
 
   constructor() {
+    console.log('Initializing API Service with base URL:', API_BASE_URL);
     this.api = axios.create({
       baseURL: API_BASE_URL,
       timeout: API_TIMEOUT,
@@ -71,6 +103,12 @@ class ApiService {
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
+        
+        // For FormData, remove Content-Type to let axios set it with boundary
+        if (config.data instanceof FormData) {
+          delete config.headers['Content-Type'];
+        }
+        
         return config;
       },
       (error) => {
@@ -228,29 +266,107 @@ class ApiService {
   // Upload profile image
   async uploadProfileImage(imageUri: string): Promise<AuthResponse> {
     try {
+      // Log the API base URL being used
+      console.log('API Base URL:', this.api.defaults.baseURL);
+      console.log('Upload endpoint:', '/auth/upload-profile-image');
+      console.log('Full URL:', `${this.api.defaults.baseURL}/auth/upload-profile-image`);
+      
+      // Get file extension from URI
+      let fileExtension = 'jpg';
+      let mimeType = 'image/jpeg';
+      
+      // Extract extension from URI (handle query params)
+      const uriWithoutQuery = imageUri.split('?')[0];
+      const uriParts = uriWithoutQuery.split('.');
+      if (uriParts.length > 1) {
+        const ext = uriParts[uriParts.length - 1].toLowerCase();
+        fileExtension = ext;
+        
+        // Map extension to MIME type
+        switch (ext) {
+          case 'png':
+            mimeType = 'image/png';
+            break;
+          case 'jpg':
+          case 'jpeg':
+            mimeType = 'image/jpeg';
+            break;
+          case 'gif':
+            mimeType = 'image/gif';
+            break;
+          case 'webp':
+            mimeType = 'image/webp';
+            break;
+          default:
+            mimeType = 'image/jpeg';
+        }
+      }
+
+      // Create FormData for React Native
       const formData = new FormData();
       
-      // For React Native, we need to format the file data properly
-      const uriParts = imageUri.split('.');
-      const fileType = uriParts[uriParts.length - 1];
-      
-      formData.append('file', {
+      // React Native FormData format - must match backend expectation
+      const fileData = {
         uri: imageUri,
-        name: `profile.${fileType}`,
-        type: `image/${fileType}`,
-      } as any);
+        name: `profile_${Date.now()}.${fileExtension}`,
+        type: mimeType,
+      };
+      
+      console.log('File data:', {
+        name: fileData.name,
+        type: fileData.type,
+        uri: imageUri.substring(0, 50) + '...', // Log partial URI
+      });
+      
+      formData.append('file', fileData as any);
 
+      // Get auth token for the request
+      const token = await this.getAuthToken();
+      console.log('Auth token present:', !!token);
+      
+      // Make the request - interceptor will handle auth token and Content-Type
       const response = await this.api.post<AuthResponse>(
         '/auth/upload-profile-image',
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            'Accept': 'application/json',
+            // Don't set Content-Type - let axios set it automatically for FormData
+          },
+          // Increase timeout for file uploads
+          timeout: 30000, // 30 seconds
+          // Add transform request to handle FormData properly
+          transformRequest: (data, headers) => {
+            // Remove Content-Type to let axios set it with boundary
+            if (data instanceof FormData) {
+              delete headers['Content-Type'];
+            }
+            return data;
           },
         }
       );
+      
+      console.log('Upload successful:', response.data);
       return response.data;
     } catch (error: any) {
+      console.error('Upload error details:', {
+        message: error.message,
+        code: error.code,
+        response: error.response?.data,
+        status: error.response?.status,
+        baseURL: this.api.defaults.baseURL,
+        url: error.config?.url,
+        fullURL: error.config ? `${error.config.baseURL}${error.config.url}` : 'unknown',
+      });
+      
+      // Provide more specific error message
+      if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error') {
+        throw new Error(
+          `Network error: Cannot connect to ${this.api.defaults.baseURL}. ` +
+          `Please check your internet connection and ensure the backend is accessible.`
+        );
+      }
+      
       throw this.handleError(error);
     }
   }
@@ -271,6 +387,91 @@ class ApiService {
       const response = await this.api.put<AuthResponse>('/auth/update-profile', data);
       return response.data;
     } catch (error: any) {
+      throw this.handleError(error);
+    }
+  }
+
+  // Activity Methods
+  async getAllActivities(): Promise<ActivityDto[]> {
+    try {
+      // Backend returns activities directly, not wrapped in ApiResponse
+      const response = await this.api.get<ActivityDto[]>('/activities');
+      // Backend returns Ok(activities) which becomes response.data
+      return Array.isArray(response.data) ? response.data : [];
+    } catch (error: any) {
+      console.error('Failed to fetch activities:', error);
+      throw this.handleError(error);
+    }
+  }
+
+  async getActivityById(id: number): Promise<ActivityDto | null> {
+    try {
+      const response = await this.api.get<ActivityDto>(`/activities/${id}`);
+      return response.data || null;
+    } catch (error: any) {
+      console.error(`Failed to fetch activity ${id}:`, error);
+      throw this.handleError(error);
+    }
+  }
+
+  async getActivitiesByStage(stageId: number): Promise<ActivityDto[]> {
+    try {
+      const response = await this.api.get<ActivityDto[]>(`/activities/stage/${stageId}`);
+      return Array.isArray(response.data) ? response.data : [];
+    } catch (error: any) {
+      console.error(`Failed to fetch activities for stage ${stageId}:`, error);
+      throw this.handleError(error);
+    }
+  }
+
+  // Exercise Methods
+  async getAllExercises(): Promise<ExerciseDto[]> {
+    try {
+      const response = await this.api.get<ExerciseDto[]>('/exercises');
+      return Array.isArray(response.data) ? response.data : [];
+    } catch (error: any) {
+      console.error('Failed to fetch exercises:', error);
+      throw this.handleError(error);
+    }
+  }
+
+  async getExerciseById(id: number): Promise<ExerciseDto | null> {
+    try {
+      const response = await this.api.get<ExerciseDto>(`/exercises/${id}`);
+      return response.data || null;
+    } catch (error: any) {
+      console.error(`Failed to fetch exercise ${id}:`, error);
+      throw this.handleError(error);
+    }
+  }
+
+  async getExercisesByActivityId(activityId: number): Promise<ExerciseDto[]> {
+    try {
+      const response = await this.api.get<ExerciseDto[]>(`/activities/${activityId}/exercises`);
+      return Array.isArray(response.data) ? response.data : [];
+    } catch (error: any) {
+      console.error(`Failed to fetch exercises for activity ${activityId}:`, error);
+      throw this.handleError(error);
+    }
+  }
+
+  // MainActivity Methods (for Songs/Videos)
+  async getAllMainActivities(): Promise<MainActivityDto[]> {
+    try {
+      const response = await this.api.get<MainActivityDto[]>('/mainactivities');
+      return Array.isArray(response.data) ? response.data : [];
+    } catch (error: any) {
+      console.error('Failed to fetch main activities:', error);
+      throw this.handleError(error);
+    }
+  }
+
+  async getMainActivityById(id: number): Promise<MainActivityDto | null> {
+    try {
+      const response = await this.api.get<MainActivityDto>(`/mainactivities/${id}`);
+      return response.data || null;
+    } catch (error: any) {
+      console.error(`Failed to fetch main activity ${id}:`, error);
       throw this.handleError(error);
     }
   }

@@ -1,15 +1,18 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../theme/ThemeContext';
+import apiService, { ActivityDto } from '../services/api';
+import { CLOUDFRONT_URL } from '../config/apiConfig';
 
 type Video = {
   id: string;
   title: string;
   description: string;
   duration: string;
+  videoUrl?: string;
   emoji: string;
   gradient: readonly [string, string];
   category: string;
@@ -18,63 +21,120 @@ type Video = {
 const VideosScreen: React.FC = () => {
   const navigation = useNavigation();
   const { theme } = useTheme();
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const videos: Video[] = [
-    {
-      id: '1',
-      title: 'Introduction to Learning',
-      description: 'Get started with our educational content',
-      duration: '5:30',
-      emoji: '🎓',
-      gradient: ['#667EEA', '#764BA2'] as const,
-      category: 'Basics',
-    },
-    {
-      id: '2',
-      title: 'Advanced Concepts',
-      description: 'Deep dive into complex topics',
-      duration: '8:15',
-      emoji: '🧠',
-      gradient: ['#F093FB', '#F5576C'] as const,
-      category: 'Advanced',
-    },
-    {
-      id: '3',
-      title: 'Fun Learning Activities',
-      description: 'Interactive educational content',
-      duration: '6:45',
-      emoji: '🎮',
-      gradient: ['#4FACFE', '#00F2FE'] as const,
-      category: 'Activities',
-    },
-    {
-      id: '4',
-      title: 'Science Adventures',
-      description: 'Explore the wonders of science',
-      duration: '7:20',
-      emoji: '🔬',
-      gradient: ['#43E97B', '#38F9D7'] as const,
-      category: 'Science',
-    },
-    {
-      id: '5',
-      title: 'Math Magic',
-      description: 'Learn math in a fun way',
-      duration: '6:00',
-      emoji: '🔢',
-      gradient: ['#FA709A', '#FEE140'] as const,
-      category: 'Math',
-    },
-    {
-      id: '6',
-      title: 'Storytime Adventures',
-      description: 'Listen to amazing stories',
-      duration: '10:30',
-      emoji: '📚',
-      gradient: ['#30CFD0', '#330867'] as const,
-      category: 'Stories',
-    },
-  ];
+  // Fetch videos from backend (Activities with ActivityTypeId = 7 for Story Player or video content)
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        setLoading(true);
+        const allActivities = await apiService.getAllActivities();
+        
+        // Filter activities with ActivityTypeId = 7 (Story Player) or activities with videoUrl in Details_JSON
+        const videoActivities = allActivities.filter(activity => {
+          if (activity.activityTypeId === 7) return true; // Story Player
+          
+          // Check if Details_JSON contains videoUrl
+          if (activity.details_JSON) {
+            try {
+              const parsed = JSON.parse(activity.details_JSON);
+              return parsed.videoUrl || parsed.mediaUrl;
+            } catch (e) {
+              return false;
+            }
+          }
+          return false;
+        });
+        
+        // Map activities to videos
+        const mappedVideos: Video[] = videoActivities.map((activity, index) => {
+          let videoData: any = {};
+          
+          // Parse Details_JSON to get video data
+          if (activity.details_JSON) {
+            try {
+              const parsed = JSON.parse(activity.details_JSON);
+              videoData = parsed;
+            } catch (e) {
+              console.error('Error parsing video JSON:', e);
+            }
+          }
+
+          // Get video URL from AWS (CloudFront)
+          let videoUrl = '';
+          if (videoData.videoUrl) {
+            videoUrl = videoData.videoUrl;
+            if (!videoUrl.startsWith('http')) {
+              videoUrl = videoUrl.startsWith('/')
+                ? `${CLOUDFRONT_URL}${videoUrl}`
+                : `${CLOUDFRONT_URL}/${videoUrl}`;
+            }
+          } else if (videoData.mediaUrl) {
+            videoUrl = videoData.mediaUrl;
+            if (!videoUrl.startsWith('http')) {
+              videoUrl = videoUrl.startsWith('/')
+                ? `${CLOUDFRONT_URL}${videoUrl}`
+                : `${CLOUDFRONT_URL}/${videoUrl}`;
+            }
+          }
+
+          // Get title (multilingual)
+          const title = videoData.title 
+            ? (typeof videoData.title === 'object' 
+                ? (videoData.title.en || videoData.title.ta || videoData.title.si || activity.name_en)
+                : videoData.title)
+            : activity.name_en || activity.name_ta || activity.name_si || 'Video';
+
+          // Get description (multilingual)
+          const description = videoData.instruction || videoData.description
+            ? (typeof (videoData.instruction || videoData.description) === 'object'
+                ? ((videoData.instruction || videoData.description).en || 
+                   (videoData.instruction || videoData.description).ta || 
+                   (videoData.instruction || videoData.description).si || 
+                   'Educational video')
+                : (videoData.instruction || videoData.description))
+            : 'Educational video';
+
+          // Gradients for videos
+          const gradients: readonly [string, string][] = [
+            ['#667EEA', '#764BA2'] as const,
+            ['#F093FB', '#F5576C'] as const,
+            ['#4FACFE', '#00F2FE'] as const,
+            ['#43E97B', '#38F9D7'] as const,
+            ['#FA709A', '#FEE140'] as const,
+            ['#30CFD0', '#330867'] as const,
+          ];
+
+          return {
+            id: activity.id.toString(),
+            title: title,
+            description: description,
+            duration: '0:00', // Duration can be calculated from video if needed
+            videoUrl: videoUrl,
+            emoji: '📹',
+            gradient: gradients[index % gradients.length],
+            category: 'Education',
+          };
+        });
+
+        setVideos(mappedVideos);
+      } catch (error: any) {
+        console.error('Error fetching videos:', error);
+        Alert.alert(
+          'Error',
+          'Could not load videos. Please try again.',
+          [{ text: 'OK' }]
+        );
+        // Use empty array on error
+        setVideos([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVideos();
+  }, []);
 
   return (
     <LinearGradient colors={theme.videosBackground} style={styles.container}>
@@ -99,14 +159,24 @@ const VideosScreen: React.FC = () => {
         </View>
       </View>
 
+      {/* Loading Indicator */}
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#fff" />
+          <Text style={styles.loadingText}>Loading videos...</Text>
+        </View>
+      )}
+
       {/* Videos List */}
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {videos.map((video, index) => (
-          <TouchableOpacity key={video.id} activeOpacity={0.8} style={styles.videoCard}>
+      {!loading && (
+        <ScrollView
+          style={styles.content}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {videos.length > 0 ? (
+            videos.map((video, index) => (
+              <TouchableOpacity key={video.id} activeOpacity={0.8} style={styles.videoCard}>
             <LinearGradient
               colors={video.gradient}
               start={{ x: 0, y: 0 }}
@@ -143,12 +213,19 @@ const VideosScreen: React.FC = () => {
                   {video.description}
                 </Text>
               </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        ))}
-        
-        <View style={styles.bottomSpacing} />
-      </ScrollView>
+              </LinearGradient>
+            </TouchableOpacity>
+            ))
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No videos available yet.</Text>
+              <Text style={styles.emptySubtext}>Check back later!</Text>
+            </View>
+          )}
+          
+          <View style={styles.bottomSpacing} />
+        </ScrollView>
+      )}
     </LinearGradient>
   );
 };
@@ -321,6 +398,35 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 50,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#fff',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 50,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#fff',
+    textAlign: 'center',
+    opacity: 0.8,
   },
 });
 

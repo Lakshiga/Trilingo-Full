@@ -26,6 +26,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "apiBaseUrl": "http://localhost:5166/api",
+      "cloudFrontUrl": "https://d3v81eez8ecmto.cloudfront.net"
     }
   }
 }

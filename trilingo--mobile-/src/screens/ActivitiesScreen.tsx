@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { 
   View, 
   Text, 
@@ -6,12 +6,15 @@ import {
   TouchableOpacity, 
   ScrollView,
   Animated,
-  Dimensions
+  Dimensions,
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../theme/ThemeContext';
+import apiService, { ActivityDto } from '../services/api';
 
 const { width } = Dimensions.get('window');
 
@@ -24,7 +27,8 @@ interface Activity {
   description: string;
 }
 
-const activities: Activity[] = [
+// Default activities as fallback
+const defaultActivities: Activity[] = [
   {
     id: 1,
     title: 'Puzzles',
@@ -75,16 +79,106 @@ const activities: Activity[] = [
   },
 ];
 
+// Map backend ActivityDto to mobile Activity interface
+const mapActivityDtoToActivity = (dto: ActivityDto, index: number): Activity => {
+  // Icon mapping based on activity type or name
+  const iconMap: { [key: string]: keyof typeof MaterialIcons.glyphMap } = {
+    'puzzle': 'extension',
+    'memory': 'psychology',
+    'quiz': 'quiz',
+    'drawing': 'brush',
+    'word': 'search',
+    'counting': 'calculate',
+    'default': 'extension',
+  };
+
+  // Get icon based on activity name (case-insensitive)
+  const nameLower = dto.name_en.toLowerCase();
+  let icon: keyof typeof MaterialIcons.glyphMap = 'extension';
+  for (const [key, value] of Object.entries(iconMap)) {
+    if (nameLower.includes(key)) {
+      icon = value;
+      break;
+    }
+  }
+
+  // Color gradients array (cycling through)
+  const gradients: readonly [string, string, ...string[]][] = [
+    ['#FF6B9D', '#C06C84'] as const,
+    ['#4ECDC4', '#44A08D'] as const,
+    ['#FFD93D', '#F9A826'] as const,
+    ['#A8E6CF', '#56C596'] as const,
+    ['#B4A7D6', '#8E7CC3'] as const,
+    ['#FFDAB9', '#FFC09F'] as const,
+  ];
+
+  return {
+    id: dto.id,
+    title: dto.name_en || dto.name_ta || dto.name_si || 'Activity',
+    icon: icon,
+    color: gradients[index % gradients.length][0],
+    gradient: gradients[index % gradients.length],
+    description: (() => {
+      try {
+        if (dto.details_JSON) {
+          const parsed = JSON.parse(dto.details_JSON);
+          return parsed.description || 'Fun activity';
+        }
+        return 'Fun activity';
+      } catch (e) {
+        return 'Fun activity';
+      }
+    })(),
+  };
+};
+
 const ActivitiesScreen: React.FC = () => {
   const navigation = useNavigation();
   const { theme, isDarkMode } = useTheme();
+  const [activities, setActivities] = useState<Activity[]>(defaultActivities);
+  const [loading, setLoading] = useState(true);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
-  const cardAnimations = useRef(
-    activities.map(() => new Animated.Value(0))
-  ).current;
+  const cardAnimations = useRef<Animated.Value[]>([]);
 
+  // Fetch activities from backend
   useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        setLoading(true);
+        const backendActivities = await apiService.getAllActivities();
+        
+        if (backendActivities && backendActivities.length > 0) {
+          // Map backend activities to mobile format
+          const mappedActivities = backendActivities.map((dto, index) => 
+            mapActivityDtoToActivity(dto, index)
+          );
+          setActivities(mappedActivities);
+        } else {
+          // Use default activities if backend returns empty
+          setActivities(defaultActivities);
+        }
+      } catch (error: any) {
+        console.error('Error fetching activities:', error);
+        // Use default activities on error
+        setActivities(defaultActivities);
+        Alert.alert(
+          'Connection Error',
+          'Could not load activities from server. Showing default activities.',
+          [{ text: 'OK' }]
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchActivities();
+  }, []);
+
+  // Update card animations when activities change
+  useEffect(() => {
+    cardAnimations.current = activities.map(() => new Animated.Value(0));
+    
     // Header animation
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -100,17 +194,19 @@ const ActivitiesScreen: React.FC = () => {
     ]).start();
 
     // Staggered card animations
-    const animations = cardAnimations.map((anim, index) =>
-      Animated.timing(anim, {
-        toValue: 1,
-        duration: 500,
-        delay: index * 100,
-        useNativeDriver: true,
-      })
-    );
+    if (cardAnimations.current.length > 0) {
+      const animations = cardAnimations.current.map((anim, index) =>
+        Animated.timing(anim, {
+          toValue: 1,
+          duration: 500,
+          delay: index * 100,
+          useNativeDriver: true,
+        })
+      );
 
-    Animated.stagger(100, animations).start();
-  }, []);
+      Animated.stagger(100, animations).start();
+    }
+  }, [activities]);
 
   const ActivityCard = ({ activity, index }: { activity: Activity; index: number }) => {
     const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -131,12 +227,26 @@ const ActivitiesScreen: React.FC = () => {
       }).start();
     };
 
+    const handlePress = () => {
+      // Navigate to ExerciseScreen with activity details
+      (navigation as any).navigate('Exercise', {
+        activity: {
+          id: activity.id,
+          title: activity.title,
+          description: activity.description,
+        },
+      });
+    };
+
+    // Ensure we have a valid animation value
+    const animValue = cardAnimations.current[index] || new Animated.Value(1);
+    
     const cardStyle = {
-      opacity: cardAnimations[index],
+      opacity: animValue,
       transform: [
         { scale: scaleAnim },
         {
-          translateY: cardAnimations[index].interpolate({
+          translateY: animValue.interpolate({
             inputRange: [0, 1],
             outputRange: [50, 0],
           }),
@@ -150,6 +260,7 @@ const ActivitiesScreen: React.FC = () => {
           activeOpacity={0.9}
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
+          onPress={handlePress}
         >
           <LinearGradient
             colors={activity.gradient}
@@ -202,12 +313,32 @@ const ActivitiesScreen: React.FC = () => {
             <Text style={[styles.subtitle, { color: theme.textSecondary }]}>Choose your adventure</Text>
           </Animated.View>
 
+          {/* Loading Indicator */}
+          {loading && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={theme.textPrimary || '#4ECDC4'} />
+              <Text style={[styles.loadingText, { color: theme.textSecondary }]}>
+                Loading activities...
+              </Text>
+            </View>
+          )}
+
           {/* Activity Cards Grid */}
-          <View style={styles.cardsContainer}>
-            {activities.map((activity, index) => (
-              <ActivityCard key={activity.id} activity={activity} index={index} />
-            ))}
-          </View>
+          {!loading && (
+            <View style={styles.cardsContainer}>
+              {activities.length > 0 ? (
+                activities.map((activity, index) => (
+                  <ActivityCard key={activity.id} activity={activity} index={index} />
+                ))
+              ) : (
+                <View style={styles.emptyContainer}>
+                  <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
+                    No activities available
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
         </ScrollView>
       </LinearGradient>
     </View>
@@ -314,6 +445,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 50,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 50,
+  },
+  emptyText: {
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

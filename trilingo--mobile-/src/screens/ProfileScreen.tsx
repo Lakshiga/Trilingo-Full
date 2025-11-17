@@ -237,17 +237,23 @@ export default function ProfileScreen() {
           } else {
             // For regular users, upload to backend first
             try {
+              console.log('Uploading image to backend...', imageUri);
               const response = await apiService.uploadProfileImage(imageUri);
+              console.log('Upload response:', response);
+              
               if (response.isSuccess && response.profileImageUrl) {
                 // Update context with SERVER URL from backend (not local file URI)
                 const serverUrl = response.profileImageUrl;
                 await updateUser({ profileImageUrl: serverUrl });
                 setProfileImage(serverUrl); // Update local state with server URL
                 Alert.alert('Success', 'Profile image uploaded successfully!');
+              } else {
+                Alert.alert('Error', response.message || 'Failed to upload image. Please try again.');
               }
             } catch (error: any) {
               console.error('Failed to upload profile image:', error);
-              Alert.alert('Error', 'Failed to upload image. Please try again.');
+              const errorMessage = error.message || 'Failed to upload image. Please check your connection and try again.';
+              Alert.alert('Upload Error', errorMessage);
             }
           }
         }

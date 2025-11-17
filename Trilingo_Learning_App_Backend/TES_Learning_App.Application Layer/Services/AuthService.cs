@@ -21,50 +21,91 @@ namespace TES_Learning_App.Application_Layer.Services
         private readonly IUnitOfWork _unitOfWork;
         //private readonly IAuthRepository _authRepository;
         private readonly ITokenService _tokenService;
+        private readonly IS3Service _s3Service;
         //public AuthService(IAuthRepository authRepository, ITokenService tokenService)
-        public AuthService(IUnitOfWork unitOfWork, ITokenService tokenService)
+        public AuthService(IUnitOfWork unitOfWork, ITokenService tokenService, IS3Service s3Service)
         {
             _unitOfWork = unitOfWork;
             //_authRepository = authRepository;
             _tokenService = tokenService;
+            _s3Service = s3Service;
         }
 
         public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
         {
-            // --- MANUAL VALIDATION LOGIC ---
-            var validationErrors = ValidateLogin(dto);
-
-            // If there are any validation errors, stop immediately.
-            if (validationErrors.Any())
+            try
             {
-                // We return a failure response with a list of all the errors.
-                return new AuthResponseDto { IsSuccess = false, Message = string.Join(" ", validationErrors) };
-            }
+                // --- MANUAL VALIDATION LOGIC ---
+                var validationErrors = ValidateLogin(dto);
 
-            var user = await _unitOfWork.AuthRepository.GetUserByIdentifierAsync(dto.Identifier);
-            //var user = await _authRepository.GetUserByIdentifierAsync(dto.Identifier);
+                // If there are any validation errors, stop immediately.
+                if (validationErrors.Any())
+                {
+                    // We return a failure response with a list of all the errors.
+                    return new AuthResponseDto { IsSuccess = false, Message = string.Join(" ", validationErrors) };
+                }
 
-            if (user == null) return new AuthResponseDto { IsSuccess = false, Message = "Invalid credentials." };
+                var user = await _unitOfWork.AuthRepository.GetUserByIdentifierAsync(dto.Identifier);
+                //var user = await _authRepository.GetUserByIdentifierAsync(dto.Identifier);
 
-            using var hmac = new HMACSHA512(user.PasswordSalt);
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(dto.Password));
-            for (int i = 0; i < computedHash.Length; i++)
-            {
-                if (computedHash[i] != user.PasswordHash[i])
+                if (user == null) return new AuthResponseDto { IsSuccess = false, Message = "Invalid credentials." };
+
+                // Validate that user has password hash and salt
+                if (user.PasswordSalt == null || user.PasswordHash == null)
+                {
+                    return new AuthResponseDto { IsSuccess = false, Message = "Invalid user account configuration." };
+                }
+
+                using var hmac = new HMACSHA512(user.PasswordSalt);
+                var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(dto.Password));
+                
+                // Validate password hash length matches
+                if (computedHash.Length != user.PasswordHash.Length)
+                {
                     return new AuthResponseDto { IsSuccess = false, Message = "Invalid credentials." };
-            }
+                }
 
-            var token = _tokenService.CreateToken(user);
-            return new AuthResponseDto 
-            { 
-                IsSuccess = true, 
-                Message = "Login successful.", 
-                Token = token,
-                Username = user.Username,
-                Email = user.Email,
-                ProfileImageUrl = user.ProfileImageUrl,
-                Role = user.Role?.RoleName
-            };
+                for (int i = 0; i < computedHash.Length; i++)
+                {
+                    if (computedHash[i] != user.PasswordHash[i])
+                        return new AuthResponseDto { IsSuccess = false, Message = "Invalid credentials." };
+                }
+
+                var token = _tokenService.CreateToken(user);
+                
+                // Convert legacy local file paths to S3 URLs if needed
+                string? profileImageUrl = null;
+                try
+                {
+                    profileImageUrl = !string.IsNullOrEmpty(user.ProfileImageUrl) 
+                        ? _s3Service.GetFileUrl(user.ProfileImageUrl)
+                        : null;
+                }
+                catch
+                {
+                    // If S3 service fails, continue without profile image URL
+                    profileImageUrl = null;
+                }
+
+                return new AuthResponseDto 
+                { 
+                    IsSuccess = true, 
+                    Message = "Login successful.", 
+                    Token = token,
+                    Username = user.Username,
+                    Email = user.Email,
+                    ProfileImageUrl = profileImageUrl,
+                    Role = user.Role?.RoleName
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AuthResponseDto 
+                { 
+                    IsSuccess = false, 
+                    Message = $"An error occurred during login: {ex.Message}" 
+                };
+            }
         }
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
@@ -244,26 +285,47 @@ namespace TES_Learning_App.Application_Layer.Services
                     return new AuthResponseDto { IsSuccess = false, Message = "User not found" };
                 }
 
-                // Create uploads directory if it doesn't exist
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "profiles");
-                if (!Directory.Exists(uploadsFolder))
+                // Generate unique filename for S3
+                var fileExtension = Path.GetExtension(file.FileName);
+                var uniqueFileName = $"profiles/{user.Id}_{Guid.NewGuid()}{fileExtension}";
+
+                // Determine content type
+                var contentType = file.ContentType ?? "application/octet-stream";
+                if (contentType == "application/octet-stream")
                 {
-                    Directory.CreateDirectory(uploadsFolder);
+                    // Try to determine from extension
+                    contentType = fileExtension.ToLower() switch
+                    {
+                        ".jpg" or ".jpeg" => "image/jpeg",
+                        ".png" => "image/png",
+                        ".gif" => "image/gif",
+                        ".webp" => "image/webp",
+                        _ => "image/jpeg"
+                    };
                 }
 
-                // Generate unique filename
-                var fileExtension = Path.GetExtension(file.FileName);
-                var uniqueFileName = $"{user.Id}_{Guid.NewGuid()}{fileExtension}";
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                // Save file
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                // Upload to S3
+                string imageUrl;
+                using (var stream = file.OpenReadStream())
                 {
-                    await file.CopyToAsync(stream);
+                    imageUrl = await _s3Service.UploadFileAsync(uniqueFileName, stream, contentType);
+                }
+
+                // If user has an existing profile image in S3, delete it
+                if (!string.IsNullOrEmpty(user.ProfileImageUrl) && !user.ProfileImageUrl.StartsWith("/uploads"))
+                {
+                    // Extract the key from the URL
+                    var existingKey = user.ProfileImageUrl.Contains("/profiles/") 
+                        ? user.ProfileImageUrl.Substring(user.ProfileImageUrl.IndexOf("/profiles/") + 1)
+                        : null;
+                    
+                    if (!string.IsNullOrEmpty(existingKey))
+                    {
+                        await _s3Service.DeleteFileAsync(existingKey);
+                    }
                 }
 
                 // Update user profile image URL
-                var imageUrl = $"/uploads/profiles/{uniqueFileName}";
                 user.ProfileImageUrl = imageUrl;
                 await _unitOfWork.UserRepository.UpdateAsync(user);
                 await _unitOfWork.CompleteAsync();
@@ -296,10 +358,19 @@ namespace TES_Learning_App.Application_Layer.Services
                     return new AuthResponseDto { IsSuccess = false, Message = "User not found" };
                 }
 
+                // Convert legacy local file paths to S3 URLs if needed
+                var profileImageUrl = !string.IsNullOrEmpty(user.ProfileImageUrl) 
+                    ? _s3Service.GetFileUrl(user.ProfileImageUrl)
+                    : null;
+
                 return new AuthResponseDto 
                 { 
                     IsSuccess = true, 
-                    Message = "User profile retrieved successfully"
+                    Message = "User profile retrieved successfully",
+                    Username = user.Username,
+                    Email = user.Email,
+                    ProfileImageUrl = profileImageUrl,
+                    Role = user.Role?.RoleName
                 };
             }
             catch (Exception ex)
@@ -353,13 +424,18 @@ namespace TES_Learning_App.Application_Layer.Services
                     await _unitOfWork.CompleteAsync();
                 }
 
+                // Convert legacy local file paths to S3 URLs if needed
+                var profileImageUrl = !string.IsNullOrEmpty(user.ProfileImageUrl) 
+                    ? _s3Service.GetFileUrl(user.ProfileImageUrl)
+                    : null;
+
                 return new AuthResponseDto
                 {
                     IsSuccess = true,
                     Message = "Profile updated successfully",
                     Username = user.Username,
                     Email = user.Email,
-                    ProfileImageUrl = user.ProfileImageUrl
+                    ProfileImageUrl = profileImageUrl
                 };
             }
             catch (Exception ex)

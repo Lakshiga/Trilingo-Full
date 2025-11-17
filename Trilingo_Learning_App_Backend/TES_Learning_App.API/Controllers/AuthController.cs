@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TES_Learning_App.Application_Layer    .DTOs.Auth;
 using TES_Learning_App.Application_Layer.Interfaces.IServices;
 using TES_Learning_App.Application_Layer.DTOs.Auth.Requests;
+using TES_Learning_App.Application_Layer.DTOs.Auth.Response;
 using Microsoft.AspNetCore.Http;
 
 namespace TES_Learning_App.API.Controllers
@@ -23,9 +24,20 @@ namespace TES_Learning_App.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
-            var result = await _authService.LoginAsync(dto);
-            if (!result.IsSuccess) return Unauthorized(result);
-            return Ok(result);
+            try
+            {
+                var result = await _authService.LoginAsync(dto);
+                if (!result.IsSuccess) return Unauthorized(result);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new AuthResponseDto 
+                { 
+                    IsSuccess = false, 
+                    Message = $"An error occurred during login: {ex.Message}" 
+                });
+            }
         }
 
         // Example of a secure endpoint

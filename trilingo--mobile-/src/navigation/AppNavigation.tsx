@@ -20,6 +20,7 @@ const getFullImageUrl = (imageUrl: string): string => {
 };
 
 import HomeScreen from '../screens/HomeScreen';
+import ExerciseScreen from '../screens/ExerciseScreen';
 import LessonScreen from '../screens/LessonScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
@@ -287,6 +288,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Songs" component={SongsScreen} />
         <Stack.Screen name="Stories" component={StoriesScreen} />
         <Stack.Screen name="Activities" component={ActivitiesScreen} />
+        <Stack.Screen name="Exercise" component={ExerciseScreen} />
       </Stack.Navigator>
   );
 }

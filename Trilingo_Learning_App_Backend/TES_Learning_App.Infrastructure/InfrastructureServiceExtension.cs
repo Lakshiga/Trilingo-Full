@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Amazon.S3;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TES_Learning_App.Application_Layer.Interfaces.Infrastructure;
@@ -26,6 +27,25 @@ namespace TES_Learning_App.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             // 3. Register External Services
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IS3Service, S3Service>();
+            services.AddSingleton<IAmazonS3>(sp =>
+            {
+                var config = sp.GetRequiredService<IConfiguration>();
+                var region = config["AWS:Region"];
+                var accessKey = config["AWS:AccessKeyId"];
+                var secretKey = config["AWS:SecretAccessKey"];
+
+                var regionEndpoint = Amazon.RegionEndpoint.GetBySystemName(region ?? "ap-southeast-1");
+
+                if (!string.IsNullOrEmpty(accessKey) && !string.IsNullOrEmpty(secretKey))
+                {
+                    return new AmazonS3Client(accessKey, secretKey, regionEndpoint);
+                }
+                else
+                {
+                    return new AmazonS3Client(regionEndpoint);
+                }
+            });
             // Add other services here later (e.g., IEmailService)
 
             return services;

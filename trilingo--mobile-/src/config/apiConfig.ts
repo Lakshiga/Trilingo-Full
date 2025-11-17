@@ -17,8 +17,11 @@ export const API_CONFIG = {
   // For Web/Expo Go
   WEB: 'http://localhost:5166/api',
 
-  // Production URL (update when deploying)
-  PRODUCTION: 'https://your-backend-url.com/api',
+  // Production URL (CloudFront)
+  PRODUCTION: 'https://d3v81eez8ecmto.cloudfront.net/api',
+  
+  // CloudFront URL for static assets
+  CLOUDFRONT: 'https://d3v81eez8ecmto.cloudfront.net',
 };
 
 const normalizeApiUrl = (url: string): string => {
@@ -88,6 +91,26 @@ const deriveHostFromRuntime = (): string | null => {
 };
 
 export const getApiBaseUrl = (): string => {
+  // Check for production environment variable
+  const isProduction = (process as any)?.env?.EXPO_PUBLIC_ENV === 'production' || 
+                       (process as any)?.env?.NODE_ENV === 'production';
+  
+  // Option 1: Use CloudFront (Production)
+  // return API_CONFIG.PRODUCTION;
+  
+  // Option 2: Use EC2 directly (For testing if CloudFront not working)
+  // Uncomment below to use EC2 directly:
+  return 'http://13.250.26.7:5166/api';
+  
+  // Option 3: Use CloudFront (Uncomment if EC2 direct works)
+  // return API_CONFIG.PRODUCTION;
+  
+  /* Uncomment below to use local backend for development:
+  if (isProduction) {
+    return API_CONFIG.PRODUCTION;
+  }
+  */
+
   const fromEnv = (process as any)?.env?.EXPO_PUBLIC_API_URL || (process as any)?.env?.API_URL;
   if (fromEnv && typeof fromEnv === 'string') {
     return normalizeApiUrl(fromEnv);
@@ -128,6 +151,9 @@ export const FALLBACK_URLS = [
 // Current API base URL
 export const API_BASE_URL = getApiBaseUrl();
 export const API_TIMEOUT = 10000; // 10 seconds
+
+// CloudFront URL for static assets (images, etc.)
+export const CLOUDFRONT_URL = API_CONFIG.CLOUDFRONT;
 
 // Instructions for updating the URL:
 /*

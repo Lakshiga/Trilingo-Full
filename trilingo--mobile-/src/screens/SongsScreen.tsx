@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../theme/ThemeContext';
+import apiService, { ActivityDto } from '../services/api';
+import { CLOUDFRONT_URL } from '../config/apiConfig';
 
 // Define the song type
 type Song = {
@@ -12,6 +14,7 @@ type Song = {
   artist: string;
   duration: string;
   coverImage?: string;
+  songUrl?: string;
   emoji: string;
   gradient: readonly [string, string];
 };
@@ -23,6 +26,7 @@ const SongsScreen: React.FC = () => {
   const [filteredSongs, setFilteredSongs] = useState<Song[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Function to lighten a hex color
   const lightenColor = (hex: string, percent: number) => {
@@ -36,57 +40,108 @@ const SongsScreen: React.FC = () => {
       (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
   };
 
-  // Mock data for songs with emojis and gradients
+  // Fetch songs from backend (Activities with ActivityTypeId = 6 for Song Player)
   useEffect(() => {
-    const mockSongs: Song[] = [
-      {
-        id: '1',
-        title: 'Alphabet Song',
-        artist: 'Learning Tunes',
-        duration: '2:30',
-        coverImage: '',
-        emoji: '🔤',
-        gradient: ['#FF6B9D', '#FF8FAB'] as const,
-      },
-      {
-        id: '2',
-        title: 'Numbers Rhyme',
-        artist: 'Math Melodies',
-        duration: '1:45',
-        coverImage: '',
-        emoji: '🔢',
-        gradient: ['#4ECDC4', '#6EDDD8'] as const,
-      },
-      {
-        id: '3',
-        title: 'Colors Song',
-        artist: 'Artistic Voices',
-        duration: '3:15',
-        coverImage: '',
-        emoji: '🎨',
-        gradient: ['#5B9FFF', '#7BB5FF'] as const,
-      },
-      {
-        id: '4',
-        title: 'Animal Sounds',
-        artist: 'Nature Notes',
-        duration: '2:10',
-        coverImage: '',
-        emoji: '🦁',
-        gradient: ['#A77BCA', '#BA91DA'] as const,
-      },
-      {
-        id: '5',
-        title: 'Days of the Week',
-        artist: 'Time Tunes',
-        duration: '2:50',
-        coverImage: '',
-        emoji: '📅',
-        gradient: ['#FFA726', '#FFB84D'] as const,
-      },
-    ];
-    setSongs(mockSongs);
-    setFilteredSongs(mockSongs);
+    const fetchSongs = async () => {
+      try {
+        setLoading(true);
+        const allActivities = await apiService.getAllActivities();
+        
+        // Filter activities with ActivityTypeId = 6 (Song Player)
+        const songActivities = allActivities.filter(activity => activity.activityTypeId === 6);
+        
+        // Map activities to songs
+        const mappedSongs: Song[] = songActivities.map((activity, index) => {
+          let songData: any = {};
+          
+          // Parse Details_JSON to get song data
+          if (activity.details_JSON) {
+            try {
+              const parsed = JSON.parse(activity.details_JSON);
+              songData = parsed.songData || parsed;
+            } catch (e) {
+              console.error('Error parsing song JSON:', e);
+            }
+          }
+
+          // Get song URL from AWS (CloudFront)
+          let songUrl = '';
+          if (songData.audioUrl) {
+            // Handle multilingual audio URL
+            if (typeof songData.audioUrl === 'object') {
+              songUrl = songData.audioUrl.en || songData.audioUrl.ta || songData.audioUrl.si || '';
+            } else {
+              songUrl = songData.audioUrl;
+            }
+            
+            // Convert to full CloudFront URL if it's a relative path
+            if (songUrl && !songUrl.startsWith('http')) {
+              songUrl = songUrl.startsWith('/') 
+                ? `${CLOUDFRONT_URL}${songUrl}`
+                : `${CLOUDFRONT_URL}/${songUrl}`;
+            }
+          }
+
+          // Get cover image URL
+          let coverImage = '';
+          if (songData.albumArtUrl) {
+            coverImage = songData.albumArtUrl;
+            if (!coverImage.startsWith('http')) {
+              coverImage = coverImage.startsWith('/')
+                ? `${CLOUDFRONT_URL}${coverImage}`
+                : `${CLOUDFRONT_URL}/${coverImage}`;
+            }
+          }
+
+          // Get title (multilingual)
+          const title = songData.title 
+            ? (typeof songData.title === 'object' 
+                ? (songData.title.en || songData.title.ta || songData.title.si || activity.name_en)
+                : songData.title)
+            : activity.name_en || activity.name_ta || activity.name_si || 'Song';
+
+          // Get artist
+          const artist = songData.artist || 'Unknown Artist';
+
+          // Gradients for songs
+          const gradients: readonly [string, string][] = [
+            ['#FF6B9D', '#FF8FAB'] as const,
+            ['#4ECDC4', '#6EDDD8'] as const,
+            ['#5B9FFF', '#7BB5FF'] as const,
+            ['#A77BCA', '#BA91DA'] as const,
+            ['#FFA726', '#FFB84D'] as const,
+          ];
+
+          return {
+            id: activity.id.toString(),
+            title: title,
+            artist: artist,
+            duration: '0:00', // Duration can be calculated from audio if needed
+            coverImage: coverImage,
+            songUrl: songUrl,
+            emoji: '🎵',
+            gradient: gradients[index % gradients.length],
+          };
+        });
+
+        setSongs(mappedSongs);
+        setFilteredSongs(mappedSongs);
+      } catch (error: any) {
+        console.error('Error fetching songs:', error);
+        Alert.alert(
+          'Error',
+          'Could not load songs. Please try again.',
+          [{ text: 'OK' }]
+        );
+        // Use empty array on error
+        setSongs([]);
+        setFilteredSongs([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSongs();
   }, []);
 
   // Filter songs based on search query
@@ -197,14 +252,30 @@ const SongsScreen: React.FC = () => {
         />
       </View>
 
+      {/* Loading Indicator */}
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#fff" />
+          <Text style={styles.loadingText}>Loading songs...</Text>
+        </View>
+      )}
+
       {/* Songs List */}
-      <FlatList
-        data={filteredSongs}
-        keyExtractor={item => item.id}
-        renderItem={renderSongItem}
-        contentContainerStyle={styles.songList}
-        showsVerticalScrollIndicator={false}
-      />
+      {!loading && (
+        <FlatList
+          data={filteredSongs}
+          keyExtractor={item => item.id}
+          renderItem={renderSongItem}
+          contentContainerStyle={styles.songList}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No songs available yet.</Text>
+              <Text style={styles.emptySubtext}>Check back later!</Text>
+            </View>
+          }
+        />
+      )}
 
       {/* Fun Player Controls */}
       {currentlyPlaying && (() => {
@@ -473,6 +544,35 @@ const styles = StyleSheet.create({
   },
   whiteText: {
     color: '#FFFFFF',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 50,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#fff',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 50,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#fff',
+    textAlign: 'center',
+    opacity: 0.8,
   },
 });
 
