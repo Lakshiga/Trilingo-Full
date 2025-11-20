@@ -1,0 +1,175 @@
+name: Deploy .NET Backend to AWS EC2
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Detect backend directory
+        id: backend-dir
+        run: |
+          if [ -d "Trilingo_Learning_App_Backend" ]; then
+            echo "BACKEND_DIR=Trilingo_Learning_App_Backend" >> $GITHUB_OUTPUT
+          elif [ -f "TES_Learning_App.API/TES_Learning_App.API.csproj" ]; then
+            echo "BACKEND_DIR=." >> $GITHUB_OUTPUT
+          else
+            echo "❌ Backend directory not found!"
+            exit 1
+          fi
+
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: ${{ steps.backend-dir.outputs.BACKEND_DIR }}
+
+      - name: Build application
+        run: dotnet build --configuration Release --no-restore
+        working-directory: ${{ steps.backend-dir.outputs.BACKEND_DIR }}
+
+      - name: Publish application
+        run: dotnet publish TES_Learning_App.API/TES_Learning_App.API.csproj --configuration Release --output ./TES_Learning_App.API/publish --no-build
+        working-directory: ${{ steps.backend-dir.outputs.BACKEND_DIR }}
+
+      # ---------------------------------------------------------
+      # FIX APPLIED: Changed Type=notify to Type=simple
+      # This prevents the "Core Dump" / Timeout error.
+      # ---------------------------------------------------------
+      - name: Create Systemd Service File
+        run: |
+          cat <<EOF > trilingo-backend.service
+          [Unit]
+          Description=Trilingo Learning App Backend API
+          After=network.target
+
+          [Service]
+          Type=simple
+          User=${{ secrets.EC2_USER }}
+          WorkingDirectory=/var/www/trilingo-backend
+          ExecStart=/usr/bin/dotnet /var/www/trilingo-backend/TES_Learning_App.API.dll
+          Restart=always
+          RestartSec=10
+          KillSignal=SIGINT
+          SyslogIdentifier=trilingo-backend
+          Environment=ASPNETCORE_ENVIRONMENT=Production
+          Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+          Environment="ConnectionStrings__DefaultConnection=${{ secrets.DB_CONNECTION_STRING }}"
+
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+
+      - name: Create deployment package
+        run: |
+          PUBLISH_DIR="${{ steps.backend-dir.outputs.BACKEND_DIR }}/TES_Learning_App.API/publish"
+          PACKAGE_NAME="deployment-package.zip"
+          echo "Creating zip package from $PUBLISH_DIR"
+          cd "$PUBLISH_DIR"
+          zip -r "${GITHUB_WORKSPACE}/${PACKAGE_NAME}" .
+          cd "${GITHUB_WORKSPACE}"
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy files to EC2
+        run: |
+          scp -i ~/.ssh/id_rsa deployment-package.zip ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/
+          scp -i ~/.ssh/id_rsa trilingo-backend.service ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/
+
+      - name: Deploy to EC2
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'ENDSSH'
+            set -e
+            
+            # Configuration
+            APP_DIR="/var/www/trilingo-backend"
+            BACKUP_DIR="/var/www/trilingo-backend-backup"
+            SERVICE_NAME="trilingo-backend"
+            
+            echo "🚀 Starting deployment..."
+            
+            # 1. Create directories
+            sudo mkdir -p $APP_DIR
+            sudo mkdir -p $BACKUP_DIR
+            
+            # 2. Stop service
+            if sudo systemctl is-active --quiet $SERVICE_NAME; then
+              echo "⏸️  Stopping service..."
+              sudo systemctl stop $SERVICE_NAME || true
+            fi
+            
+            # 3. Backup
+            if [ -d "$APP_DIR" ] && [ "$(ls -A $APP_DIR)" ]; then
+              echo "💾 Creating backup..."
+              sudo cp -r $APP_DIR/* $BACKUP_DIR/$(date +%Y%m%d_%H%M%S)/ 2>/dev/null || true
+            fi
+            
+            # 4. Extract New Files
+            echo "📦 Extracting package..."
+            TEMP_DIR=$(mktemp -d)
+            sudo unzip -q /tmp/deployment-package.zip -d $TEMP_DIR
+            
+            # 5. Preserve specific files (wwwroot/uploads)
+            if [ -d "$APP_DIR/wwwroot" ]; then
+              echo "  - Preserving wwwroot..."
+              sudo mkdir -p $TEMP_DIR/wwwroot
+              sudo cp -r $APP_DIR/wwwroot/* $TEMP_DIR/wwwroot/ 2>/dev/null || true
+            fi
+
+            # 6. Move files to App Dir
+            echo "🧹 Updating files..."
+            sudo rm -rf $APP_DIR/*
+            sudo cp -r $TEMP_DIR/* $APP_DIR/
+            
+            # 7. Install/Update Service File
+            echo "📝 Updating Systemd Service..."
+            sudo mv /tmp/trilingo-backend.service /etc/systemd/system/$SERVICE_NAME.service
+            
+            # 8. Permissions
+            echo "🔐 Setting permissions..."
+            sudo chown -R ${{ secrets.EC2_USER }}:${{ secrets.EC2_USER }} $APP_DIR
+            sudo chmod +x $APP_DIR/TES_Learning_App.API.dll || true
+            
+            # 9. Restart Service
+            echo "🔄 Restarting service..."
+            sudo systemctl daemon-reload
+            sudo systemctl enable $SERVICE_NAME
+            sudo systemctl start $SERVICE_NAME
+            
+            # 10. Cleanup
+            sudo rm -rf $TEMP_DIR
+            sudo rm -f /tmp/deployment-package.zip
+            
+            # 11. Check Status
+            echo "⏳ Waiting for service to initialize..."
+            sleep 5
+            
+            if sudo systemctl is-active --quiet $SERVICE_NAME; then
+              echo "✅ Service started successfully!"
+              sudo systemctl status $SERVICE_NAME --no-pager -l
+            else
+              echo "❌ Service failed to start. Showing logs:"
+              sudo journalctl -u $SERVICE_NAME --no-pager -n 50
+              exit 1
+            fi
+          ENDSSH
+      
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/id_rsa
