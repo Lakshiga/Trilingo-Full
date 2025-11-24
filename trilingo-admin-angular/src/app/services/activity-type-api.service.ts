@@ -10,6 +10,7 @@ export interface ActivityTypeResponse {
   name_ta: string;
   name_si: string;
   jsonMethod?: string;
+  mainActivityId: number;
 }
 
 export interface ActivityTypeCreateDto {
@@ -17,6 +18,7 @@ export interface ActivityTypeCreateDto {
   name_ta: string;
   name_si: string;
   jsonMethod?: string;
+  mainActivityId: number;
 }
 
 @Injectable({
@@ -29,6 +31,12 @@ export class ActivityTypeApiService {
 
   getAll(): Observable<ActivityTypeResponse[]> {
     return this.httpClient.get<ActivityTypeResponse[]>(this.endpoint);
+  }
+
+  getByMainActivity(mainActivityId: number): Observable<ActivityTypeResponse[]> {
+    return this.httpClient.get<ActivityTypeResponse[]>(
+      `${this.endpoint}/by-main-activity/${mainActivityId}`
+    );
   }
 
   create(newItem: ActivityTypeCreateDto): Observable<ActivityTypeResponse> {
@@ -45,6 +53,7 @@ export class ActivityTypeApiService {
               name_ta: created.name_ta,
               name_si: created.name_si,
               jsonMethod: json,
+              mainActivityId: created.mainActivityId || newItem.mainActivityId, // Include mainActivityId
             })
             .pipe(map(() => ({ ...created, jsonMethod: json })));
         })

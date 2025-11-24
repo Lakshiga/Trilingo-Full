@@ -83,6 +83,9 @@ namespace TES_Learning_App.Infrastructure.Migrations
                     b.Property<string>("JsonMethod")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("MainActivityId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name_en")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -99,6 +102,8 @@ namespace TES_Learning_App.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MainActivityId");
 
                     b.ToTable("ActivityTypes");
                 });
@@ -452,6 +457,17 @@ namespace TES_Learning_App.Infrastructure.Migrations
                     b.Navigation("Stage");
                 });
 
+            modelBuilder.Entity("TES_Learning_App.Domain.Entities.ActivityType", b =>
+                {
+                    b.HasOne("TES_Learning_App.Domain.Entities.MainActivity", "MainActivity")
+                        .WithMany("ActivityTypes")
+                        .HasForeignKey("MainActivityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MainActivity");
+                });
+
             modelBuilder.Entity("TES_Learning_App.Domain.Entities.Admin", b =>
                 {
                     b.HasOne("TES_Learning_App.Domain.Entities.User", "User")
@@ -554,6 +570,8 @@ namespace TES_Learning_App.Infrastructure.Migrations
             modelBuilder.Entity("TES_Learning_App.Domain.Entities.MainActivity", b =>
                 {
                     b.Navigation("Activities");
+
+                    b.Navigation("ActivityTypes");
                 });
 
             modelBuilder.Entity("TES_Learning_App.Domain.Entities.Role", b =>
